@@ -1,0 +1,19 @@
+import Link from "next/link";
+
+export default function NotFound() {
+  return (
+    <main className="mx-auto flex min-h-screen max-w-[1200px] flex-col items-center justify-center px-6 lg:px-12">
+      <h1 className="font-mono text-7xl font-bold tracking-tight text-accent">404</h1>
+      <p className="mt-4 font-mono text-sm text-fg-secondary">page not found</p>
+      <Link
+        href="/"
+        className="group mt-8 inline-flex items-center gap-2 font-mono text-sm text-fg transition-colors hover:text-accent"
+      >
+        <span aria-hidden className="transition-transform group-hover:-translate-x-1">
+          ←
+        </span>
+        back home
+      </Link>
+    </main>
+  );
+}
