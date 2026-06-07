@@ -66,6 +66,7 @@ Project screenshots and media live in:
 public/media/projects/[project-slug]/
 public/media/screenshots/
 public/media/archive/
+public/reports/
 ```
 
 Use clear filenames such as:
@@ -94,6 +95,16 @@ media: [
 ```
 
 Only use real screenshots, repo assets, or honest project outputs. If a project does not have UI media yet, leave `media: []` and keep the card in the archive with a conservative note.
+
+## Security Reports
+
+Public portfolio reports live in:
+
+```text
+public/reports/
+```
+
+The Cyberlou penetration test report is linked from the Security Assessment section as both PDF and DOCX.
 
 ## Resume PDF
 

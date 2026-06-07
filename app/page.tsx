@@ -10,6 +10,7 @@ import ProjectCategoryShowcase from "@/components/ProjectCategoryShowcase";
 import ProofBar from "@/components/ProofBar";
 import ResumeCTA from "@/components/ResumeCTA";
 import SectionHeader from "@/components/SectionHeader";
+import SecurityReportSection from "@/components/SecurityReportSection";
 import SkillsGrid from "@/components/SkillsGrid";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
         <FeaturedBuilds />
         <FoFitEcosystem />
         <ProjectCategoryShowcase />
+        <SecurityReportSection />
         <section id="archive" className="section-shell py-20">
           <SectionHeader eyebrow="All Builds / Repository Archive" title="Complete body of work.">
             Every listed GitHub repository is included with status, category, stack, tags, and a
