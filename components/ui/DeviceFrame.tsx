@@ -15,8 +15,8 @@ export default function DeviceFrame({
 }) {
   if (kind === "phone") {
     return (
-      <div className="mx-auto aspect-[9/19.5] w-[260px] rounded-[36px] border-2 border-border bg-bg-elevated p-2 shadow-2xl">
-        <div className="relative h-full w-full overflow-hidden rounded-[28px] bg-bg">
+      <div className="border-border bg-bg-elevated mx-auto aspect-[9/19.5] w-[260px] rounded-[36px] border-2 p-2 shadow-2xl">
+        <div className="bg-bg relative h-full w-full overflow-hidden rounded-[28px]">
           <Image
             src={src}
             alt={alt}
@@ -33,12 +33,12 @@ export default function DeviceFrame({
   }
   if (kind === "browser") {
     return (
-      <div className="w-full overflow-hidden rounded-lg border border-border bg-bg-elevated">
-        <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-status-error/60" />
-          <span className="h-2.5 w-2.5 rounded-full bg-status-active/60" />
-          <span className="h-2.5 w-2.5 rounded-full bg-accent/60" />
-          <span className="ml-3 font-mono text-[10px] text-fg-muted">{alt}</span>
+      <div className="border-border bg-bg-elevated w-full overflow-hidden rounded-lg border">
+        <div className="border-border flex items-center gap-2 border-b px-3 py-2">
+          <span className="bg-status-error/60 h-2.5 w-2.5 rounded-full" />
+          <span className="bg-status-active/60 h-2.5 w-2.5 rounded-full" />
+          <span className="bg-accent/60 h-2.5 w-2.5 rounded-full" />
+          <span className="text-fg-muted ml-3 font-mono text-[10px]">{alt}</span>
         </div>
         <div className="relative aspect-[16/10]">
           <Image
@@ -54,8 +54,8 @@ export default function DeviceFrame({
     );
   }
   return (
-    <div className="w-full overflow-hidden rounded-lg border border-border bg-bg font-mono">
-      <div className="border-b border-border px-3 py-2 text-[10px] text-fg-muted">{alt}</div>
+    <div className="border-border bg-bg w-full overflow-hidden rounded-lg border font-mono">
+      <div className="border-border text-fg-muted border-b px-3 py-2 text-[10px]">{alt}</div>
       <div className="relative aspect-[16/10]">
         <Image
           src={src}

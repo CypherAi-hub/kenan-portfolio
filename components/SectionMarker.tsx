@@ -6,10 +6,7 @@ import { ease } from "@/lib/motion";
 export default function SectionMarker({ number, label }: { number: string; label: string }) {
   const { ref, inView } = useInViewOnce<HTMLDivElement>();
   return (
-    <div
-      ref={ref}
-      className="flex items-center gap-4 font-mono text-xs uppercase tracking-[0.12em] text-fg-muted"
-    >
+    <div ref={ref} className="text-fg-muted flex items-center gap-4 font-mono text-xs uppercase">
       <motion.span
         className="text-accent"
         initial={{ opacity: 0 }}
@@ -27,7 +24,7 @@ export default function SectionMarker({ number, label }: { number: string; label
       </motion.span>
       <motion.span
         aria-hidden
-        className="ml-2 h-px max-w-[280px] flex-1 origin-left bg-border"
+        className="bg-border ml-2 h-px max-w-[280px] flex-1 origin-left"
         initial={{ scaleX: 0 }}
         animate={inView ? { scaleX: 1 } : {}}
         transition={{ duration: 0.7, ease: ease.out, delay: 0.2 }}

@@ -24,7 +24,7 @@ export default function AWSVisual() {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="absolute inset-0 m-0 overflow-auto bg-bg p-5 font-mono text-[11px] leading-[1.55] text-fg-secondary"
+      className="bg-bg text-fg-secondary absolute inset-0 m-0 overflow-auto p-5 font-mono text-[11px] leading-[1.55]"
     >
       {code.split("\n").map((line, i) => (
         <motion.div
@@ -34,7 +34,7 @@ export default function AWSVisual() {
           viewport={{ once: true }}
           transition={{ delay: 0.1 + i * 0.04 }}
         >
-          <span className="tabular mr-4 select-none text-fg-dimmed">
+          <span className="tabular text-fg-dimmed mr-4 select-none">
             {String(i + 1).padStart(2, "0")}
           </span>
           <span

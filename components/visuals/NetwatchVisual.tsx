@@ -5,7 +5,12 @@ const LOGS = [
   { t: "12:04:11", k: "TCP", msg: "443 → 10.0.1.4 :: ALLOW", c: "text-fg-secondary" },
   { t: "12:04:12", k: "DNS", msg: "lookup: api.fofit.app :: OK", c: "text-fg-secondary" },
   { t: "12:04:14", k: "ALERT", msg: "anomaly score 0.87 on host-7", c: "text-status-active" },
-  { t: "12:04:15", k: "TCP", msg: "22 → 10.0.1.9 :: DENY policy=ssh-block", c: "text-status-error" },
+  {
+    t: "12:04:15",
+    k: "TCP",
+    msg: "22 → 10.0.1.9 :: DENY policy=ssh-block",
+    c: "text-status-error",
+  },
   { t: "12:04:17", k: "TCP", msg: "443 → 10.0.1.4 :: ALLOW", c: "text-fg-secondary" },
   { t: "12:04:19", k: "INFO", msg: "rotating session keys :: OK", c: "text-fg-secondary" },
   { t: "12:04:21", k: "ALERT", msg: "egress spike 480MB/s on if-eth0", c: "text-status-active" },
@@ -14,7 +19,7 @@ const LOGS = [
 
 export default function NetwatchVisual() {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-bg p-4 font-mono text-[10px]">
+    <div className="bg-bg absolute inset-0 overflow-hidden p-4 font-mono text-[10px]">
       <div className="text-fg-muted">netwatch · live · tap=eth0</div>
       <div className="mt-2 space-y-1">
         {LOGS.map((l, i) => (

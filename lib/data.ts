@@ -1,153 +1,106 @@
-export type ProjectStatus = "live" | "active" | "early" | "shipped" | "private";
+import type { Project, ProjectStatus } from "@/data/projects";
 
-export type Project = {
-  slug: string;
-  index: string;
-  title: string;
-  status: ProjectStatus;
-  category: string;
-  blurb: string;
-  body: string;
-  stack: string[];
-  links: { live?: string; github?: string; case?: string };
-  visual: "fofit" | "cypher" | "ultraflips" | "netwatch" | "aws";
-};
-
-export const projects: Project[] = [
-  {
-    slug: "fofit",
-    index: "P/01",
-    title: "FoFit",
-    status: "live",
-    category: "MOBILE · AI",
-    blurb: "AI fitness coach that builds & adapts plans from your real workout history.",
-    body: "Founded and shipped solo. React Native + Expo on iOS, Supabase for auth/data/storage, OpenAI for plan generation and adaptive progression. Live at fofit.app.",
-    stack: ["React Native", "Expo", "Supabase", "OpenAI", "TypeScript"],
-    links: { live: "https://fofit.app", github: "https://github.com/CypherAi-hub" },
-    visual: "fofit",
-  },
-  {
-    slug: "cypher-os",
-    index: "P/02",
-    title: "Cypher OS",
-    status: "active",
-    category: "DESKTOP · AGENTIC AI",
-    blurb: "Sovereign AI command system. 30+ specialized agents across 8 departments.",
-    body: "Tauri 2 + React + TypeScript + SQLite. Local-first, privacy-respecting, built around an orchestration layer that routes tasks to domain-specialized agents.",
-    stack: ["Tauri 2", "React", "TypeScript", "SQLite", "Rust"],
-    links: { github: "https://github.com/CypherAi-hub" },
-    visual: "cypher",
-  },
-  {
-    slug: "ultraflips",
-    index: "P/03",
-    title: "UltraFlips",
-    status: "early",
-    category: "WEB · MARKETPLACE",
-    blurb: "Pokémon TCG marketplace with AI-driven pricing and condition grading.",
-    body: "Next.js 15 + Supabase + Stripe Connect for marketplace payments, Anthropic SDK for grading assistance, Inngest for background jobs (price syncs, payouts).",
-    stack: ["Next.js 15", "Supabase", "Stripe Connect", "Anthropic", "Inngest"],
-    links: {},
-    visual: "ultraflips",
-  },
-  {
-    slug: "netwatch",
-    index: "P/04",
-    title: "Netwatch",
-    status: "shipped",
-    category: "SECURITY · MONITORING",
-    blurb: "SOC-style network monitoring dashboard with anomaly scoring.",
-    body: "Supabase backend, real-time event ingestion, anomaly heuristics. Built to mirror the cadence of an entry-level SOC console.",
-    stack: ["Supabase", "TypeScript", "Postgres", "Realtime"],
-    links: { github: "https://github.com/CypherAi-hub" },
-    visual: "netwatch",
-  },
-  {
-    slug: "aws-image-label",
-    index: "P/05",
-    title: "AWS Image Label Generator",
-    status: "shipped",
-    category: "CLOUD · ML",
-    blurb: "Python + boto3 pipeline using Rekognition for batch image labeling.",
-    body: "Demonstrates IAM-scoped service access, S3 ingest, and Rekognition orchestration. Lightweight, scriptable, runs as a CLI.",
-    stack: ["Python", "boto3", "AWS Rekognition", "S3"],
-    links: { github: "https://github.com/CypherAi-hub" },
-    visual: "aws",
-  },
-];
-
-export type Writeup = {
-  slug: string;
-  index: string;
-  category: string;
-  title: string;
-  summary: string;
-  href: string;
-};
-
-// TODO(kenan): replace these placeholder writeups with real ones.
-export const writeups: Writeup[] = [
-  {
-    slug: "todo-1",
-    index: "W/01",
-    category: "PHISHING SIM",
-    title: "TODO: real writeup title",
-    summary: "TODO: 1-2 sentence summary of the engagement, scope, and outcome.",
-    href: "/writeups/todo-1",
-  },
-  {
-    slug: "todo-2",
-    index: "W/02",
-    category: "PEN TEST",
-    title: "TODO: real writeup title",
-    summary: "TODO: replace with actual finding overview.",
-    href: "/writeups/todo-2",
-  },
-  {
-    slug: "todo-3",
-    index: "W/03",
-    category: "NETWORK",
-    title: "TODO: real writeup title",
-    summary: "TODO: real summary.",
-    href: "/writeups/todo-3",
-  },
-  {
-    slug: "todo-4",
-    index: "W/04",
-    category: "AI SECURITY",
-    title: "TODO: real writeup title",
-    summary: "TODO: real summary.",
-    href: "/writeups/todo-4",
-  },
-  {
-    slug: "todo-5",
-    index: "W/05",
-    category: "CLOUD",
-    title: "TODO: real writeup title",
-    summary: "TODO: real summary.",
-    href: "/writeups/todo-5",
-  },
-  {
-    slug: "todo-6",
-    index: "W/06",
-    category: "OSINT",
-    title: "TODO: real writeup title",
-    summary: "TODO: real summary.",
-    href: "/writeups/todo-6",
-  },
-];
+export type { Project, ProjectStatus };
+export {
+  caseStudies,
+  featuredProjects,
+  foFitProjects,
+  projectCategories,
+  projects,
+} from "@/data/projects";
 
 export const profile = {
-  name: "KENAN LARRY",
-  tagline: "Cybersecurity & AI · Builder · St. Louis",
+  name: "Kenan Larry",
+  headline: "Cybersecurity & AI Student Building Applied AI Products",
   intro:
-    "I build sovereign tools and ship products. Currently studying Cybersecurity & AI at Maryville University, doing pen tests and phishing simulations as a student consultant at Maryville Business Solutions, and architecting a personal AI command system called Cypher OS. I shipped FoFit solo and it's live in users' hands.",
+    "I build full-stack AI, fitness-tech, cloud, and cybersecurity projects with a focus on real users, product execution, and technical problem-solving.",
+  status: "Seeking Summer 2027 Technology / Cybersecurity / AI Internships",
   location: "St. Louis, MO",
-  education: "B.S. Cybersecurity & AI, Maryville University · expected May 2028",
-  currently: "Architecting Cypher OS · Building UltraFlips",
-  openTo: "Internships · Security research · Founding-engineering work",
+  education: "Cybersecurity & AI student at Maryville University",
+  currently: "Building FoFit, FoFit Coach, and applied AI/cybersecurity projects",
+  openTo: "Summer 2027 Technology / Cybersecurity / AI internships",
   email: "kenan@kenanlarry.dev",
   github: "https://github.com/CypherAi-hub",
   linkedin: "https://www.linkedin.com/in/kenan-larry",
+  resumeUrl: "",
   copyright: `© ${new Date().getFullYear()} Kenan Larry. Built in St. Louis.`,
+};
+
+export const proofPoints = [
+  "Cybersecurity & AI Major",
+  "Founder/Builder of FoFit",
+  "React Native / Supabase / OpenAI API",
+  "AWS / Cloud Projects",
+  "Cybersecurity Projects",
+  "AI Agent Tools",
+  "St. Louis, MO",
+];
+
+export const experiences = [
+  {
+    role: "Student Consultant",
+    org: "Maryville Business Solutions",
+    summary:
+      "Consulting experience across technical problem-solving, client communication, security fundamentals, and business-facing delivery.",
+  },
+  {
+    role: "Technology Support Assistant",
+    org: "IST Management Services",
+    summary:
+      "Hands-on support work focused on reliability, troubleshooting, user assistance, and operational follow-through.",
+  },
+  {
+    role: "AI Training Specialist",
+    org: "Outlier AI",
+    summary:
+      "Evaluation and feedback work for AI-generated outputs, prompt quality, reasoning consistency, and model behavior.",
+  },
+  {
+    role: "Vehicle Prep / Operations",
+    org: "CarMax",
+    summary:
+      "Operations role framed around quality standards, consistency, process discipline, and work ethic.",
+  },
+];
+
+export const skillGroups = [
+  {
+    label: "Languages",
+    skills: ["Python", "JavaScript", "TypeScript"],
+  },
+  {
+    label: "Frontend / Mobile",
+    skills: ["React", "Next.js", "React Native", "Expo", "Tailwind CSS"],
+  },
+  {
+    label: "Backend / Data",
+    skills: ["Supabase", "PostgreSQL basics", "Authentication", "APIs"],
+  },
+  {
+    label: "AI",
+    skills: ["OpenAI API", "LLM evaluation", "Prompt engineering", "AI product workflows"],
+  },
+  {
+    label: "Cloud",
+    skills: ["AWS S3", "AWS Rekognition", "Cloud project workflows"],
+  },
+  {
+    label: "Cybersecurity",
+    skills: [
+      "Risk assessment",
+      "Phishing simulations",
+      "Penetration testing basics",
+      "Networking fundamentals",
+      "SIEM basics",
+    ],
+  },
+  {
+    label: "Tools",
+    skills: ["Git", "GitHub", "Vercel", "VS Code"],
+  },
+];
+
+export const certification = {
+  name: "CompTIA Security+",
+  status: "In Progress",
 };

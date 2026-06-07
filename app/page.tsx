@@ -1,37 +1,40 @@
-import Hero from "@/components/Hero";
-import SectionMarker from "@/components/SectionMarker";
-import ProjectCard from "@/components/ProjectCard";
-import SecurityWriteups from "@/components/SecurityWriteups";
-import About from "@/components/About";
-import Contact from "@/components/Contact";
+import CaseStudySection from "@/components/CaseStudySection";
+import ContactSection from "@/components/ContactSection";
+import ExperienceTimeline from "@/components/ExperienceTimeline";
+import FeaturedBuilds from "@/components/FeaturedBuilds";
 import Footer from "@/components/Footer";
-import { projects } from "@/lib/data";
+import FoFitEcosystem from "@/components/FoFitEcosystem";
+import Hero from "@/components/Hero";
+import ProjectArchive from "@/components/ProjectArchive";
+import ProjectCategoryShowcase from "@/components/ProjectCategoryShowcase";
+import ProofBar from "@/components/ProofBar";
+import ResumeCTA from "@/components/ResumeCTA";
+import SectionHeader from "@/components/SectionHeader";
+import SkillsGrid from "@/components/SkillsGrid";
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-[1200px] px-6 lg:px-12">
+    <>
       <Hero />
-      <section id="work" className="py-32">
-        <SectionMarker number="01" label="selected work" />
-        <div className="mt-16 grid gap-8">
-          {projects.map((p, i) => (
-            <ProjectCard key={p.slug} project={p} index={i} />
-          ))}
-        </div>
-      </section>
-      <section id="writeups" className="py-32">
-        <SectionMarker number="02" label="security writeups" />
-        <SecurityWriteups />
-      </section>
-      <section id="about" className="py-32">
-        <SectionMarker number="03" label="about" />
-        <About />
-      </section>
-      <section id="contact" className="py-32">
-        <SectionMarker number="04" label="contact" />
-        <Contact />
-      </section>
-      <Footer />
-    </main>
+      <ProofBar />
+      <main className="mx-auto max-w-[1280px] px-4 lg:px-8">
+        <FeaturedBuilds />
+        <FoFitEcosystem />
+        <ProjectCategoryShowcase />
+        <section id="archive" className="section-shell py-20">
+          <SectionHeader eyebrow="All Builds / Repository Archive" title="Complete body of work.">
+            Every listed GitHub repository is included with status, category, stack, tags, and a
+            GitHub link. Search and filters make it fast to scan.
+          </SectionHeader>
+          <ProjectArchive />
+        </section>
+        <CaseStudySection />
+        <ExperienceTimeline />
+        <SkillsGrid />
+        <ResumeCTA />
+        <ContactSection />
+        <Footer />
+      </main>
+    </>
   );
 }

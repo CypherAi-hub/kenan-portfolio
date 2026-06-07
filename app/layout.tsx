@@ -8,16 +8,22 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kenanlarry.dev"),
-  title: { default: "Kenan Larry — Cybersecurity & AI · Builder", template: "%s · Kenan Larry" },
+  title: { default: "Kenan Larry | Cybersecurity & AI Student", template: "%s | Kenan Larry" },
   description:
-    "Cybersecurity & AI student at Maryville University. Founder of FoFit. Architecting Cypher OS. Based in St. Louis.",
+    "Portfolio of Kenan Larry, a Cybersecurity & AI student building applied AI, fitness-tech, cloud, and cybersecurity projects.",
   openGraph: {
-    title: "Kenan Larry",
-    description: "Cybersecurity & AI · Builder · St. Louis",
+    title: "Kenan Larry | Cybersecurity & AI Student",
+    description:
+      "Applied AI, fitness-tech, cloud, cybersecurity, and business-facing software projects by Kenan Larry.",
     type: "website",
     url: "https://kenanlarry.dev",
+    siteName: "Kenan Larry Portfolio",
   },
-  twitter: { card: "summary_large_image", creator: "@cypher_ai" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kenan Larry | Cybersecurity & AI Student",
+    description: "Applied AI, cloud, cybersecurity, and product builds.",
+  },
   robots: { index: true, follow: true },
 };
 
