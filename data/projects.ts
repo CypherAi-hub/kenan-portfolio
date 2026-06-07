@@ -111,6 +111,66 @@ export const projects: Project[] = [
     liveUrl: "https://fofit.vercel.app",
     media: [
       projectImage(
+        "/media/projects/fofit/fofit-athlete-home.webp",
+        "FoFit mobile home screen for an independent basketball athlete with training and recovery prompts",
+        "Athlete home",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-cypher-athlete-coach.webp",
+        "FoFit Cypher athlete coach screen recommending a guard speed and power workout block",
+        "Cypher athlete coach",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-workout-proposal.webp",
+        "FoFit Cypher proposal modal suggesting a speed and power training day",
+        "Workout proposal",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-session-form-guide.webp",
+        "FoFit active workout session screen with form guide and coach moment controls",
+        "Session form guide",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-fuel-plan.webp",
+        "FoFit fuel plan screen with calorie targets, protein targets, and meal plan actions",
+        "Fuel plan",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-photo-meal-estimate.webp",
+        "FoFit photo meal estimate screen for logging macros from a meal image",
+        "Photo meal estimate",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-fuel-library.webp",
+        "FoFit fuel library screen with searchable athlete meals and macro details",
+        "Fuel library",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-energy-summary.webp",
+        "FoFit energy summary screen showing estimated calories and macro breakdown",
+        "Energy summary",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-practice-primer.webp",
+        "FoFit practice primer detail screen for a basketball guard court burst workout",
+        "Practice primer",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-brand-mark.webp",
+        "FoFit gradient lightning brand mark on a black background",
+        "FoFit brand mark",
+        "local",
+      ),
+      projectImage(
         "/media/projects/fofit/fofit-train.png",
         "FoFit mobile Train screen with workout plan and session controls",
         "Mobile Train screen",
