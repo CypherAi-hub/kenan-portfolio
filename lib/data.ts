@@ -19,10 +19,10 @@ export const profile = {
   education: "Cybersecurity & AI student at Maryville University",
   currently: "Building FoFit, FoFit Coach, and applied AI/cybersecurity projects",
   openTo: "Summer 2027 Technology / Cybersecurity / AI internships",
-  email: "kenan@kenanlarry.dev",
+  email: "kenanlarry8@gmail.com",
   github: "https://github.com/CypherAi-hub",
   linkedin: "https://www.linkedin.com/in/kenan-larry",
-  resumeUrl: "",
+  resumeUrl: "/resume.pdf",
   copyright: `© ${new Date().getFullYear()} Kenan Larry. Built in St. Louis.`,
 };
 
@@ -102,5 +102,5 @@ export const skillGroups = [
 
 export const certification = {
   name: "CompTIA Security+",
-  status: "In Progress",
+  status: "In Progress — Expected September 2026",
 };

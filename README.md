@@ -118,11 +118,8 @@ The visible resume CTA is disabled until that value is set so the site does not 
 
 ## Content Still Needed
 
-- Current resume PDF
 - Authenticated FoFit Coach dashboard screenshots once a safe demo workspace exists
 - Netwatch dashboard screenshots if/when the planned frontend is built
 - Additional screenshots for private/archive projects with no media yet: Cypher OS Archive, Ruflo OS, UltraFlips Mobile, Stack Mode, Get-funded, FoFit Content Lab
 - Final case-study copy, annotated screenshots, and demo notes
-- Confirmed email address
-- Security+ expected month/year
 - Any final live URLs that should replace temporary Vercel preview URLs
