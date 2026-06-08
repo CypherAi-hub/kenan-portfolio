@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   Award,
   BriefcaseBusiness,
+  ChevronLeft,
+  ChevronRight,
   CheckCircle2,
   Cpu,
   Download,
@@ -1220,6 +1222,21 @@ function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] 
   return [];
 }
 
+function getMediaSourceLabel(source: ProjectMedia["source"]) {
+  switch (source) {
+    case "live":
+      return "Live capture";
+    case "local":
+      return "Local app media";
+    case "repo":
+      return "Repository artifact";
+    case "generated":
+      return "Generated asset";
+    default:
+      return "Project media";
+  }
+}
+
 function getCurrentDistrict(player: { x: number; y: number }) {
   const center = { x: player.x + PLAYER.width / 2, y: player.y + PLAYER.height / 2 };
   return districts.find(
@@ -1685,7 +1702,37 @@ function DetailOverlay({
   const district = districtById.get(entity.district)!;
   const media = getEntityMedia(entity, project);
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
-  const selectedMedia = media[selectedMediaIndex] ?? media[0];
+  const selectedMediaSafeIndex = media.length ? Math.min(selectedMediaIndex, media.length - 1) : 0;
+  const selectedMedia = media[selectedMediaSafeIndex] ?? media[0];
+  const mediaSourceLabel = selectedMedia ? getMediaSourceLabel(selectedMedia.source) : undefined;
+  const proofPanels = project
+    ? [
+        { label: "Problem", value: project.problem ?? "Project problem statement coming soon." },
+        { label: "Built", value: project.built ?? project.longDescription },
+        { label: "Proves", value: project.proof ?? preset.proofType },
+      ]
+    : [
+        {
+          label: "Signal",
+          value: entity.subtitle,
+        },
+        {
+          label: "Context",
+          value: preset.proofLine,
+        },
+        {
+          label: "Proves",
+          value: preset.proofType,
+        },
+      ];
+
+  const selectRelativeMedia = useCallback(
+    (direction: number) => {
+      if (media.length < 2) return;
+      setSelectedMediaIndex((current) => (current + direction + media.length) % media.length);
+    },
+    [media.length],
+  );
 
   useEffect(() => {
     setSelectedMediaIndex(0);
@@ -1776,11 +1823,46 @@ function DetailOverlay({
                     priority={project?.featured}
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                  {media.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => selectRelativeMedia(-1)}
+                        aria-label="Show previous project screenshot"
+                        className="absolute top-1/2 left-3 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/16 bg-black/70 text-white/78 backdrop-blur transition hover:border-white/42 hover:text-white"
+                      >
+                        <ChevronLeft size={18} aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => selectRelativeMedia(1)}
+                        aria-label="Show next project screenshot"
+                        className="absolute top-1/2 right-3 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/16 bg-black/70 text-white/78 backdrop-blur transition hover:border-white/42 hover:text-white"
+                      >
+                        <ChevronRight size={18} aria-hidden />
+                      </button>
+                    </>
+                  )}
+                  {media.length > 0 && (
+                    <div className="absolute top-3 right-3 rounded border border-white/10 bg-black/68 px-2 py-1 font-mono text-[9px] text-white/64 uppercase backdrop-blur">
+                      {selectedMediaSafeIndex + 1}/{media.length}
+                    </div>
+                  )}
                   <div className="absolute right-3 bottom-3 left-3 rounded border border-white/10 bg-black/68 p-3 backdrop-blur">
-                    <p className="font-mono text-[10px] tracking-[0.14em] text-white/58 uppercase">
-                      Active media
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-mono text-[10px] tracking-[0.14em] text-white/58 uppercase">
+                        Active media
+                      </p>
+                      {mediaSourceLabel && (
+                        <span className="rounded border border-white/12 px-2 py-0.5 font-mono text-[9px] text-white/52 uppercase">
+                          {mediaSourceLabel}
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm font-semibold text-white">{selectedMedia.label}</p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-4 text-white/58">
+                      {selectedMedia.alt}
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -1799,14 +1881,14 @@ function DetailOverlay({
 
               {media.length > 1 && (
                 <div className="scrollbar-hide mt-3 flex gap-2 overflow-x-auto pb-1">
-                  {media.slice(0, 8).map((item, index) => (
+                  {media.map((item, index) => (
                     <button
                       key={item.src}
                       type="button"
                       onClick={() => setSelectedMediaIndex(index)}
                       className={cn(
                         "group relative h-20 w-28 shrink-0 overflow-hidden rounded border bg-black transition",
-                        selectedMediaIndex === index
+                        selectedMediaSafeIndex === index
                           ? "border-white"
                           : "border-white/12 hover:border-white/36",
                       )}
@@ -1862,6 +1944,17 @@ function DetailOverlay({
                   <div key={fact.label} className="rounded border border-white/10 bg-black/32 p-3">
                     <p className="text-fg-muted font-mono text-[9px] uppercase">{fact.label}</p>
                     <p className="mt-1 line-clamp-2 text-sm font-semibold">{fact.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 grid gap-2 md:grid-cols-3">
+                {proofPanels.map((panel) => (
+                  <div key={panel.label} className="rounded border border-white/10 bg-black/28 p-3">
+                    <p className="text-fg-muted font-mono text-[9px] tracking-[0.12em] uppercase">
+                      {panel.label}
+                    </p>
+                    <p className="text-fg-secondary mt-2 text-sm leading-5">{panel.value}</p>
                   </div>
                 ))}
               </div>
@@ -1941,6 +2034,12 @@ function DetailOverlay({
                       </span>
                     ))}
                   </div>
+                  {project.notes && (
+                    <div className="mt-4 rounded border border-white/10 bg-white/[0.03] p-3">
+                      <p className="text-fg-muted font-mono text-[9px] uppercase">Evidence note</p>
+                      <p className="text-fg-secondary mt-1 text-xs leading-5">{project.notes}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
