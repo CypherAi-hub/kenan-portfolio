@@ -107,7 +107,7 @@ type ShowroomPreset = {
 
 const WORLD = { width: 2360, height: 1540 };
 const PLAYER = { width: 34, height: 46 };
-const INTERACTION_DISTANCE = 128;
+const INTERACTION_DISTANCE = 168;
 
 const districts = [
   {
@@ -537,6 +537,23 @@ const entities: WorldEntity[] = [
     ],
   },
   {
+    id: "larry-investments",
+    kind: "building",
+    district: "career",
+    title: "Larry Investments HQ",
+    subtitle: "Company vision",
+    x: 1848,
+    y: 438,
+    w: 160,
+    h: 116,
+    accent: "#f1e4d4",
+    proof: [
+      "Honest venture umbrella for FoFit and a long-term portfolio of applied software products.",
+      "Current proof stays tied to real builds: fitness-tech, AI tools, cybersecurity projects, cloud automation, and business-facing software.",
+      "The goal is not fake company scale; it is founder direction, product taste, and consistent shipping.",
+    ],
+  },
+  {
     id: "google-cert",
     kind: "building",
     district: "museum",
@@ -908,6 +925,7 @@ const keyProofEntities = [
   "netwatch",
   "pentest-lab",
   "agentroom",
+  "larry-investments",
   "resume-terminal",
 ];
 
@@ -1034,6 +1052,21 @@ const showroomPresets: Record<string, ShowroomPreset> = {
     workflow: ["Paycheck split", "Debt plan", "Savings bucket", "Daily lock-in"],
     recruiterRead:
       "Shows range across mobile product categories while keeping prototype status honest.",
+  },
+  "larry-investments": {
+    room: "Founder Office",
+    visualMode: "proof",
+    proofType: "Company Vision",
+    proofLine:
+      "A company-vision stop that frames FoFit and future builds without pretending they are bigger than the current proof.",
+    workflow: [
+      "FoFit product family",
+      "AI/cyber builds",
+      "Business-facing software",
+      "Recruiter proof",
+    ],
+    recruiterRead:
+      "Shows founder ambition while keeping the evidence grounded in real repositories, screenshots, and case studies.",
   },
   "google-cert": {
     room: "Certification Trophy Hall",
@@ -2036,6 +2069,152 @@ function RecruiterMode({
   );
 }
 
+function QuestBoard({
+  visitedDistricts,
+  collected,
+  unlockedProof,
+  recruiterViewed,
+}: {
+  visitedDistricts: DistrictId[];
+  collected: string[];
+  unlockedProof: string[];
+  recruiterViewed: boolean;
+}) {
+  const tokenTotal = entities.filter((entity) => entity.kind === "collectible").length;
+  const quests = [
+    {
+      label: "Wake the world",
+      detail: "Open the MacBook or Whiteboard in Hometown.",
+      complete: unlockedProof.some((id) => ["laptop", "whiteboard"].includes(id)),
+    },
+    {
+      label: "Prove FoFit",
+      detail: "Visit Mobile HQ and Coach Center.",
+      complete: ["fofit-mobile", "fofit-coach"].every((id) => unlockedProof.includes(id)),
+    },
+    {
+      label: "Open cyber proof",
+      detail: "Inspect SOC, Netwatch, or the pentest exhibit.",
+      complete: ["soc-monitor", "netwatch", "pentest-lab"].some((id) => unlockedProof.includes(id)),
+    },
+    {
+      label: "Inspect agent tools",
+      detail: "Enter AgentRoom or another AI lab.",
+      complete: ["agentroom", "omni", "ruflo", "stack-mode"].some((id) =>
+        unlockedProof.includes(id),
+      ),
+    },
+    {
+      label: "Read the founder signal",
+      detail: "Visit Larry Investments HQ in Career City.",
+      complete: unlockedProof.includes("larry-investments"),
+    },
+    {
+      label: "Collect proof tokens",
+      detail: `${collected.length} of ${tokenTotal} tokens collected.`,
+      complete: collected.length >= 3,
+    },
+    {
+      label: "Recruiter handoff",
+      detail: "Open Recruiter Mode for the clean summary.",
+      complete: recruiterViewed,
+    },
+  ];
+
+  const completedCount = quests.filter((quest) => quest.complete).length;
+  const nextQuest = quests.find((quest) => !quest.complete);
+
+  return (
+    <aside className="pointer-events-none fixed top-16 right-5 z-40 hidden w-80 rounded border border-white/12 bg-black/72 p-4 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur xl:block">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-fg-muted font-mono text-[10px] tracking-[0.16em] uppercase">
+            Quest Board
+          </p>
+          <h2 className="mt-1 text-lg font-semibold">Build path</h2>
+        </div>
+        <span className="rounded border border-white/12 bg-white/[0.035] px-2 py-1 font-mono text-[10px] text-white/62">
+          {completedCount}/{quests.length}
+        </span>
+      </div>
+
+      <div className="mt-3 rounded border border-white/10 bg-white/[0.035] p-3">
+        <p className="text-fg-muted font-mono text-[9px] uppercase">Next proof stop</p>
+        <p className="mt-1 text-sm font-semibold">{nextQuest?.label ?? "Proof report ready"}</p>
+        <p className="text-fg-secondary mt-1 text-xs leading-5">
+          {nextQuest?.detail ?? "Open Recruiter Mode when you want the traditional summary."}
+        </p>
+      </div>
+
+      <div className="mt-3 grid gap-2">
+        {quests.map((quest) => (
+          <div
+            key={quest.label}
+            className={cn(
+              "flex items-start gap-2 rounded border p-2 transition",
+              quest.complete
+                ? "border-white/18 bg-white/[0.045] text-white"
+                : "border-white/8 bg-black/28 text-white/60",
+            )}
+          >
+            <span
+              className={cn(
+                "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full border",
+                quest.complete
+                  ? "border-white bg-white text-black"
+                  : "border-white/18 bg-white/[0.03]",
+              )}
+            >
+              {quest.complete ? <CheckCircle2 size={11} aria-hidden /> : null}
+            </span>
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase">{quest.label}</p>
+              <p className="text-fg-muted mt-0.5 text-xs leading-4">{quest.detail}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-fg-muted mt-3 border-t border-white/10 pt-3 font-mono text-[9px] uppercase">
+        Districts discovered: {visitedDistricts.length} / {districts.length}
+      </p>
+    </aside>
+  );
+}
+
+function NearbyPrompt({ entity }: { entity: WorldEntity }) {
+  const district = districtById.get(entity.district)!;
+  const verb =
+    entity.kind === "collectible"
+      ? "Collect proof token"
+      : (entity.actionLabel ?? (entity.kind === "npc" ? "Talk" : "Open proof room"));
+
+  return (
+    <div className="fixed bottom-24 left-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 rounded border border-white/18 bg-black/78 p-3 text-left shadow-[0_18px_70px_rgba(0,0,0,.38)] backdrop-blur md:bottom-8">
+      <div className="flex items-start gap-3">
+        <span
+          className="mt-1 size-2 shrink-0 rounded-full"
+          style={{ backgroundColor: district.accent, boxShadow: `0 0 18px ${district.accent}` }}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-fg-muted font-mono text-[10px] uppercase">Nearby</p>
+            <span className="rounded border border-white/10 px-2 py-0.5 font-mono text-[9px] text-white/55 uppercase">
+              {district.title}
+            </span>
+          </div>
+          <p className="mt-1 text-sm font-semibold">{entity.title}</p>
+          <p className="text-fg-secondary mt-1 line-clamp-2 text-xs leading-5">{entity.subtitle}</p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="font-mono text-[10px] text-white/70 uppercase">{verb}</p>
+          <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">E / Enter</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MiniMap({
   player,
   activeEntity,
@@ -2162,6 +2341,7 @@ export default function KenanWorld() {
   const [focusedEntity, setFocusedEntity] = useState<WorldEntity | null>(null);
   const [collected, setCollected] = useState<string[]>([]);
   const [recruiterMode, setRecruiterMode] = useState(false);
+  const [recruiterViewed, setRecruiterViewed] = useState(false);
   const [visitedDistricts, setVisitedDistricts] = useState<DistrictId[]>(["hometown"]);
   const [unlockedProof, setUnlockedProof] = useState<string[]>([]);
   const [notification, setNotification] = useState<{
@@ -2203,6 +2383,11 @@ export default function KenanWorld() {
     }, 2400);
   }, []);
 
+  const openRecruiterMode = useCallback(() => {
+    setRecruiterViewed(true);
+    setRecruiterMode(true);
+  }, []);
+
   const activeEntity = useMemo(() => {
     const candidates = entities
       .filter((entity) => !(entity.kind === "collectible" && collected.includes(entity.id)))
@@ -2232,7 +2417,7 @@ export default function KenanWorld() {
           "Resume, projects, skills, and contact in one view.",
           entity.accent,
         );
-        setRecruiterMode(true);
+        openRecruiterMode();
         return;
       }
       if (
@@ -2247,7 +2432,7 @@ export default function KenanWorld() {
       }
       setFocusedEntity(entity);
     },
-    [activeEntity, announce],
+    [activeEntity, announce, openRecruiterMode],
   );
 
   const setDirection = useCallback((key: string, active: boolean) => {
@@ -2294,7 +2479,7 @@ export default function KenanWorld() {
         interact();
       }
       if (event.key.toLowerCase() === "r") {
-        setRecruiterMode(true);
+        openRecruiterMode();
       }
       if (event.key === "Escape") {
         setFocusedEntity(null);
@@ -2312,7 +2497,7 @@ export default function KenanWorld() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [focusedEntity, interact, recruiterMode, started]);
+  }, [focusedEntity, interact, openRecruiterMode, recruiterMode, started]);
 
   useEffect(() => {
     if (!started || focusedEntity || recruiterMode) {
@@ -2382,7 +2567,7 @@ export default function KenanWorld() {
           </div>
           <button
             type="button"
-            onClick={() => setRecruiterMode(true)}
+            onClick={openRecruiterMode}
             className="inline-flex h-9 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black"
           >
             Recruiter Mode
@@ -2497,12 +2682,15 @@ export default function KenanWorld() {
       )}
 
       {activeEntity && started && !focusedEntity && !recruiterMode && (
-        <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded border border-white/18 bg-black/75 px-4 py-3 text-center backdrop-blur md:bottom-8">
-          <p className="text-fg-muted font-mono text-[10px] uppercase">Nearby</p>
-          <p className="text-sm font-semibold">{activeEntity.title}</p>
-          <p className="text-fg-muted mt-1 font-mono text-[10px] uppercase">Press E / Enter</p>
-        </div>
+        <NearbyPrompt entity={activeEntity} />
       )}
+
+      <QuestBoard
+        visitedDistricts={visitedDistricts}
+        collected={collected}
+        unlockedProof={unlockedProof}
+        recruiterViewed={recruiterViewed}
+      />
 
       <MiniMap
         player={player}
@@ -2572,7 +2760,7 @@ export default function KenanWorld() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRecruiterMode(true)}
+                  onClick={openRecruiterMode}
                   className="text-fg-secondary inline-flex h-12 items-center rounded border border-white/20 px-5 font-mono text-sm transition hover:border-white/45 hover:text-white"
                 >
                   Open Recruiter Mode
@@ -2593,7 +2781,7 @@ export default function KenanWorld() {
           entity={focusedEntity}
           project={getProject(focusedEntity.projectSlug)}
           onClose={() => setFocusedEntity(null)}
-          onRecruiterMode={() => setRecruiterMode(true)}
+          onRecruiterMode={openRecruiterMode}
         />
       )}
 
