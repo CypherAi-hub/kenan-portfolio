@@ -114,6 +114,12 @@ type GuidedStep = {
   complete: boolean;
 };
 
+type DistrictTravelPoint = {
+  x: number;
+  y: number;
+  label: string;
+};
+
 type ShowroomPreset = {
   room: string;
   visualMode: "mobile" | "dashboard" | "security" | "cloud" | "agent" | "report" | "proof";
@@ -233,6 +239,15 @@ const districts = [
 ] satisfies District[];
 
 const districtById = new Map(districts.map((district) => [district.id, district]));
+
+const districtTravelPoints: Record<DistrictId, DistrictTravelPoint> = {
+  hometown: { x: 300, y: 298, label: "Spawn Room" },
+  fofit: { x: 758, y: 318, label: "FoFit City Gate" },
+  cyber: { x: 132, y: 660, label: "SOC Avenue" },
+  ai: { x: 972, y: 860, label: "Agent Lab Gate" },
+  career: { x: 1718, y: 190, label: "Career Plaza" },
+  museum: { x: 1748, y: 742, label: "Proof Hall Steps" },
+};
 
 const entities: WorldEntity[] = [
   {
@@ -1068,6 +1083,31 @@ function getGuideSteps({
       complete: recruiterViewed || proofSet.has("resume-terminal"),
     },
   ];
+}
+
+function getDistrictProgress({
+  districtId,
+  unlockedProof,
+  collected,
+}: {
+  districtId: DistrictId;
+  unlockedProof: string[];
+  collected: string[];
+}) {
+  const districtEntities = entities.filter((entity) => entity.district === districtId);
+  const proofStops = districtEntities.filter((entity) => entity.kind !== "collectible");
+  const tokenStops = districtEntities.filter((entity) => entity.kind === "collectible");
+  const unlockedStops = proofStops.filter((entity) => unlockedProof.includes(entity.id));
+  const collectedTokens = tokenStops.filter((entity) => collected.includes(entity.id));
+  const nextStop = proofStops.find((entity) => !unlockedProof.includes(entity.id));
+
+  return {
+    proofTotal: proofStops.length,
+    proofUnlocked: unlockedStops.length,
+    tokenTotal: tokenStops.length,
+    tokenCollected: collectedTokens.length,
+    nextStop,
+  };
 }
 
 const showroomPresets: Record<string, ShowroomPreset> = {
@@ -2675,6 +2715,274 @@ function GuideBeacon({ entity, step }: { entity: WorldEntity; step?: GuidedStep 
   );
 }
 
+function DistrictNavigator({
+  currentDistrict,
+  visitedDistricts,
+  unlockedProof,
+  collected,
+  guideTarget,
+  activeStep,
+  completionPercent,
+  onTravel,
+  onClose,
+  onRecruiterMode,
+}: {
+  currentDistrict?: District;
+  visitedDistricts: DistrictId[];
+  unlockedProof: string[];
+  collected: string[];
+  guideTarget?: WorldEntity;
+  activeStep?: GuidedStep;
+  completionPercent: number;
+  onTravel: (districtId: DistrictId) => void;
+  onClose: () => void;
+  onRecruiterMode: () => void;
+}) {
+  const guideDistrict = guideTarget ? districtById.get(guideTarget.district) : undefined;
+
+  return (
+    <div className="fixed inset-0 z-[85] flex items-center justify-center bg-black/76 p-3 backdrop-blur-md md:p-6">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="world-map-title"
+        className="glass-panel max-h-[94dvh] w-full max-w-6xl overflow-hidden rounded"
+      >
+        <div className="grid max-h-[94dvh] overflow-y-auto lg:grid-cols-[1.05fr_.95fr]">
+          <div className="relative min-h-[460px] border-b border-white/10 bg-black p-4 md:p-6 lg:border-r lg:border-b-0">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_26%_20%,rgba(255,255,255,.12),transparent_34%),linear-gradient(135deg,rgba(255,255,255,.08),transparent_44%)]" />
+            <div className="relative">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-fg-muted font-mono text-[10px] tracking-[0.2em] uppercase">
+                    Navigator
+                  </p>
+                  <h2 id="world-map-title" className="mt-2 text-3xl font-semibold md:text-5xl">
+                    World Map
+                  </h2>
+                  <p className="text-fg-secondary mt-3 max-w-xl text-sm leading-6">
+                    Jump between districts without breaking the playable route. Use this when a
+                    recruiter wants the fast version, then open proof rooms from the map.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close world map"
+                  className="text-fg-secondary flex h-10 shrink-0 items-center gap-2 rounded border border-white/15 bg-black/60 px-3 font-mono text-[10px] uppercase transition hover:border-white/40 hover:text-white"
+                >
+                  <X size={16} aria-hidden />
+                  <span className="hidden sm:inline">Close</span>
+                </button>
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+                  <p className="text-fg-muted font-mono text-[9px] uppercase">Completion</p>
+                  <p className="mt-1 text-2xl font-semibold">{completionPercent}%</p>
+                </div>
+                <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+                  <p className="text-fg-muted font-mono text-[9px] uppercase">Districts found</p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {visitedDistricts.length}/{districts.length}
+                  </p>
+                </div>
+                <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+                  <p className="text-fg-muted font-mono text-[9px] uppercase">Current district</p>
+                  <p className="mt-1 truncate text-lg font-semibold">
+                    {currentDistrict?.title ?? "Between districts"}
+                  </p>
+                </div>
+              </div>
+
+              {guideTarget && (
+                <div className="mt-5 rounded border border-white/12 bg-white/[0.04] p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Sparkles size={14} aria-hidden />
+                    <p className="font-mono text-[10px] tracking-[0.16em] text-white/58 uppercase">
+                      Guided next stop
+                    </p>
+                    {guideDistrict && (
+                      <span
+                        className="rounded border px-2 py-0.5 font-mono text-[9px] uppercase"
+                        style={{
+                          borderColor: `${guideDistrict.accent}55`,
+                          color: guideDistrict.accent,
+                        }}
+                      >
+                        {guideDistrict.title}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <p className="text-xl font-semibold">{guideTarget.title}</p>
+                      <p className="text-fg-secondary mt-1 max-w-2xl text-sm leading-5">
+                        {activeStep?.detail ?? guideTarget.subtitle}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onTravel(guideTarget.district)}
+                      className="inline-flex h-10 shrink-0 items-center justify-center rounded border border-white bg-white px-3 font-mono text-xs text-black transition hover:bg-white/88"
+                    >
+                      Travel to next stop
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-6 rounded border border-white/12 bg-white/[0.025] p-3">
+                <div className="relative aspect-[236/154] overflow-hidden border border-white/10 bg-[#050505]">
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:24px_24px]" />
+                  {districts.map((district) => {
+                    const visited = visitedDistricts.includes(district.id);
+                    const isCurrent = currentDistrict?.id === district.id;
+                    const isGuide = guideTarget?.district === district.id;
+
+                    return (
+                      <button
+                        key={district.id}
+                        type="button"
+                        onClick={() => onTravel(district.id)}
+                        className={cn(
+                          "absolute border text-left transition hover:scale-[1.015] focus:outline-none",
+                          isCurrent ? "z-20" : "z-10",
+                        )}
+                        style={{
+                          left: `${(district.x / WORLD.width) * 100}%`,
+                          top: `${(district.y / WORLD.height) * 100}%`,
+                          width: `${(district.w / WORLD.width) * 100}%`,
+                          height: `${(district.h / WORLD.height) * 100}%`,
+                          borderColor: isCurrent
+                            ? district.accent
+                            : isGuide
+                              ? "#ffffff"
+                              : "rgba(255,255,255,.18)",
+                          background: visited
+                            ? `linear-gradient(135deg, ${district.glow}, rgba(255,255,255,.035))`
+                            : "rgba(255,255,255,.055)",
+                          boxShadow: isCurrent
+                            ? `0 0 28px ${district.accent}66`
+                            : isGuide
+                              ? `0 0 20px ${district.accent}55`
+                              : undefined,
+                        }}
+                        aria-label={`Travel to ${district.title}`}
+                      >
+                        <span className="absolute top-1 left-1 rounded bg-black/72 px-1.5 py-0.5 font-mono text-[8px] text-white/75 uppercase">
+                          {district.title}
+                        </span>
+                        {isCurrent && (
+                          <span className="absolute right-1 bottom-1 rounded bg-white px-1.5 py-0.5 font-mono text-[7px] text-black uppercase">
+                            Here
+                          </span>
+                        )}
+                        {isGuide && !isCurrent && (
+                          <span className="world-pulse absolute right-1 bottom-1 size-2 rounded-full bg-white" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 md:p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-fg-muted font-mono text-[10px] tracking-[0.18em] uppercase">
+                  District Select
+                </p>
+                <h3 className="mt-1 text-2xl font-semibold">Choose the next room.</h3>
+              </div>
+              <button
+                type="button"
+                onClick={onRecruiterMode}
+                className="hidden h-10 shrink-0 items-center rounded border border-white bg-white px-3 font-mono text-xs text-black md:inline-flex"
+              >
+                Recruiter Mode
+              </button>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              {districts.map((district) => {
+                const stats = getDistrictProgress({
+                  districtId: district.id,
+                  unlockedProof,
+                  collected,
+                });
+                const isCurrent = currentDistrict?.id === district.id;
+                const isVisited = visitedDistricts.includes(district.id);
+                const travelPoint = districtTravelPoints[district.id];
+
+                return (
+                  <button
+                    key={district.id}
+                    type="button"
+                    onClick={() => onTravel(district.id)}
+                    className={cn(
+                      "group rounded border bg-black/34 p-3 text-left transition hover:-translate-y-0.5 hover:border-white/35",
+                      isCurrent ? "border-white/45" : "border-white/10",
+                    )}
+                    style={{
+                      boxShadow: isCurrent ? `0 0 28px ${district.accent}30` : undefined,
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className="size-2 rounded-full"
+                            style={{
+                              backgroundColor: district.accent,
+                              boxShadow: `0 0 14px ${district.accent}`,
+                            }}
+                          />
+                          <p className="font-mono text-[10px] text-white/58 uppercase">
+                            {travelPoint.label}
+                          </p>
+                          {isVisited && <CheckCircle2 size={13} aria-hidden />}
+                        </div>
+                        <p className="mt-1 text-base font-semibold">{district.title}</p>
+                        <p className="text-fg-muted mt-1 text-xs">{district.subtitle}</p>
+                      </div>
+                      <span className="rounded border border-white/12 px-2 py-1 font-mono text-[9px] text-white/58 uppercase transition group-hover:border-white/32 group-hover:text-white">
+                        {isCurrent ? "Center" : "Travel"}
+                      </span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+                        <p className="text-fg-muted font-mono text-[8px] uppercase">Proof rooms</p>
+                        <p className="mt-1 font-mono text-xs">
+                          {stats.proofUnlocked}/{stats.proofTotal}
+                        </p>
+                      </div>
+                      <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+                        <p className="text-fg-muted font-mono text-[8px] uppercase">Tokens</p>
+                        <p className="mt-1 font-mono text-xs">
+                          {stats.tokenCollected}/{stats.tokenTotal}
+                        </p>
+                      </div>
+                      <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+                        <p className="text-fg-muted font-mono text-[8px] uppercase">Next</p>
+                        <p className="mt-1 truncate font-mono text-xs">
+                          {stats.nextStop?.title ?? "Clear"}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function NearbyPrompt({ entity, unlocked }: { entity: WorldEntity; unlocked: boolean }) {
   const district = districtById.get(entity.district)!;
   const verb =
@@ -2715,17 +3023,29 @@ function MiniMap({
   activeEntity,
   visitedDistricts,
   currentDistrict,
+  onOpen,
 }: {
   player: { x: number; y: number };
   activeEntity?: WorldEntity;
   visitedDistricts: DistrictId[];
   currentDistrict?: District;
+  onOpen: () => void;
 }) {
   return (
-    <div className="pointer-events-none absolute right-4 bottom-24 z-40 hidden w-56 rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:block">
-      <div className="mb-2 flex items-center gap-2">
-        <MapIcon size={12} aria-hidden />
-        <p className="text-fg-muted font-mono text-[10px] uppercase">World Map</p>
+    <div className="absolute right-4 bottom-24 z-40 hidden w-56 rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:block">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <MapIcon size={12} aria-hidden />
+          <p className="text-fg-muted font-mono text-[10px] uppercase">World Map</p>
+        </div>
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-label="Open district navigator"
+          className="rounded border border-white/12 px-2 py-1 font-mono text-[9px] text-white/64 uppercase transition hover:border-white/35 hover:text-white"
+        >
+          Open
+        </button>
       </div>
       <div className="relative aspect-[236/154] border border-white/10 bg-white/[0.03]">
         {districts.map((district) => (
@@ -2841,6 +3161,7 @@ export default function KenanWorld() {
   const [focusedEntity, setFocusedEntity] = useState<WorldEntity | null>(null);
   const [collected, setCollected] = useState<string[]>([]);
   const [recruiterMode, setRecruiterMode] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const [recruiterViewed, setRecruiterViewed] = useState(false);
   const [visitedDistricts, setVisitedDistricts] = useState<DistrictId[]>(["hometown"]);
   const [unlockedProof, setUnlockedProof] = useState<string[]>([]);
@@ -2910,8 +3231,36 @@ export default function KenanWorld() {
 
   const openRecruiterMode = useCallback(() => {
     setRecruiterViewed(true);
+    setMapOpen(false);
     setRecruiterMode(true);
   }, []);
+
+  const travelToDistrict = useCallback(
+    (districtId: DistrictId) => {
+      const district = districtById.get(districtId);
+      const point = districtTravelPoints[districtId];
+      if (!district || !point) return;
+
+      pressed.current = {};
+      movingRef.current = false;
+      setMoving(false);
+      setStarted(true);
+      setFocusedEntity(null);
+      setRecruiterMode(false);
+      setMapOpen(false);
+      setPlayer({
+        x: clamp(point.x, 20, WORLD.width - PLAYER.width - 20),
+        y: clamp(point.y, 20, WORLD.height - PLAYER.height - 20),
+      });
+      facingRef.current = "down";
+      setFacing("down");
+      setVisitedDistricts((current) =>
+        current.includes(districtId) ? current : [...current, districtId],
+      );
+      announce("World map travel", `${district.title}: ${point.label}`, district.accent);
+    },
+    [announce],
+  );
 
   const activeEntity = useMemo(() => {
     const candidates = entities
@@ -3034,17 +3383,31 @@ export default function KenanWorld() {
           setStarted(true);
           return;
         }
-        if (!focusedEntity && !recruiterMode) interact();
+        if (!focusedEntity && !recruiterMode && !mapOpen) interact();
       }
-      if (event.key.toLowerCase() === "e" && started && !focusedEntity && !recruiterMode) {
+      if (
+        event.key.toLowerCase() === "e" &&
+        started &&
+        !focusedEntity &&
+        !recruiterMode &&
+        !mapOpen
+      ) {
         interact();
       }
       if (event.key.toLowerCase() === "r") {
         openRecruiterMode();
       }
+      if (event.key.toLowerCase() === "m" && started && !focusedEntity && !recruiterMode) {
+        event.preventDefault();
+        setMapOpen((current) => !current);
+      }
       if (event.key === "Escape") {
-        setFocusedEntity(null);
-        setRecruiterMode(false);
+        if (mapOpen) {
+          setMapOpen(false);
+        } else {
+          setFocusedEntity(null);
+          setRecruiterMode(false);
+        }
       }
     }
 
@@ -3058,10 +3421,10 @@ export default function KenanWorld() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [focusedEntity, interact, openRecruiterMode, recruiterMode, started]);
+  }, [focusedEntity, interact, mapOpen, openRecruiterMode, recruiterMode, started]);
 
   useEffect(() => {
-    if (!started || focusedEntity || recruiterMode) {
+    if (!started || focusedEntity || recruiterMode || mapOpen) {
       movingRef.current = false;
       setMoving(false);
       return;
@@ -3093,7 +3456,7 @@ export default function KenanWorld() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [focusedEntity, recruiterMode, started]);
+  }, [focusedEntity, mapOpen, recruiterMode, started]);
 
   const cameraX = clamp(player.x - viewport.width / 2, 0, WORLD.width - viewport.width);
   const cameraY = clamp(player.y - viewport.height / 2, 0, WORLD.height - viewport.height);
@@ -3125,14 +3488,29 @@ export default function KenanWorld() {
             <span>Move: WASD / arrows</span>
             <span>Interact: E / Enter</span>
             <span>Recruiter: R</span>
+            <span>Map: M</span>
           </div>
-          <button
-            type="button"
-            onClick={openRecruiterMode}
-            className="inline-flex h-9 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black"
-          >
-            Recruiter Mode
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMapOpen(true)}
+              aria-label="Open world map"
+              className="text-fg-secondary inline-flex h-9 items-center gap-2 rounded border border-white/15 bg-black/45 px-3 font-mono text-xs transition hover:border-white/40 hover:text-white"
+            >
+              <MapIcon size={13} aria-hidden />
+              <span className="hidden sm:inline">World Map</span>
+              <span className="sm:hidden">Map</span>
+            </button>
+            <button
+              type="button"
+              onClick={openRecruiterMode}
+              aria-label="Open Recruiter Mode"
+              className="inline-flex h-9 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black"
+            >
+              <span className="hidden sm:inline">Recruiter Mode</span>
+              <span className="sm:hidden">Recruiter</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -3181,7 +3559,7 @@ export default function KenanWorld() {
             </div>
           ))}
 
-          {started && guideState.guideTarget && !focusedEntity && !recruiterMode && (
+          {started && guideState.guideTarget && !focusedEntity && !recruiterMode && !mapOpen && (
             <GuideBeacon entity={guideState.guideTarget} step={guideState.activeGuideStep} />
           )}
 
@@ -3227,7 +3605,7 @@ export default function KenanWorld() {
         </div>
       </div>
 
-      {started && !focusedEntity && !recruiterMode && (
+      {started && !focusedEntity && !recruiterMode && !mapOpen && (
         <GuidePanel
           guideSteps={guideState.guideSteps}
           activeStep={guideState.activeGuideStep}
@@ -3256,7 +3634,7 @@ export default function KenanWorld() {
         </div>
       )}
 
-      {activeEntity && started && !focusedEntity && !recruiterMode && (
+      {activeEntity && started && !focusedEntity && !recruiterMode && !mapOpen && (
         <NearbyPrompt entity={activeEntity} unlocked={unlockedProof.includes(activeEntity.id)} />
       )}
 
@@ -3273,6 +3651,7 @@ export default function KenanWorld() {
         activeEntity={activeEntity}
         visitedDistricts={visitedDistricts}
         currentDistrict={currentDistrict}
+        onOpen={() => setMapOpen(true)}
       />
 
       <div className="fixed bottom-4 left-4 z-40 hidden rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:block">
@@ -3301,6 +3680,21 @@ export default function KenanWorld() {
       </div>
 
       <ControlPad onDirection={setDirection} onInteract={() => interact()} />
+
+      {mapOpen && (
+        <DistrictNavigator
+          currentDistrict={currentDistrict}
+          visitedDistricts={visitedDistricts}
+          unlockedProof={unlockedProof}
+          collected={collected}
+          guideTarget={guideState.guideTarget}
+          activeStep={guideState.activeGuideStep}
+          completionPercent={completionPercent}
+          onTravel={travelToDistrict}
+          onClose={() => setMapOpen(false)}
+          onRecruiterMode={openRecruiterMode}
+        />
+      )}
 
       {!started && !recruiterMode && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md">
