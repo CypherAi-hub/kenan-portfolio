@@ -5,6 +5,7 @@ import FeaturedBuilds from "@/components/FeaturedBuilds";
 import Footer from "@/components/Footer";
 import FoFitEcosystem from "@/components/FoFitEcosystem";
 import Hero from "@/components/Hero";
+import MissionModeSection from "@/components/MissionModeSection";
 import Navigation from "@/components/Navigation";
 import ProjectArchive from "@/components/ProjectArchive";
 import ProjectCategoryShowcase from "@/components/ProjectCategoryShowcase";
@@ -23,6 +24,7 @@ export default function Home() {
       <Hero />
       <ProofBar />
       <main className="mx-auto max-w-[1280px] px-4 lg:px-8">
+        <MissionModeSection />
         <FeaturedBuilds />
         <FoFitEcosystem />
         <ProjectMediaShowcase />
