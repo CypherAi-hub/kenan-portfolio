@@ -106,6 +106,14 @@ type Achievement = {
   unlocked: boolean;
 };
 
+type GuidedStep = {
+  id: string;
+  title: string;
+  detail: string;
+  targetIds: string[];
+  complete: boolean;
+};
+
 type ShowroomPreset = {
   room: string;
   visualMode: "mobile" | "dashboard" | "security" | "cloud" | "agent" | "report" | "proof";
@@ -932,6 +940,8 @@ const unlockableEntityIds = entities
   .filter((entity) => entity.kind !== "collectible")
   .map((entity) => entity.id);
 
+const entityById = new Map(entities.map((entity) => [entity.id, entity]));
+
 function countUnlocked(ids: string[], proofSet: Set<string>) {
   return ids.filter((id) => proofSet.has(id)).length;
 }
@@ -1001,6 +1011,61 @@ function getAchievements({
       detail: "Traditional recruiter summary opened.",
       accent: "#f6d777",
       unlocked: recruiterViewed || proofSet.has("resume-terminal"),
+    },
+  ];
+}
+
+function getGuideSteps({
+  unlockedProof,
+  recruiterViewed,
+}: {
+  unlockedProof: string[];
+  recruiterViewed: boolean;
+}): GuidedStep[] {
+  const proofSet = new Set(unlockedProof);
+
+  return [
+    {
+      id: "wake",
+      title: "Wake the build map",
+      detail: "Start with the MacBook in Hometown. It explains why this world exists.",
+      targetIds: ["laptop"],
+      complete: proofSet.has("laptop") || proofSet.has("whiteboard"),
+    },
+    {
+      id: "fofit",
+      title: "Enter FoFit City",
+      detail: "Open FoFit Mobile HQ first; it is the strongest product proof room.",
+      targetIds: ["fofit-mobile"],
+      complete: proofSet.has("fofit-mobile"),
+    },
+    {
+      id: "cyber",
+      title: "Open cyber proof",
+      detail: "Review SOC Monitor or the Cyberlou lab to see the security story.",
+      targetIds: ["soc-monitor", "pentest-lab"],
+      complete: proofSet.has("soc-monitor") || proofSet.has("pentest-lab"),
+    },
+    {
+      id: "agent",
+      title: "Inspect agent tooling",
+      detail: "Visit AgentRoom HQ to connect the AI workflow side of the portfolio.",
+      targetIds: ["agentroom"],
+      complete: proofSet.has("agentroom"),
+    },
+    {
+      id: "career",
+      title: "Meet the founder signal",
+      detail: "Visit Larry Investments HQ to see the company and operating-system layer.",
+      targetIds: ["larry-investments"],
+      complete: proofSet.has("larry-investments"),
+    },
+    {
+      id: "handoff",
+      title: "Generate recruiter summary",
+      detail: "End at the Resume Terminal or press R for the traditional summary.",
+      targetIds: ["resume-terminal"],
+      complete: recruiterViewed || proofSet.has("resume-terminal"),
     },
   ];
 }
@@ -1180,6 +1245,19 @@ function distanceToEntity(player: { x: number; y: number }, entity: WorldEntity)
   const playerCenter = { x: player.x + PLAYER.width / 2, y: player.y + PLAYER.height / 2 };
   const entityCenter = { x: entity.x + entity.w / 2, y: entity.y + entity.h / 2 };
   return Math.hypot(playerCenter.x - entityCenter.x, playerCenter.y - entityCenter.y);
+}
+
+function getDirectionHint(player: { x: number; y: number }, entity: WorldEntity) {
+  const playerCenter = { x: player.x + PLAYER.width / 2, y: player.y + PLAYER.height / 2 };
+  const entityCenter = { x: entity.x + entity.w / 2, y: entity.y + entity.h / 2 };
+  const dx = entityCenter.x - playerCenter.x;
+  const dy = entityCenter.y - playerCenter.y;
+  const horizontal = Math.abs(dx) > 72 ? (dx > 0 ? "east" : "west") : "";
+  const vertical = Math.abs(dy) > 72 ? (dy > 0 ? "south" : "north") : "";
+
+  if (!horizontal && !vertical) return "You are close";
+  if (horizontal && vertical) return `Head ${vertical}-${horizontal}`;
+  return `Head ${horizontal || vertical}`;
 }
 
 function getProject(slug?: string): Project | undefined {
@@ -2454,6 +2532,111 @@ function QuestBoard({
   );
 }
 
+function GuidePanel({
+  guideSteps,
+  activeStep,
+  target,
+  player,
+}: {
+  guideSteps: GuidedStep[];
+  activeStep?: GuidedStep;
+  target?: WorldEntity;
+  player: { x: number; y: number };
+}) {
+  const completedCount = guideSteps.filter((step) => step.complete).length;
+  const targetDistrict = target ? districtById.get(target.district) : undefined;
+  const distance = target ? Math.round(distanceToEntity(player, target)) : undefined;
+  const direction = target ? getDirectionHint(player, target) : undefined;
+
+  return (
+    <aside className="pointer-events-none fixed top-[10.6rem] left-3 z-40 hidden w-[min(92vw,420px)] rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5 md:block">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-fg-muted font-mono text-[10px] tracking-[0.16em] uppercase">
+            Guided Route
+          </p>
+          <h2 className="mt-1 text-sm font-semibold">
+            {activeStep?.title ?? "Build path complete"}
+          </h2>
+        </div>
+        <span className="rounded border border-white/12 bg-white/[0.035] px-2 py-1 font-mono text-[10px] text-white/62">
+          {completedCount}/{guideSteps.length}
+        </span>
+      </div>
+      <p className="text-fg-secondary mt-2 text-xs leading-5">
+        {activeStep?.detail ?? "Recruiter Mode is ready when you want the clean summary."}
+      </p>
+      {target && (
+        <div className="mt-3 rounded border border-white/10 bg-white/[0.035] p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="size-2 rounded-full"
+              style={{
+                backgroundColor: targetDistrict?.accent ?? "#fff",
+                boxShadow: `0 0 16px ${targetDistrict?.accent ?? "#fff"}`,
+              }}
+            />
+            <p className="font-mono text-[10px] text-white/70 uppercase">Next stop</p>
+            <span className="rounded border border-white/10 px-2 py-0.5 font-mono text-[9px] text-white/48 uppercase">
+              {targetDistrict?.title}
+            </span>
+          </div>
+          <p className="mt-1 text-sm font-semibold">{target.title}</p>
+          <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">
+            {direction} · {distance} world px
+          </p>
+        </div>
+      )}
+      <div className="mt-3 grid grid-cols-6 gap-1">
+        {guideSteps.map((step) => (
+          <span
+            key={step.id}
+            className={cn(
+              "h-1.5 rounded-full transition",
+              step.complete
+                ? "bg-white"
+                : step.id === activeStep?.id
+                  ? "bg-white/55"
+                  : "bg-white/12",
+            )}
+          />
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+function GuideBeacon({ entity, step }: { entity: WorldEntity; step?: GuidedStep }) {
+  const district = districtById.get(entity.district)!;
+
+  return (
+    <div
+      className="pointer-events-none absolute z-20"
+      style={{
+        left: entity.x - 22,
+        top: entity.y - 22,
+        width: entity.w + 44,
+        height: entity.h + 44,
+      }}
+    >
+      <div
+        className="world-pulse absolute inset-0 rounded-[4px] border border-white/52"
+        style={{ boxShadow: `0 0 34px ${district.accent}` }}
+      />
+      <div
+        className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full border px-2 py-1 font-mono text-[9px] whitespace-nowrap uppercase shadow-lg backdrop-blur"
+        style={{
+          borderColor: `${district.accent}66`,
+          color: district.accent,
+          backgroundColor: "rgba(0,0,0,.78)",
+        }}
+      >
+        Next: {step?.title ?? entity.title}
+      </div>
+    </div>
+  );
+}
+
 function NearbyPrompt({ entity, unlocked }: { entity: WorldEntity; unlocked: boolean }) {
   const district = districtById.get(entity.district)!;
   const verb =
@@ -2650,6 +2833,19 @@ export default function KenanWorld() {
   const unlockedAchievementCount = achievements.filter(
     (achievement) => achievement.unlocked,
   ).length;
+  const guideState = useMemo(() => {
+    const guideSteps = getGuideSteps({ unlockedProof, recruiterViewed });
+    const activeGuideStep = guideSteps.find((step) => !step.complete);
+    const targetId =
+      activeGuideStep?.targetIds.find((id) => !unlockedProof.includes(id)) ??
+      activeGuideStep?.targetIds[0];
+
+    return {
+      guideSteps,
+      activeGuideStep,
+      guideTarget: targetId ? entityById.get(targetId) : undefined,
+    };
+  }, [recruiterViewed, unlockedProof]);
 
   const progressTotal =
     districts.length + collectibleCount + unlockableEntityIds.length + achievements.length;
@@ -2659,8 +2855,9 @@ export default function KenanWorld() {
   );
   const completionPercent = Math.round((progressCount / progressTotal) * 100);
 
-  const objectiveText =
-    collected.length < 3
+  const objectiveText = guideState.activeGuideStep
+    ? `${guideState.activeGuideStep.title}: ${guideState.activeGuideStep.detail}`
+    : collected.length < 3
       ? `Collect ${3 - collected.length} more proof token${3 - collected.length === 1 ? "" : "s"} to unlock the early proof path.`
       : unlockedProof.length < 4
         ? `Enter ${4 - unlockedProof.length} more project or experience stop${4 - unlockedProof.length === 1 ? "" : "s"} to deepen the proof report.`
@@ -2946,6 +3143,10 @@ export default function KenanWorld() {
             </div>
           ))}
 
+          {started && guideState.guideTarget && !focusedEntity && !recruiterMode && (
+            <GuideBeacon entity={guideState.guideTarget} step={guideState.activeGuideStep} />
+          )}
+
           {entities.map((entity) => (
             <EntitySprite
               key={entity.id}
@@ -2987,6 +3188,15 @@ export default function KenanWorld() {
           />
         </div>
       </div>
+
+      {started && !focusedEntity && !recruiterMode && (
+        <GuidePanel
+          guideSteps={guideState.guideSteps}
+          activeStep={guideState.activeGuideStep}
+          target={guideState.guideTarget}
+          player={player}
+        />
+      )}
 
       {notification && (
         <div className="world-notification fixed top-[4.5rem] left-1/2 z-[60] w-[min(92vw,420px)] -translate-x-1/2 rounded border border-white/16 bg-black/78 p-3 shadow-[0_18px_70px_rgba(0,0,0,.42)] backdrop-blur">
