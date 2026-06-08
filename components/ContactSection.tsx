@@ -4,7 +4,7 @@ import SectionHeader from "@/components/SectionHeader";
 
 const contactLinks = [
   { label: "Email", href: `mailto:${profile.email}`, value: profile.email, icon: Mail },
-  { label: "LinkedIn", href: profile.linkedin, value: "in/kenan-larry", icon: Linkedin },
+  { label: "LinkedIn", href: profile.linkedin, value: profile.linkedinLabel, icon: Linkedin },
   { label: "GitHub", href: profile.github, value: "github.com/CypherAi-hub", icon: Github },
 ];
 

@@ -21,7 +21,8 @@ export const profile = {
   openTo: "Summer 2027 Technology / Cybersecurity / AI internships",
   email: "kenanlarry8@gmail.com",
   github: "https://github.com/CypherAi-hub",
-  linkedin: "https://www.linkedin.com/in/kenan-larry",
+  linkedin: "https://www.linkedin.com/in/kenan-larry-993350332",
+  linkedinLabel: "in/kenan-larry-993350332",
   resumeUrl: "/resume.pdf",
   copyright: `© ${new Date().getFullYear()} Kenan Larry. Built in St. Louis.`,
 };
