@@ -918,16 +918,9 @@ const worldProps: WorldProp[] = [
   },
 ];
 
-const keyProofEntities = [
-  "fofit-mobile",
-  "fofit-coach",
-  "soc-monitor",
-  "netwatch",
-  "pentest-lab",
-  "agentroom",
-  "larry-investments",
-  "resume-terminal",
-];
+const unlockableEntityIds = entities
+  .filter((entity) => entity.kind !== "collectible")
+  .map((entity) => entity.id);
 
 const showroomPresets: Record<string, ShowroomPreset> = {
   "fofit-mobile": {
@@ -1475,11 +1468,13 @@ function EntitySprite({
   entity,
   active,
   collected,
+  unlocked,
   onInteract,
 }: {
   entity: WorldEntity;
   active: boolean;
   collected: boolean;
+  unlocked: boolean;
   onInteract: () => void;
 }) {
   return (
@@ -1510,6 +1505,11 @@ function EntitySprite({
       {entity.kind === "npc" && <PixelNpc accent={entity.accent} active={active} />}
       {entity.kind === "object" && <ObjectSprite entity={entity} />}
       {entity.kind === "collectible" && <CollectibleSprite entity={entity} collected={collected} />}
+      {unlocked && entity.kind !== "collectible" && (
+        <span className="absolute -top-3 -right-3 flex size-6 items-center justify-center rounded-full border border-white bg-white text-black shadow-[0_0_18px_rgba(255,255,255,.32)]">
+          <CheckCircle2 size={14} aria-hidden />
+        </span>
+      )}
       <span
         className={cn(
           "absolute top-full left-1/2 mt-2 -translate-x-1/2 border border-white/15 bg-black/80 px-2 py-1 font-mono text-[10px] whitespace-nowrap text-white shadow-lg backdrop-blur transition",
@@ -2182,12 +2182,14 @@ function QuestBoard({
   );
 }
 
-function NearbyPrompt({ entity }: { entity: WorldEntity }) {
+function NearbyPrompt({ entity, unlocked }: { entity: WorldEntity; unlocked: boolean }) {
   const district = districtById.get(entity.district)!;
   const verb =
     entity.kind === "collectible"
       ? "Collect proof token"
-      : (entity.actionLabel ?? (entity.kind === "npc" ? "Talk" : "Open proof room"));
+      : unlocked
+        ? "Review proof room"
+        : (entity.actionLabel ?? (entity.kind === "npc" ? "Talk" : "Open proof room"));
 
   return (
     <div className="fixed bottom-24 left-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 rounded border border-white/18 bg-black/78 p-3 text-left shadow-[0_18px_70px_rgba(0,0,0,.38)] backdrop-blur md:bottom-8">
@@ -2362,7 +2364,7 @@ export default function KenanWorld() {
 
   const currentDistrict = useMemo(() => getCurrentDistrict(player), [player]);
 
-  const progressTotal = districts.length + collectibleCount + keyProofEntities.length;
+  const progressTotal = districts.length + collectibleCount + unlockableEntityIds.length;
   const progressCount = Math.min(
     progressTotal,
     visitedDistricts.length + collected.length + unlockedProof.length,
@@ -2420,11 +2422,7 @@ export default function KenanWorld() {
         openRecruiterMode();
         return;
       }
-      if (
-        keyProofEntities.includes(entity.id) ||
-        entity.kind === "npc" ||
-        entity.kind === "object"
-      ) {
+      if (unlockableEntityIds.includes(entity.id)) {
         setUnlockedProof((current) =>
           current.includes(entity.id) ? current : [...current, entity.id],
         );
@@ -2626,6 +2624,7 @@ export default function KenanWorld() {
               entity={entity}
               active={activeEntity?.id === entity.id}
               collected={collected.includes(entity.id)}
+              unlocked={unlockedProof.includes(entity.id)}
               onInteract={() => interact(entity)}
             />
           ))}
@@ -2682,7 +2681,7 @@ export default function KenanWorld() {
       )}
 
       {activeEntity && started && !focusedEntity && !recruiterMode && (
-        <NearbyPrompt entity={activeEntity} />
+        <NearbyPrompt entity={activeEntity} unlocked={unlockedProof.includes(activeEntity.id)} />
       )}
 
       <QuestBoard
