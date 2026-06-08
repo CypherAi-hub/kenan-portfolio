@@ -250,6 +250,12 @@ export const projects: Project[] = [
         "Coach mobile profile",
         "local",
       ),
+      projectImage(
+        "/media/projects/fofit/fofit-journey-poster.webp",
+        "FoFit brand poster with athlete seated in a dark gym and the line your journey starts here",
+        "FoFit journey poster",
+        "local",
+      ),
     ],
     featured: true,
     caseStudy: true,

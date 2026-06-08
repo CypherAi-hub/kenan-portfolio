@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Download, Github, Linkedin, Mail, ShieldCheck } from "lucide-react";
+import { ArrowRight, Download, Gamepad2, Github, Linkedin, Mail, ShieldCheck } from "lucide-react";
 import { motion } from "motion/react";
 import { profile } from "@/lib/data";
 import GradientMesh from "@/components/effects/GradientMesh";
@@ -127,6 +127,10 @@ export default function Hero() {
               <HeroLink href="#featured" primary>
                 View Featured Work
                 <ArrowRight size={16} aria-hidden />
+              </HeroLink>
+              <HeroLink href="/world">
+                <Gamepad2 size={16} aria-hidden />
+                Enter Kenan World
               </HeroLink>
               {profile.resumeUrl ? (
                 <HeroLink href={profile.resumeUrl}>
