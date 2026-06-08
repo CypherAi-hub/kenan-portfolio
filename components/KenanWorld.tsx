@@ -1283,6 +1283,42 @@ function getShowroomPreset(entity: WorldEntity, project?: Project): ShowroomPres
 
 function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] {
   if (project?.media.length) return project.media;
+  if (entity.id === "laptop") {
+    return [
+      {
+        src: "/media/projects/kenan-portfolio/kenan-portfolio-home.png",
+        alt: "Kenan portfolio homepage showing featured project proof and recruiter positioning",
+        label: "Portfolio command center",
+        source: "local",
+        type: "image",
+      },
+      {
+        src: "/media/screenshots/portfolio-featured-builds.png",
+        alt: "Featured builds section with polished project proof cards",
+        label: "Featured builds proof",
+        source: "local",
+        type: "image",
+      },
+    ];
+  }
+  if (entity.id === "whiteboard") {
+    return [
+      {
+        src: "/media/screenshots/portfolio-archive-grid.png",
+        alt: "Project archive grid showing Kenan's broader GitHub repository proof system",
+        label: "Build archive map",
+        source: "local",
+        type: "image",
+      },
+      {
+        src: "/media/screenshots/portfolio-premium-desktop.png",
+        alt: "Desktop portfolio view with premium black and white recruiter-ready layout",
+        label: "Recruiter site polish",
+        source: "local",
+        type: "image",
+      },
+    ];
+  }
   if (entity.id === "google-cert") {
     const media = certifications.find((certification) => certification.media)?.media;
     if (media) {
@@ -1862,9 +1898,11 @@ function DetailOverlay({
                   type="button"
                   onClick={onClose}
                   aria-label="Close proof panel"
-                  className="text-fg-secondary flex size-10 shrink-0 items-center justify-center rounded border border-white/15 bg-black/60 transition hover:border-white/40 hover:text-white"
+                  title="Close proof panel"
+                  className="text-fg-secondary flex h-10 shrink-0 items-center gap-2 rounded border border-white/15 bg-black/60 px-3 font-mono text-[10px] uppercase transition hover:border-white/40 hover:text-white"
                 >
                   <X size={16} aria-hidden />
+                  <span className="hidden sm:inline">Close</span>
                 </button>
               </div>
 
