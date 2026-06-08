@@ -20,6 +20,8 @@ export const profile = {
   currently: "Building FoFit, FoFit Coach, and applied AI/cybersecurity projects",
   openTo: "Summer 2027 Technology / Cybersecurity / AI internships",
   email: "kenanlarry8@gmail.com",
+  phone: "7082286041",
+  phoneLabel: "(708) 228-6041",
   github: "https://github.com/CypherAi-hub",
   linkedin: "https://www.linkedin.com/in/kenan-larry-993350332",
   linkedinLabel: "in/kenan-larry-993350332",

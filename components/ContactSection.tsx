@@ -1,9 +1,10 @@
-import { Github, Linkedin, Mail, MapPin } from "lucide-react";
+import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
 import { profile } from "@/lib/data";
 import SectionHeader from "@/components/SectionHeader";
 
 const contactLinks = [
   { label: "Email", href: `mailto:${profile.email}`, value: profile.email, icon: Mail },
+  { label: "Phone", href: `tel:+1${profile.phone}`, value: profile.phoneLabel, icon: Phone },
   { label: "LinkedIn", href: profile.linkedin, value: profile.linkedinLabel, icon: Linkedin },
   { label: "GitHub", href: profile.github, value: "github.com/CypherAi-hub", icon: Github },
 ];
