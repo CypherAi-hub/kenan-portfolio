@@ -50,7 +50,7 @@ export default function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
               className="text-fg-secondary inline-flex rounded border border-white/20 bg-white/[0.06] px-3 py-2 font-mono text-xs"
@@ -58,7 +58,7 @@ export default function Hero() {
               {profile.status}
             </motion.div>
             <motion.h1
-              initial={{ opacity: 0, y: 22 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.06, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               className="mt-6 text-5xl leading-none font-semibold tracking-normal md:text-7xl"
@@ -66,7 +66,7 @@ export default function Hero() {
               {profile.name}
             </motion.h1>
             <motion.p
-              initial={{ opacity: 0, y: 22 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               className="text-fg mt-5 max-w-3xl text-2xl leading-tight md:text-4xl"
@@ -74,7 +74,7 @@ export default function Hero() {
               {profile.headline}
             </motion.p>
             <motion.p
-              initial={{ opacity: 0, y: 22 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               className="text-fg-secondary mt-6 max-w-2xl text-base leading-7 md:text-lg"
@@ -83,7 +83,7 @@ export default function Hero() {
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.24, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
               className="mt-7 flex flex-wrap gap-2"
@@ -99,7 +99,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
               className="glass-panel mt-8 max-w-xl rounded p-4"
@@ -119,7 +119,7 @@ export default function Hero() {
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.36, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
               className="mt-8 flex flex-wrap gap-3"
