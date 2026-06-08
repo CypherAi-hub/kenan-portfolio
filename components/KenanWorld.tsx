@@ -6,11 +6,12 @@ import {
   ArrowLeft,
   Award,
   BriefcaseBusiness,
+  CheckCircle2,
   Download,
   Github,
   Linkedin,
   Mail,
-  Map,
+  Map as MapIcon,
   Maximize2,
   Trophy,
   X,
@@ -22,6 +23,20 @@ import { cn } from "@/lib/utils";
 
 type EntityKind = "building" | "npc" | "object" | "collectible";
 type DistrictId = "hometown" | "fofit" | "cyber" | "ai" | "career" | "museum";
+type PropKind =
+  | "tree"
+  | "planter"
+  | "bench"
+  | "lamp"
+  | "sign"
+  | "terminal"
+  | "trophy"
+  | "server"
+  | "antenna"
+  | "kiosk"
+  | "field"
+  | "lab-light";
+type Facing = "down" | "up" | "left" | "right";
 
 type WorldEntity = {
   id: string;
@@ -40,6 +55,35 @@ type WorldEntity = {
   actionLabel?: string;
 };
 
+type District = {
+  id: DistrictId;
+  title: string;
+  subtitle: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  accent: string;
+  secondary: string;
+  border: string;
+  ground: string;
+  path: string;
+  glow: string;
+  background: string;
+};
+
+type WorldProp = {
+  id: string;
+  kind: PropKind;
+  district: DistrictId;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  color?: string;
+  label?: string;
+};
+
 const WORLD = { width: 2360, height: 1540 };
 const PLAYER = { width: 34, height: 46 };
 const INTERACTION_DISTANCE = 128;
@@ -53,8 +97,14 @@ const districts = [
     y: 60,
     w: 600,
     h: 430,
-    accent: "#f5f5f5",
-    background: "linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.025))",
+    accent: "#f3d7a6",
+    secondary: "#cda169",
+    border: "rgba(243,215,166,.42)",
+    ground: "#221d18",
+    path: "#7b684f",
+    glow: "rgba(243,215,166,.22)",
+    background:
+      "linear-gradient(135deg, rgba(243,215,166,.20), rgba(78,64,48,.18) 42%, rgba(255,255,255,.035))",
   },
   {
     id: "fofit",
@@ -65,7 +115,13 @@ const districts = [
     w: 880,
     h: 640,
     accent: "#76f4df",
-    background: "linear-gradient(135deg, rgba(118,244,223,.22), rgba(255,255,255,.035))",
+    secondary: "#38d9bb",
+    border: "rgba(118,244,223,.46)",
+    ground: "#07312f",
+    path: "#2d9a8d",
+    glow: "rgba(118,244,223,.26)",
+    background:
+      "linear-gradient(135deg, rgba(118,244,223,.25), rgba(18,92,84,.18) 50%, rgba(255,255,255,.035))",
   },
   {
     id: "cyber",
@@ -75,8 +131,14 @@ const districts = [
     y: 570,
     w: 820,
     h: 710,
-    accent: "#d9f5ff",
-    background: "linear-gradient(135deg, rgba(120,190,255,.18), rgba(255,255,255,.025))",
+    accent: "#78c7ff",
+    secondary: "#2f6f9f",
+    border: "rgba(120,199,255,.42)",
+    ground: "#071625",
+    path: "#23445f",
+    glow: "rgba(120,199,255,.22)",
+    background:
+      "linear-gradient(135deg, rgba(31,89,132,.36), rgba(5,18,32,.22) 52%, rgba(255,255,255,.025))",
   },
   {
     id: "ai",
@@ -86,8 +148,14 @@ const districts = [
     y: 760,
     w: 900,
     h: 660,
-    accent: "#e9e9e9",
-    background: "linear-gradient(135deg, rgba(255,255,255,.15), rgba(118,244,223,.08))",
+    accent: "#bfa7ff",
+    secondary: "#7257d8",
+    border: "rgba(191,167,255,.42)",
+    ground: "#16102e",
+    path: "#4f3e92",
+    glow: "rgba(191,167,255,.22)",
+    background:
+      "linear-gradient(135deg, rgba(113,86,214,.30), rgba(23,16,48,.22) 48%, rgba(118,244,223,.06))",
   },
   {
     id: "career",
@@ -97,8 +165,14 @@ const districts = [
     y: 72,
     w: 610,
     h: 560,
-    accent: "#ffffff",
-    background: "linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.03))",
+    accent: "#e8d7c4",
+    secondary: "#9c8468",
+    border: "rgba(232,215,196,.38)",
+    ground: "#201f1e",
+    path: "#6d645c",
+    glow: "rgba(232,215,196,.18)",
+    background:
+      "linear-gradient(135deg, rgba(232,215,196,.18), rgba(72,68,62,.16) 45%, rgba(255,255,255,.03))",
   },
   {
     id: "museum",
@@ -108,20 +182,18 @@ const districts = [
     y: 690,
     w: 590,
     h: 540,
-    accent: "#f4f4f4",
-    background: "linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.04))",
+    accent: "#f6d777",
+    secondary: "#d0d8e8",
+    border: "rgba(246,215,119,.42)",
+    ground: "#191919",
+    path: "#8c7a44",
+    glow: "rgba(246,215,119,.22)",
+    background:
+      "linear-gradient(135deg, rgba(246,215,119,.18), rgba(210,216,232,.10) 45%, rgba(255,255,255,.04))",
   },
-] satisfies Array<{
-  id: DistrictId;
-  title: string;
-  subtitle: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  accent: string;
-  background: string;
-}>;
+] satisfies District[];
+
+const districtById = new Map(districts.map((district) => [district.id, district]));
 
 const entities: WorldEntity[] = [
   {
@@ -578,6 +650,246 @@ const entities: WorldEntity[] = [
   },
 ];
 
+const worldProps: WorldProp[] = [
+  {
+    id: "room-rug",
+    kind: "field",
+    district: "hometown",
+    x: 128,
+    y: 250,
+    w: 220,
+    h: 116,
+    color: "#7b5e43",
+  },
+  {
+    id: "room-bed",
+    kind: "bench",
+    district: "hometown",
+    x: 78,
+    y: 132,
+    w: 78,
+    h: 42,
+    color: "#9a7b58",
+    label: "rest",
+  },
+  {
+    id: "room-plant",
+    kind: "planter",
+    district: "hometown",
+    x: 540,
+    y: 405,
+    w: 52,
+    h: 52,
+    color: "#a7d98b",
+  },
+  {
+    id: "hometown-lamp",
+    kind: "lamp",
+    district: "hometown",
+    x: 545,
+    y: 112,
+    w: 28,
+    h: 70,
+    color: "#f3d7a6",
+  },
+  {
+    id: "fofit-track",
+    kind: "field",
+    district: "fofit",
+    x: 744,
+    y: 545,
+    w: 460,
+    h: 58,
+    color: "#26bda7",
+    label: "training lane",
+  },
+  {
+    id: "fofit-sign",
+    kind: "sign",
+    district: "fofit",
+    x: 730,
+    y: 105,
+    w: 118,
+    h: 48,
+    color: "#76f4df",
+    label: "FoFit City",
+  },
+  {
+    id: "fofit-planter-1",
+    kind: "planter",
+    district: "fofit",
+    x: 985,
+    y: 520,
+    w: 58,
+    h: 58,
+    color: "#9df7d6",
+  },
+  {
+    id: "fofit-planter-2",
+    kind: "planter",
+    district: "fofit",
+    x: 1410,
+    y: 570,
+    w: 58,
+    h: 58,
+    color: "#9df7d6",
+  },
+  {
+    id: "fofit-kiosk",
+    kind: "kiosk",
+    district: "fofit",
+    x: 1335,
+    y: 405,
+    w: 82,
+    h: 70,
+    color: "#baffef",
+    label: "Market",
+  },
+  {
+    id: "cyber-server-1",
+    kind: "server",
+    district: "cyber",
+    x: 118,
+    y: 635,
+    w: 46,
+    h: 96,
+    color: "#78c7ff",
+  },
+  {
+    id: "cyber-server-2",
+    kind: "server",
+    district: "cyber",
+    x: 720,
+    y: 625,
+    w: 46,
+    h: 96,
+    color: "#78c7ff",
+  },
+  {
+    id: "cyber-antenna",
+    kind: "antenna",
+    district: "cyber",
+    x: 708,
+    y: 925,
+    w: 82,
+    h: 96,
+    color: "#9bd8ff",
+  },
+  {
+    id: "cyber-terminal",
+    kind: "terminal",
+    district: "cyber",
+    x: 210,
+    y: 940,
+    w: 76,
+    h: 52,
+    color: "#78c7ff",
+    label: "SIEM",
+  },
+  {
+    id: "ai-light-1",
+    kind: "lab-light",
+    district: "ai",
+    x: 960,
+    y: 840,
+    w: 90,
+    h: 90,
+    color: "#bfa7ff",
+  },
+  {
+    id: "ai-light-2",
+    kind: "lab-light",
+    district: "ai",
+    x: 1710,
+    y: 1260,
+    w: 90,
+    h: 90,
+    color: "#8ee8ff",
+  },
+  {
+    id: "ai-terminal",
+    kind: "terminal",
+    district: "ai",
+    x: 1378,
+    y: 1110,
+    w: 88,
+    h: 58,
+    color: "#bfa7ff",
+    label: "Plan -> Build",
+  },
+  {
+    id: "career-fountain",
+    kind: "trophy",
+    district: "career",
+    x: 1880,
+    y: 130,
+    w: 72,
+    h: 72,
+    color: "#e8d7c4",
+  },
+  {
+    id: "career-bench-1",
+    kind: "bench",
+    district: "career",
+    x: 1730,
+    y: 420,
+    w: 90,
+    h: 36,
+    color: "#9c8468",
+  },
+  {
+    id: "career-bench-2",
+    kind: "bench",
+    district: "career",
+    x: 2045,
+    y: 450,
+    w: 90,
+    h: 36,
+    color: "#9c8468",
+  },
+  {
+    id: "museum-torch-1",
+    kind: "lamp",
+    district: "museum",
+    x: 1730,
+    y: 760,
+    w: 28,
+    h: 82,
+    color: "#f6d777",
+  },
+  {
+    id: "museum-torch-2",
+    kind: "lamp",
+    district: "museum",
+    x: 2220,
+    y: 760,
+    w: 28,
+    h: 82,
+    color: "#f6d777",
+  },
+  {
+    id: "museum-runner",
+    kind: "trophy",
+    district: "museum",
+    x: 1888,
+    y: 948,
+    w: 72,
+    h: 72,
+    color: "#f6d777",
+    label: "Proof",
+  },
+];
+
+const keyProofEntities = [
+  "fofit-mobile",
+  "fofit-coach",
+  "soc-monitor",
+  "netwatch",
+  "pentest-lab",
+  "agentroom",
+  "resume-terminal",
+];
+
 const spawn = { x: 300, y: 298 };
 
 function clamp(value: number, min: number, max: number) {
@@ -595,25 +907,61 @@ function getProject(slug?: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
 
-function PixelKenan() {
+function getCurrentDistrict(player: { x: number; y: number }) {
+  const center = { x: player.x + PLAYER.width / 2, y: player.y + PLAYER.height / 2 };
+  return districts.find(
+    (district) =>
+      center.x >= district.x &&
+      center.x <= district.x + district.w &&
+      center.y >= district.y &&
+      center.y <= district.y + district.h,
+  );
+}
+
+function PixelKenan({ facing, moving }: { facing: Facing; moving: boolean }) {
   return (
-    <div className="relative h-[46px] w-[34px] drop-shadow-[0_12px_18px_rgba(0,0,0,.55)]">
-      <div className="absolute top-0 left-[9px] h-4 w-4 bg-[#1b1b1b] shadow-[4px_0_0_#1b1b1b,-4px_2px_0_#1b1b1b]" />
-      <div className="absolute top-[11px] left-[10px] h-3 w-4 border border-black/30 bg-[#8b5a3c]" />
-      <div className="absolute top-[22px] left-[7px] h-4 w-5 bg-white shadow-[5px_0_0_#cfcfcf,-5px_0_0_#cfcfcf]" />
-      <div className="absolute top-[36px] left-[8px] h-2 w-2 bg-[#202020] shadow-[12px_0_0_#202020]" />
-      <div className="absolute top-[28px] left-[2px] h-2 w-2 bg-[#8b5a3c] shadow-[28px_0_0_#8b5a3c]" />
+    <div
+      className={cn(
+        "kenan-player relative h-[46px] w-[34px] drop-shadow-[0_14px_18px_rgba(0,0,0,.55)]",
+        moving && "kenan-player--moving",
+      )}
+      data-facing={facing}
+    >
+      <div className="absolute -bottom-1 left-1/2 h-2 w-9 -translate-x-1/2 rounded-full bg-black/45 blur-[1px]" />
+      <div className="absolute top-0 left-[8px] h-4 w-5 bg-[#141414] shadow-[4px_0_0_#141414,-4px_2px_0_#141414,0_4px_0_#141414]" />
+      <div className="absolute top-[11px] left-[9px] h-3 w-5 border border-black/35 bg-[#8b5a3c]">
+        {facing !== "up" && (
+          <>
+            <span className="absolute top-1 left-1 h-1 w-1 bg-black/75" />
+            <span className="absolute top-1 right-1 h-1 w-1 bg-black/75" />
+          </>
+        )}
+      </div>
+      <div className="absolute top-[21px] left-[6px] h-5 w-6 border border-black/35 bg-[#101419] shadow-[5px_0_0_#d8fff7,-5px_0_0_#d8fff7]" />
+      <div className="absolute top-[24px] left-[12px] h-1.5 w-3 bg-[#76f4df]" />
+      <div
+        className={cn(
+          "absolute top-[37px] h-2 w-2 bg-[#202020] shadow-[12px_0_0_#202020]",
+          moving ? "left-[7px]" : "left-[8px]",
+        )}
+      />
+      <div className="absolute top-[28px] left-[1px] h-2 w-2 bg-[#8b5a3c] shadow-[30px_0_0_#8b5a3c]" />
     </div>
   );
 }
 
-function PixelNpc({ accent }: { accent: string }) {
+function PixelNpc({ accent, active }: { accent: string; active: boolean }) {
   return (
-    <div className="relative h-full w-full">
+    <div className={cn("npc-sprite relative h-full w-full", active && "npc-sprite--active")}>
+      {active && (
+        <div className="absolute -top-5 left-1/2 flex size-5 -translate-x-1/2 items-center justify-center rounded-full border border-white/35 bg-black/85 font-mono text-[10px] text-white">
+          E
+        </div>
+      )}
       <div className="absolute top-1 left-1/2 h-4 w-4 -translate-x-1/2 bg-[#202020]" />
       <div className="absolute top-4 left-1/2 h-3 w-5 -translate-x-1/2 border border-black/30 bg-[#8b5a3c]" />
       <div
-        className="absolute top-7 left-1/2 h-7 w-7 -translate-x-1/2 border border-black/40"
+        className="absolute top-7 left-1/2 h-7 w-7 -translate-x-1/2 border border-black/40 shadow-[inset_0_0_0_3px_rgba(255,255,255,.18)]"
         style={{ backgroundColor: accent }}
       />
       <div className="absolute bottom-1 left-[14px] h-3 w-2 bg-[#111] shadow-[12px_0_0_#111]" />
@@ -621,38 +969,219 @@ function PixelNpc({ accent }: { accent: string }) {
   );
 }
 
-function BuildingSprite({ entity }: { entity: WorldEntity }) {
+function BuildingSprite({ entity, active }: { entity: WorldEntity; active: boolean }) {
+  const district = districtById.get(entity.district)!;
   const isTower = entity.id.includes("netwatch");
-  const isLab = entity.title.toLowerCase().includes("lab");
+  const isLab = entity.title.toLowerCase().includes("lab") || entity.district === "ai";
+  const isMuseum = entity.district === "museum";
+  const isCyber = entity.district === "cyber";
+  const isFoFit = entity.district === "fofit";
+  const isCareer = entity.district === "career";
+  const roof =
+    entity.id === "marketplace"
+      ? "polygon(0 38%, 12% 0, 88% 0, 100% 38%, 100% 100%, 0 100%)"
+      : isMuseum
+        ? "polygon(50% 0, 100% 42%, 92% 100%, 8% 100%, 0 42%)"
+        : isLab
+          ? "polygon(14% 0, 86% 0, 100% 100%, 0 100%)"
+          : "polygon(8% 0, 92% 0, 100% 100%, 0 100%)";
+
   return (
     <div className="relative h-full w-full">
       <div
-        className="absolute inset-x-2 top-0 h-7 border border-black/45"
+        className={cn(
+          "absolute -inset-3 rounded-[2px] opacity-0 blur-md transition duration-300",
+          active && "opacity-70",
+        )}
+        style={{ background: `radial-gradient(circle, ${district.accent}, transparent 70%)` }}
+      />
+      <div
+        className="absolute inset-x-2 top-0 h-8 border border-black/55 shadow-[0_6px_0_rgba(0,0,0,.28)]"
         style={{
-          background: `linear-gradient(90deg, ${entity.accent}, rgba(255,255,255,.88))`,
-          clipPath: isLab ? "polygon(14% 0, 86% 0, 100% 100%, 0 100%)" : undefined,
+          background: `linear-gradient(90deg, ${entity.accent}, ${district.secondary}, rgba(255,255,255,.78))`,
+          clipPath: roof,
         }}
       />
       <div
-        className="absolute inset-x-0 bottom-0 border border-black/50 bg-[#171717]"
+        className="absolute inset-x-0 bottom-0 border border-black/55"
         style={{ top: isTower ? 20 : 28 }}
       >
-        <div className="grid h-full grid-cols-3 gap-2 p-3">
-          {Array.from({ length: isTower ? 9 : 6 }).map((_, index) => (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.20)), ${isCyber ? "#06121e" : isFoFit ? "#082724" : isCareer ? "#211f1c" : isMuseum ? "#222016" : "#171321"}`,
+          }}
+        />
+        <div
+          className={cn(
+            "relative grid h-full gap-2 p-3",
+            isTower ? "grid-cols-2" : isFoFit ? "grid-cols-4" : "grid-cols-3",
+          )}
+        >
+          {Array.from({ length: isTower ? 12 : isMuseum ? 4 : 8 }).map((_, index) => (
             <span
               key={index}
-              className="border border-white/12 bg-white/18"
-              style={{ boxShadow: index % 3 === 0 ? `0 0 12px ${entity.accent}66` : undefined }}
+              className={cn("border border-white/12", isMuseum && index < 2 ? "rounded-full" : "")}
+              style={{
+                background:
+                  index % 3 === 0
+                    ? `${district.accent}66`
+                    : isCyber || isLab
+                      ? "rgba(255,255,255,.10)"
+                      : "rgba(255,255,255,.17)",
+                boxShadow: index % 3 === 0 ? `0 0 12px ${district.accent}70` : undefined,
+              }}
             />
           ))}
         </div>
       </div>
-      <div className="absolute right-3 bottom-0 left-3 h-5 border border-black/60 bg-black" />
+      {isFoFit && (
+        <div className="absolute right-5 bottom-7 h-2 w-14 bg-[#76f4df] shadow-[0_0_14px_#76f4df]" />
+      )}
+      {isCyber && (
+        <div className="absolute top-3 right-2 h-8 w-1 bg-[#78c7ff] shadow-[0_0_14px_#78c7ff]" />
+      )}
+      {isMuseum && (
+        <>
+          <div className="absolute right-5 bottom-2 h-16 w-2 bg-[#f6d777]" />
+          <div className="absolute bottom-2 left-5 h-16 w-2 bg-[#f6d777]" />
+        </>
+      )}
+      <div className="absolute right-3 bottom-0 left-3 h-5 border border-black/60 bg-black shadow-[0_-4px_0_rgba(255,255,255,.06)]" />
       <div
-        className="absolute bottom-1 left-1/2 h-4 w-9 -translate-x-1/2 border border-white/10"
-        style={{ backgroundColor: entity.accent }}
+        className="absolute bottom-1 left-1/2 h-4 w-10 -translate-x-1/2 border border-white/12"
+        style={{ backgroundColor: isMuseum ? "#111" : entity.accent }}
+      />
+      <div
+        className="absolute -bottom-3 left-1/2 h-3 w-[80%] -translate-x-1/2 rounded-full bg-black/45 blur-[2px]"
+        aria-hidden
       />
     </div>
+  );
+}
+
+function PropSprite({ prop }: { prop: WorldProp }) {
+  const color = prop.color ?? districtById.get(prop.district)?.accent ?? "#ffffff";
+
+  if (prop.kind === "tree" || prop.kind === "planter") {
+    return (
+      <div className="relative h-full w-full">
+        <div className="absolute bottom-0 left-1/2 h-4 w-5 -translate-x-1/2 border border-black/50 bg-[#5b3b28]" />
+        <div
+          className="absolute top-0 left-1/2 size-9 -translate-x-1/2 rounded-[3px] border border-black/40 shadow-[inset_0_0_0_4px_rgba(255,255,255,.12)]"
+          style={{ backgroundColor: color }}
+        />
+        <div
+          className="absolute top-5 left-[7px] size-7 rounded-[3px] border border-black/35"
+          style={{ backgroundColor: color }}
+        />
+      </div>
+    );
+  }
+
+  if (prop.kind === "bench") {
+    return (
+      <div className="relative h-full w-full">
+        <div
+          className="absolute inset-x-0 top-2 h-3 border border-black/45"
+          style={{ backgroundColor: color }}
+        />
+        <div className="absolute inset-x-2 top-6 h-2 border border-black/45 bg-black/45" />
+        <div className="absolute bottom-0 left-3 h-3 w-2 bg-black/70 shadow-[42px_0_0_rgba(0,0,0,.7)]" />
+      </div>
+    );
+  }
+
+  if (prop.kind === "lamp") {
+    return (
+      <div className="relative h-full w-full">
+        <div
+          className="absolute -top-3 left-1/2 size-9 -translate-x-1/2 rounded-full opacity-45 blur-md"
+          style={{ backgroundColor: color }}
+        />
+        <div
+          className="absolute top-1 left-1/2 size-4 -translate-x-1/2 rounded-full border border-black/40"
+          style={{ backgroundColor: color }}
+        />
+        <div className="absolute top-5 bottom-1 left-1/2 w-1 -translate-x-1/2 bg-[#161616]" />
+        <div className="absolute right-1 bottom-0 left-1 h-2 border border-black/50 bg-[#101010]" />
+      </div>
+    );
+  }
+
+  if (prop.kind === "server") {
+    return (
+      <div className="grid h-full w-full gap-1 border border-black/55 bg-[#07111a] p-1">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <span
+            key={index}
+            className="border border-white/10 bg-white/[0.08]"
+            style={{ boxShadow: index % 2 === 0 ? `0 0 10px ${color}70` : undefined }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (prop.kind === "antenna") {
+    return (
+      <div className="relative h-full w-full">
+        <div className="absolute bottom-0 left-1/2 h-16 w-1 -translate-x-1/2 bg-white/50" />
+        <div
+          className="absolute top-4 left-1/2 h-10 w-10 -translate-x-1/2 rotate-45 border-t border-l"
+          style={{ borderColor: color }}
+        />
+        <div
+          className="absolute top-1 left-1/2 size-3 -translate-x-1/2 rounded-full"
+          style={{ backgroundColor: color, boxShadow: `0 0 16px ${color}` }}
+        />
+      </div>
+    );
+  }
+
+  if (prop.kind === "terminal" || prop.kind === "kiosk" || prop.kind === "sign") {
+    return (
+      <div className="relative flex h-full w-full items-center justify-center border border-black/55 bg-[#080808] p-2 text-center font-mono text-[9px] font-semibold text-white uppercase">
+        <div className="absolute inset-1 border border-white/10" />
+        <span className="relative" style={{ color }}>
+          {prop.label ?? prop.kind}
+        </span>
+      </div>
+    );
+  }
+
+  if (prop.kind === "trophy") {
+    return (
+      <div className="relative h-full w-full">
+        <div
+          className="absolute top-0 left-1/2 size-8 -translate-x-1/2 rounded-b-full border border-black/45"
+          style={{ backgroundColor: color }}
+        />
+        <div className="absolute top-8 left-1/2 h-6 w-2 -translate-x-1/2 bg-white/45" />
+        <div className="absolute right-3 bottom-0 left-3 h-3 border border-black/45 bg-[#111]" />
+      </div>
+    );
+  }
+
+  if (prop.kind === "lab-light") {
+    return (
+      <div
+        className="world-pulse h-full w-full rounded-full opacity-70 blur-[1px]"
+        style={{ background: `radial-gradient(circle, ${color}, transparent 62%)` }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="h-full w-full rounded-[2px] border border-black/40 opacity-80"
+      style={{
+        background:
+          prop.kind === "field"
+            ? `repeating-linear-gradient(90deg, ${color} 0 18px, rgba(0,0,0,.12) 18px 24px)`
+            : color,
+      }}
+    />
   );
 }
 
@@ -686,13 +1215,17 @@ function ObjectSprite({ entity }: { entity: WorldEntity }) {
 }
 
 function CollectibleSprite({ entity, collected }: { entity: WorldEntity; collected: boolean }) {
+  const district = districtById.get(entity.district)!;
   return (
     <div
       className={cn(
-        "flex h-full w-full items-center justify-center border-2 border-black bg-white font-mono text-[10px] font-bold text-black shadow-[0_0_18px_rgba(255,255,255,.32)]",
+        "world-token flex h-full w-full items-center justify-center rounded-[3px] border-2 border-black font-mono text-[10px] font-bold text-black shadow-[0_0_18px_rgba(255,255,255,.32)]",
         collected && "opacity-25 grayscale",
       )}
-      style={{ backgroundColor: entity.accent }}
+      style={{
+        backgroundColor: entity.accent,
+        boxShadow: collected ? undefined : `0 0 22px ${district.accent}70`,
+      }}
     >
       {entity.collectibleLabel}
     </div>
@@ -716,8 +1249,8 @@ function EntitySprite({
       onClick={onInteract}
       aria-label={`Interact with ${entity.title}`}
       className={cn(
-        "group absolute transition duration-200",
-        active && "z-30 scale-105 drop-shadow-[0_0_24px_rgba(255,255,255,.22)]",
+        "group absolute transition duration-200 focus:outline-none",
+        active && "z-30 scale-105",
         collected && entity.kind === "collectible" && "pointer-events-none",
       )}
       style={{
@@ -728,41 +1261,88 @@ function EntitySprite({
         imageRendering: "pixelated",
       }}
     >
-      {entity.kind === "building" && <BuildingSprite entity={entity} />}
-      {entity.kind === "npc" && <PixelNpc accent={entity.accent} />}
+      {active && entity.kind !== "collectible" && (
+        <span
+          className="pointer-events-none absolute -inset-3 rounded-[2px] border border-white/40 opacity-80"
+          style={{ boxShadow: `0 0 26px ${districtById.get(entity.district)?.accent ?? "#fff"}` }}
+        />
+      )}
+      {entity.kind === "building" && <BuildingSprite entity={entity} active={active} />}
+      {entity.kind === "npc" && <PixelNpc accent={entity.accent} active={active} />}
       {entity.kind === "object" && <ObjectSprite entity={entity} />}
       {entity.kind === "collectible" && <CollectibleSprite entity={entity} collected={collected} />}
-      <span className="absolute top-full left-1/2 mt-2 hidden -translate-x-1/2 border border-white/15 bg-black/80 px-2 py-1 font-mono text-[10px] whitespace-nowrap text-white shadow-lg group-hover:block md:block">
+      <span
+        className={cn(
+          "absolute top-full left-1/2 mt-2 -translate-x-1/2 border border-white/15 bg-black/80 px-2 py-1 font-mono text-[10px] whitespace-nowrap text-white shadow-lg backdrop-blur transition",
+          active ? "block" : "hidden group-hover:block md:block",
+        )}
+      >
         {entity.title}
       </span>
+      {active && (
+        <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full border border-white/20 bg-black/80 px-2 py-1 font-mono text-[9px] whitespace-nowrap text-white uppercase shadow-lg">
+          Press E
+        </span>
+      )}
     </button>
   );
 }
 
-function DistrictPanel({ district }: { district: (typeof districts)[number] }) {
+function DistrictPanel({
+  district,
+  discovered,
+}: {
+  district: (typeof districts)[number];
+  discovered: boolean;
+}) {
   return (
     <section
       aria-label={`${district.title}: ${district.subtitle}`}
-      className="absolute overflow-hidden border border-white/16 shadow-[inset_0_0_0_2px_rgba(0,0,0,.22),0_24px_90px_rgba(0,0,0,.34)]"
+      className={cn(
+        "absolute overflow-hidden border shadow-[inset_0_0_0_2px_rgba(0,0,0,.22),0_24px_90px_rgba(0,0,0,.34)] transition duration-500",
+        discovered ? "opacity-100" : "opacity-88",
+      )}
       style={{
         left: district.x,
         top: district.y,
         width: district.w,
         height: district.h,
-        background: `${district.background}, repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 2px, transparent 2px 32px), repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 32px)`,
+        borderColor: district.border,
+        background: `${district.background}, radial-gradient(circle at 78% 82%, ${district.glow}, transparent 34%), repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 2px, transparent 2px 32px), repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 32px)`,
+        boxShadow: `inset 0 0 0 2px rgba(0,0,0,.22), 0 24px 90px rgba(0,0,0,.34), 0 0 55px ${district.glow}`,
         imageRendering: "pixelated",
       }}
     >
-      <div className="absolute top-4 left-4 border border-white/18 bg-black/45 px-3 py-2 backdrop-blur">
+      <div
+        className="absolute inset-x-6 top-1/2 h-4 -translate-y-1/2 rounded-full border border-black/20 opacity-45"
+        style={{ backgroundColor: district.path }}
+      />
+      <div
+        className="absolute top-6 bottom-6 left-1/2 w-4 -translate-x-1/2 rounded-full border border-black/20 opacity-35"
+        style={{ backgroundColor: district.path }}
+      />
+      <div className="absolute top-4 left-4 border border-white/18 bg-black/48 px-3 py-2 shadow-[0_10px_28px_rgba(0,0,0,.28)] backdrop-blur">
         <p className="font-mono text-[10px] tracking-[0.18em] text-white/55 uppercase">
           {district.subtitle}
         </p>
-        <h2 className="mt-1 text-sm font-semibold text-white">{district.title}</h2>
+        <div className="mt-1 flex items-center gap-2">
+          <h2 className="text-sm font-semibold text-white">{district.title}</h2>
+          {discovered && <CheckCircle2 size={13} style={{ color: district.accent }} aria-hidden />}
+        </div>
       </div>
       <div
-        className="absolute right-0 bottom-0 h-28 w-28 opacity-30"
+        className="world-district-sheen absolute inset-0 opacity-35"
+        style={{
+          background: `linear-gradient(115deg, transparent 0%, ${district.glow} 46%, transparent 72%)`,
+        }}
+      />
+      <div
+        className="absolute right-0 bottom-0 h-36 w-36 opacity-40"
         style={{ background: `radial-gradient(circle, ${district.accent}, transparent 70%)` }}
       />
+      <div className="absolute right-4 bottom-4 font-mono text-[42px] font-black text-white/[0.035] uppercase">
+        {district.id}
+      </div>
     </section>
   );
 }
@@ -1093,31 +1673,43 @@ function RecruiterMode({
 function MiniMap({
   player,
   activeEntity,
+  visitedDistricts,
+  currentDistrict,
 }: {
   player: { x: number; y: number };
   activeEntity?: WorldEntity;
+  visitedDistricts: DistrictId[];
+  currentDistrict?: District;
 }) {
   return (
-    <div className="pointer-events-none absolute right-4 bottom-24 z-40 hidden w-52 rounded border border-white/12 bg-black/70 p-3 backdrop-blur md:block">
+    <div className="pointer-events-none absolute right-4 bottom-24 z-40 hidden w-56 rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:block">
       <div className="mb-2 flex items-center gap-2">
-        <Map size={12} aria-hidden />
+        <MapIcon size={12} aria-hidden />
         <p className="text-fg-muted font-mono text-[10px] uppercase">World Map</p>
       </div>
       <div className="relative aspect-[236/154] border border-white/10 bg-white/[0.03]">
         {districts.map((district) => (
           <span
             key={district.id}
-            className="absolute border border-white/14 bg-white/10"
+            className={cn(
+              "absolute border transition",
+              currentDistrict?.id === district.id ? "opacity-100" : "opacity-65",
+            )}
             style={{
               left: `${(district.x / WORLD.width) * 100}%`,
               top: `${(district.y / WORLD.height) * 100}%`,
               width: `${(district.w / WORLD.width) * 100}%`,
               height: `${(district.h / WORLD.height) * 100}%`,
+              borderColor:
+                currentDistrict?.id === district.id ? district.accent : "rgba(255,255,255,.14)",
+              backgroundColor: visitedDistricts.includes(district.id)
+                ? `${district.accent}24`
+                : "rgba(255,255,255,.08)",
             }}
           />
         ))}
         <span
-          className="absolute size-2 -translate-x-1/2 -translate-y-1/2 bg-white"
+          className="world-token absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
           style={{
             left: `${(player.x / WORLD.width) * 100}%`,
             top: `${(player.y / WORLD.height) * 100}%`,
@@ -1125,7 +1717,11 @@ function MiniMap({
         />
       </div>
       <p className="text-fg-muted mt-2 min-h-4 truncate font-mono text-[10px]">
-        {activeEntity ? `Near: ${activeEntity.title}` : "Find a building, NPC, or token"}
+        {activeEntity
+          ? `Near: ${activeEntity.title}`
+          : currentDistrict
+            ? `In: ${currentDistrict.title}`
+            : "Find a building, NPC, or token"}
       </p>
     </div>
   );
@@ -1200,12 +1796,46 @@ export default function KenanWorld() {
   const [focusedEntity, setFocusedEntity] = useState<WorldEntity | null>(null);
   const [collected, setCollected] = useState<string[]>([]);
   const [recruiterMode, setRecruiterMode] = useState(false);
+  const [visitedDistricts, setVisitedDistricts] = useState<DistrictId[]>(["hometown"]);
+  const [unlockedProof, setUnlockedProof] = useState<string[]>([]);
+  const [notification, setNotification] = useState<{
+    title: string;
+    body: string;
+    accent: string;
+  } | null>(null);
+  const [facing, setFacing] = useState<Facing>("down");
+  const [moving, setMoving] = useState(false);
   const pressed = useRef<Record<string, boolean>>({});
+  const movingRef = useRef(false);
+  const facingRef = useRef<Facing>("down");
 
   const collectibleCount = useMemo(
     () => entities.filter((entity) => entity.kind === "collectible").length,
     [],
   );
+
+  const currentDistrict = useMemo(() => getCurrentDistrict(player), [player]);
+
+  const progressTotal = districts.length + collectibleCount + keyProofEntities.length;
+  const progressCount = Math.min(
+    progressTotal,
+    visitedDistricts.length + collected.length + unlockedProof.length,
+  );
+  const completionPercent = Math.round((progressCount / progressTotal) * 100);
+
+  const objectiveText =
+    collected.length < 3
+      ? `Collect ${3 - collected.length} more proof token${3 - collected.length === 1 ? "" : "s"} to unlock the early proof path.`
+      : unlockedProof.length < 4
+        ? `Enter ${4 - unlockedProof.length} more project or experience stop${4 - unlockedProof.length === 1 ? "" : "s"} to deepen the proof report.`
+        : "Open Recruiter Mode when you want the clean summary.";
+
+  const announce = useCallback((title: string, body: string, accent: string) => {
+    setNotification({ title, body, accent });
+    window.setTimeout(() => {
+      setNotification((current) => (current?.title === title ? null : current));
+    }, 2400);
+  }, []);
 
   const activeEntity = useMemo(() => {
     const candidates = entities
@@ -1223,16 +1853,35 @@ export default function KenanWorld() {
         setCollected((current) =>
           current.includes(entity.id) ? current : [...current, entity.id],
         );
+        announce("Proof token collected", entity.proof[0] ?? entity.title, entity.accent);
         setFocusedEntity(entity);
         return;
       }
       if (entity.id === "resume-terminal") {
+        setUnlockedProof((current) =>
+          current.includes(entity.id) ? current : [...current, entity.id],
+        );
+        announce(
+          "Recruiter summary unlocked",
+          "Resume, projects, skills, and contact in one view.",
+          entity.accent,
+        );
         setRecruiterMode(true);
         return;
       }
+      if (
+        keyProofEntities.includes(entity.id) ||
+        entity.kind === "npc" ||
+        entity.kind === "object"
+      ) {
+        setUnlockedProof((current) =>
+          current.includes(entity.id) ? current : [...current, entity.id],
+        );
+        announce("Proof unlocked", `${entity.title} added to the world path.`, entity.accent);
+      }
       setFocusedEntity(entity);
     },
-    [activeEntity],
+    [activeEntity, announce],
   );
 
   const setDirection = useCallback((key: string, active: boolean) => {
@@ -1247,6 +1896,18 @@ export default function KenanWorld() {
     window.addEventListener("resize", syncViewport);
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
+
+  useEffect(() => {
+    if (!started || !currentDistrict || visitedDistricts.includes(currentDistrict.id)) return;
+    setVisitedDistricts((current) =>
+      current.includes(currentDistrict.id) ? current : [...current, currentDistrict.id],
+    );
+    announce(
+      "District discovered",
+      `${currentDistrict.title}: ${currentDistrict.subtitle}`,
+      currentDistrict.accent,
+    );
+  }, [announce, currentDistrict, started, visitedDistricts]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -1288,13 +1949,28 @@ export default function KenanWorld() {
   }, [focusedEntity, interact, recruiterMode, started]);
 
   useEffect(() => {
-    if (!started || focusedEntity || recruiterMode) return;
+    if (!started || focusedEntity || recruiterMode) {
+      movingRef.current = false;
+      setMoving(false);
+      return;
+    }
     let frame = 0;
     const tick = () => {
       const keys = pressed.current;
       const dx = (keys.ArrowRight || keys.d ? 1 : 0) - (keys.ArrowLeft || keys.a ? 1 : 0);
       const dy = (keys.ArrowDown || keys.s ? 1 : 0) - (keys.ArrowUp || keys.w ? 1 : 0);
+      const nextMoving = Boolean(dx || dy);
+      if (movingRef.current !== nextMoving) {
+        movingRef.current = nextMoving;
+        setMoving(nextMoving);
+      }
       if (dx || dy) {
+        const nextFacing: Facing =
+          Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : dy > 0 ? "down" : "up";
+        if (facingRef.current !== nextFacing) {
+          facingRef.current = nextFacing;
+          setFacing(nextFacing);
+        }
         const diagonal = dx && dy ? 0.72 : 1;
         setPlayer((current) => ({
           x: clamp(current.x + dx * 4.4 * diagonal, 20, WORLD.width - PLAYER.width - 20),
@@ -1332,6 +2008,8 @@ export default function KenanWorld() {
             </div>
           </div>
           <div className="text-fg-muted hidden items-center gap-4 font-mono text-[10px] uppercase md:flex">
+            <span>{currentDistrict ? currentDistrict.title : "Between districts"}</span>
+            <span>{completionPercent}% complete</span>
             <span>Move: WASD / arrows</span>
             <span>Interact: E / Enter</span>
             <span>Recruiter: R</span>
@@ -1364,12 +2042,32 @@ export default function KenanWorld() {
             }}
           />
           {districts.map((district) => (
-            <DistrictPanel key={district.id} district={district} />
+            <DistrictPanel
+              key={district.id}
+              district={district}
+              discovered={visitedDistricts.includes(district.id)}
+            />
           ))}
 
-          <div className="absolute top-[280px] left-[630px] h-[24px] w-[1160px] border-y border-white/12 bg-white/[0.045]" />
-          <div className="absolute top-[690px] left-[800px] h-[24px] w-[980px] rotate-[18deg] border-y border-white/12 bg-white/[0.04]" />
-          <div className="absolute top-[600px] left-[900px] h-[760px] w-[24px] border-x border-white/12 bg-white/[0.04]" />
+          <div className="absolute top-[280px] left-[630px] h-[28px] w-[1160px] border-y border-white/12 bg-[#5b5650]/70 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]" />
+          <div className="absolute top-[690px] left-[800px] h-[28px] w-[980px] rotate-[18deg] border-y border-white/12 bg-[#3b4550]/70 shadow-[inset_0_1px_0_rgba(255,255,255,.08)]" />
+          <div className="absolute top-[600px] left-[900px] h-[760px] w-[28px] border-x border-white/12 bg-[#4c3f64]/70 shadow-[inset_1px_0_0_rgba(255,255,255,.08)]" />
+
+          {worldProps.map((prop) => (
+            <div
+              key={prop.id}
+              className="absolute z-10"
+              style={{
+                left: prop.x,
+                top: prop.y,
+                width: prop.w,
+                height: prop.h,
+                imageRendering: "pixelated",
+              }}
+            >
+              <PropSprite prop={prop} />
+            </div>
+          ))}
 
           {entities.map((entity) => (
             <EntitySprite
@@ -1385,17 +2083,52 @@ export default function KenanWorld() {
             className="absolute z-40"
             style={{ left: player.x, top: player.y, width: PLAYER.width, height: PLAYER.height }}
           >
-            <PixelKenan />
+            <PixelKenan facing={facing} moving={moving} />
           </div>
         </div>
       </div>
 
-      <div className="pointer-events-none fixed top-16 left-3 z-40 max-w-[calc(100vw-1.5rem)] rounded border border-white/12 bg-black/65 p-3 backdrop-blur md:left-5">
-        <p className="text-fg-muted font-mono text-[10px] uppercase">Current Objective</p>
-        <p className="text-fg-secondary mt-1 max-w-md text-sm">
-          Explore buildings, talk to NPCs, collect proof tokens, or press R for the recruiter view.
-        </p>
+      <div className="pointer-events-none fixed top-16 left-3 z-40 max-w-[calc(100vw-1.5rem)] rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5">
+        <div className="flex items-center gap-2">
+          <span
+            className="size-2 rounded-full"
+            style={{ backgroundColor: currentDistrict?.accent ?? "#fff" }}
+          />
+          <p className="text-fg-muted font-mono text-[10px] uppercase">
+            Current Objective · {currentDistrict?.title ?? "World Path"}
+          </p>
+        </div>
+        <p className="text-fg-secondary mt-1 max-w-md text-sm">{objectiveText}</p>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${completionPercent}%`,
+              background: `linear-gradient(90deg, ${currentDistrict?.accent ?? "#fff"}, #ffffff)`,
+            }}
+          />
+        </div>
       </div>
+
+      {notification && (
+        <div className="world-notification fixed top-[4.5rem] left-1/2 z-[60] w-[min(92vw,420px)] -translate-x-1/2 rounded border border-white/16 bg-black/78 p-3 shadow-[0_18px_70px_rgba(0,0,0,.42)] backdrop-blur">
+          <div className="flex items-start gap-3">
+            <span
+              className="mt-1 size-2 shrink-0 rounded-full"
+              style={{
+                backgroundColor: notification.accent,
+                boxShadow: `0 0 18px ${notification.accent}`,
+              }}
+            />
+            <div>
+              <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+                {notification.title}
+              </p>
+              <p className="mt-1 text-sm text-white">{notification.body}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {activeEntity && started && !focusedEntity && !recruiterMode && (
         <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded border border-white/18 bg-black/75 px-4 py-3 text-center backdrop-blur md:bottom-8">
@@ -1405,9 +2138,14 @@ export default function KenanWorld() {
         </div>
       )}
 
-      <MiniMap player={player} activeEntity={activeEntity} />
+      <MiniMap
+        player={player}
+        activeEntity={activeEntity}
+        visitedDistricts={visitedDistricts}
+        currentDistrict={currentDistrict}
+      />
 
-      <div className="fixed bottom-4 left-4 z-40 hidden rounded border border-white/12 bg-black/65 p-3 backdrop-blur md:block">
+      <div className="fixed bottom-4 left-4 z-40 hidden rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:block">
         <div className="flex items-center gap-2">
           <Trophy size={14} aria-hidden />
           <p className="text-fg-muted font-mono text-[10px] uppercase">
