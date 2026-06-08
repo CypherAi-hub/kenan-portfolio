@@ -7,18 +7,30 @@ import {
   Award,
   BriefcaseBusiness,
   CheckCircle2,
+  Cpu,
   Download,
   Github,
+  Images,
+  Layers,
   Linkedin,
   Mail,
   Map as MapIcon,
   Maximize2,
+  ShieldCheck,
+  Sparkles,
   Trophy,
   X,
 } from "lucide-react";
+import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { certifications, experiences, profile, skillGroups } from "@/lib/data";
-import { caseStudies, featuredProjects, projects, type Project } from "@/data/projects";
+import {
+  caseStudies,
+  featuredProjects,
+  projects,
+  type Project,
+  type ProjectMedia,
+} from "@/data/projects";
 import { cn } from "@/lib/utils";
 
 type EntityKind = "building" | "npc" | "object" | "collectible";
@@ -82,6 +94,15 @@ type WorldProp = {
   h: number;
   color?: string;
   label?: string;
+};
+
+type ShowroomPreset = {
+  room: string;
+  visualMode: "mobile" | "dashboard" | "security" | "cloud" | "agent" | "report" | "proof";
+  proofType: string;
+  proofLine: string;
+  workflow: string[];
+  recruiterRead: string;
 };
 
 const WORLD = { width: 2360, height: 1540 };
@@ -890,6 +911,156 @@ const keyProofEntities = [
   "resume-terminal",
 ];
 
+const showroomPresets: Record<string, ShowroomPreset> = {
+  "fofit-mobile": {
+    room: "Mobile Product HQ",
+    visualMode: "mobile",
+    proofType: "AI Product Engineering",
+    proofLine:
+      "The flagship product room: mobile training, Cypher support, nutrition, and athlete workflow proof.",
+    workflow: ["Athlete context", "AI coach prompt", "Workout logging", "Fuel workflow"],
+    recruiterRead:
+      "Shows product depth, mobile execution, and the ability to move from idea to usable app surfaces.",
+  },
+  "fofit-coach": {
+    room: "Coach Command Center",
+    visualMode: "dashboard",
+    proofType: "Dashboard Product UX",
+    proofLine:
+      "Team-facing FoFit proof: coach dashboard direction, roster thinking, and B2B product surface.",
+    workflow: ["Roster view", "Athlete delivery", "Programming dashboard", "Team operations"],
+    recruiterRead: "Shows FoFit is a product ecosystem, not a one-screen app concept.",
+  },
+  "cypher-lab": {
+    room: "Cypher AI Lab",
+    visualMode: "mobile",
+    proofType: "AI Product Workflow",
+    proofLine:
+      "The AI layer room: screenshots and proof around recommendation, coaching, and assistant-style workflows.",
+    workflow: ["Context intake", "Training recommendation", "User confirmation", "Workout handoff"],
+    recruiterRead:
+      "Shows AI is embedded in a product loop instead of being treated as a generic chat box.",
+  },
+  marketplace: {
+    room: "FoFit Commerce Row",
+    visualMode: "dashboard",
+    proofType: "Business System Thinking",
+    proofLine:
+      "A product-business room for marketplace, affiliate, waitlist, and product-site surfaces.",
+    workflow: ["Landing intent", "Product browse", "Market proof", "Conversion path"],
+    recruiterRead: "Shows business-facing thinking around product distribution and user journeys.",
+  },
+  "nutrition-lab": {
+    room: "Fuel Systems Lab",
+    visualMode: "mobile",
+    proofType: "Product Depth",
+    proofLine:
+      "Nutrition and recovery proof: fuel plan, meal library, photo meal estimate, and athlete readiness context.",
+    workflow: ["Fuel target", "Meal library", "Photo estimate", "Recovery signal"],
+    recruiterRead:
+      "Shows the product reaches beyond workouts into a fuller athlete operating system.",
+  },
+  "soc-monitor": {
+    room: "SOC Console",
+    visualMode: "security",
+    proofType: "Defensive Security UX",
+    proofLine:
+      "A recruiter-safe security room for triage, packet review, MITRE context, and incident timeline proof.",
+    workflow: ["Alert triage", "Packet context", "MITRE mapping", "Analyst decision"],
+    recruiterRead:
+      "Shows cybersecurity thinking through defensive workflows and clear analyst communication.",
+  },
+  netwatch: {
+    room: "Monitoring Tower",
+    visualMode: "security",
+    proofType: "Security Monitoring Architecture",
+    proofLine: "Architecture and monitoring proof for metrics, alerting, and backend visibility.",
+    workflow: ["Metric capture", "Alert rule", "Dashboard view", "Storage model"],
+    recruiterRead:
+      "Shows backend/security architecture thinking even where the UI is still evolving.",
+  },
+  "pentest-lab": {
+    room: "Pentest Report Exhibit",
+    visualMode: "report",
+    proofType: "Cybersecurity Reporting",
+    proofLine:
+      "A safe, redacted report room focused on evidence capture, severity, remediation, and communication.",
+    workflow: ["Scope", "Evidence", "Severity", "Remediation"],
+    recruiterRead:
+      "Shows technical communication and responsible security reporting without exposing unsafe details.",
+  },
+  "aws-generator": {
+    room: "Cloud Pipeline Bay",
+    visualMode: "cloud",
+    proofType: "Cloud Automation",
+    proofLine: "AWS room for S3, Rekognition, Python processing, and output-label proof.",
+    workflow: ["Upload image", "S3 object", "Rekognition labels", "Python output"],
+    recruiterRead: "Shows practical cloud service wiring and explainable automation boundaries.",
+  },
+  agentroom: {
+    room: "Agent Mission Control",
+    visualMode: "agent",
+    proofType: "Agent Workflow Tooling",
+    proofLine:
+      "Agent operations room for checkpoints, blockers, validation, screenshots, and deploy-oriented workflow.",
+    workflow: ["Plan", "Build", "Validate", "Screenshot", "Deploy"],
+    recruiterRead:
+      "Shows systems thinking around managing AI coding agents and technical proof loops.",
+  },
+  omni: {
+    room: "AI Builder IDE",
+    visualMode: "agent",
+    proofType: "Developer Tooling",
+    proofLine:
+      "A builder-lab room for the Omni AI browser IDE direction and local project surface.",
+    workflow: ["Describe app", "Run workspace", "Preview output", "Publish path"],
+    recruiterRead: "Shows interest in AI-native developer tooling and productized build workflows.",
+  },
+  ruflo: {
+    room: "Operations Console",
+    visualMode: "agent",
+    proofType: "Agent Operations",
+    proofLine:
+      "A proof room for guardrails, workflow documentation, and local agent operations direction.",
+    workflow: ["Guardrails", "Workspace", "Review", "Publish"],
+    recruiterRead: "Shows operational discipline around AI-assisted building.",
+  },
+  "stack-mode": {
+    room: "Finance Prototype Studio",
+    visualMode: "mobile",
+    proofType: "Mobile Product Concepting",
+    proofLine:
+      "A finance-product prototype room for debt payoff, savings buckets, and planning workflows.",
+    workflow: ["Paycheck split", "Debt plan", "Savings bucket", "Daily lock-in"],
+    recruiterRead:
+      "Shows range across mobile product categories while keeping prototype status honest.",
+  },
+  "google-cert": {
+    room: "Certification Trophy Hall",
+    visualMode: "proof",
+    proofType: "Cybersecurity Learning",
+    proofLine: "Certificate proof room for completed cybersecurity coursework and foundations.",
+    workflow: ["Foundations", "Risk", "Networks", "Detection", "Automation"],
+    recruiterRead: "Shows verified learning progress without overstating certifications.",
+  },
+  "security-plus": {
+    room: "Security+ Study Wing",
+    visualMode: "proof",
+    proofType: "Certification In Progress",
+    proofLine: "Study-path room for Security+ preparation and expected September 2026 timeline.",
+    workflow: ["Threats", "Architecture", "Implementation", "Operations"],
+    recruiterRead: "Shows the certification target honestly as in progress.",
+  },
+  "resume-terminal": {
+    room: "Recruiter Terminal",
+    visualMode: "proof",
+    proofType: "Recruiter Usability",
+    proofLine: "The instant summary room: resume, projects, skills, contact, GitHub, LinkedIn.",
+    workflow: ["Summary", "Resume", "Projects", "Skills", "Contact"],
+    recruiterRead: "Shows the world stays optional and recruiter-friendly.",
+  },
+};
+
 const spawn = { x: 300, y: 298 };
 
 function clamp(value: number, min: number, max: number) {
@@ -905,6 +1076,41 @@ function distanceToEntity(player: { x: number; y: number }, entity: WorldEntity)
 function getProject(slug?: string): Project | undefined {
   if (!slug) return undefined;
   return projects.find((project) => project.slug === slug);
+}
+
+function getShowroomPreset(entity: WorldEntity, project?: Project): ShowroomPreset {
+  return (
+    showroomPresets[entity.id] ??
+    (project ? showroomPresets[project.slug] : undefined) ?? {
+      room: entity.kind === "npc" ? "Experience Dialogue" : "Proof Stop",
+      visualMode: "proof",
+      proofType: project?.proof ?? entity.subtitle,
+      proofLine: project?.longDescription ?? entity.proof[0] ?? entity.subtitle,
+      workflow: entity.proof.slice(0, 4).map((line, index) => `Proof ${index + 1}`),
+      recruiterRead:
+        project?.proof ??
+        "This interaction adds context to Kenan's founder, builder, cybersecurity, and career story.",
+    }
+  );
+}
+
+function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] {
+  if (project?.media.length) return project.media;
+  if (entity.id === "google-cert") {
+    const media = certifications.find((certification) => certification.media)?.media;
+    if (media) {
+      return [
+        {
+          src: media,
+          alt: "Google Cybersecurity Professional Certificate proof",
+          label: "Certificate proof",
+          source: "local",
+          type: "image",
+        },
+      ];
+    }
+  }
+  return [];
 }
 
 function getCurrentDistrict(player: { x: number; y: number }) {
@@ -1347,37 +1553,6 @@ function DistrictPanel({
   );
 }
 
-function ProjectMediaStrip({ project }: { project: Project }) {
-  const media = project.media.slice(0, 4);
-  if (media.length === 0) {
-    return (
-      <div className="border-border bg-bg-elevated text-fg-muted flex min-h-48 items-center justify-center rounded border text-sm">
-        Media coming soon
-      </div>
-    );
-  }
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {media.map((item) => (
-        <div key={item.src} className="overflow-hidden rounded border border-white/12 bg-black">
-          <div className="relative aspect-[16/10]">
-            <Image
-              src={item.src}
-              alt={item.alt}
-              fill
-              sizes="(min-width: 768px) 360px, 88vw"
-              className="object-cover object-top grayscale transition duration-300 hover:grayscale-0"
-            />
-          </div>
-          <div className="border-t border-white/10 px-3 py-2">
-            <p className="text-fg-muted font-mono text-[10px] uppercase">{item.label}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function DetailOverlay({
   entity,
   project,
@@ -1392,124 +1567,315 @@ function DetailOverlay({
   const caseStudy = project?.caseStudySlug
     ? caseStudies.find((study) => study.slug === project.caseStudySlug)
     : undefined;
+  const preset = getShowroomPreset(entity, project);
+  const district = districtById.get(entity.district)!;
+  const media = getEntityMedia(entity, project);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+  const selectedMedia = media[selectedMediaIndex] ?? media[0];
+
+  useEffect(() => {
+    setSelectedMediaIndex(0);
+  }, [entity.id, project?.slug]);
+
+  const facts = [
+    project ? { label: "Status", value: project.status } : { label: "Type", value: entity.kind },
+    project
+      ? { label: "Category", value: project.category }
+      : { label: "District", value: district.title },
+    {
+      label: "Media",
+      value: media.length
+        ? `${media.length} real asset${media.length === 1 ? "" : "s"}`
+        : "Coming soon",
+    },
+    { label: "Proof", value: preset.proofType },
+  ];
 
   return (
-    <div className="fixed inset-0 z-[90] flex items-end bg-black/70 p-3 backdrop-blur-md md:items-center md:justify-center md:p-6">
-      <article className="glass-panel max-h-[92dvh] w-full max-w-5xl overflow-y-auto rounded p-4 md:p-6">
-        <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
-          <div>
-            <p className="text-fg-muted font-mono text-[11px] tracking-[0.18em] uppercase">
-              {entity.subtitle}
-            </p>
-            <h2 className="mt-2 text-3xl font-semibold md:text-5xl">{entity.title}</h2>
-            {project && (
-              <p className="text-fg-secondary mt-3 max-w-3xl text-sm leading-6 md:text-base">
-                {project.longDescription}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close proof panel"
-            className="text-fg-secondary flex size-10 shrink-0 items-center justify-center rounded border border-white/15 transition hover:border-white/40 hover:text-white"
-          >
-            <X size={16} aria-hidden />
-          </button>
-        </div>
-
-        <div className="mt-5 grid gap-5 lg:grid-cols-[1.15fr_.85fr]">
-          <div className="space-y-5">
-            {project ? (
-              <ProjectMediaStrip project={project} />
-            ) : entity.id === "google-cert" ? (
-              <ProjectMediaStrip
-                project={
-                  {
-                    media: [
-                      {
-                        src: certifications[0].media ?? "",
-                        alt: "Google Cybersecurity Professional Certificate proof",
-                        label: "Certificate proof",
-                        source: "local",
-                        type: "image",
-                      },
-                    ],
-                  } as Project
-                }
-              />
-            ) : null}
-            <div className="grid gap-3 sm:grid-cols-2">
-              {entity.proof.map((line) => (
-                <div key={line} className="rounded border border-white/10 bg-white/[0.035] p-4">
-                  <p className="text-fg-secondary text-sm leading-6">{line}</p>
+    <div className="fixed inset-0 z-[90] flex items-end bg-black/74 p-2 backdrop-blur-md md:items-center md:justify-center md:p-6">
+      <article
+        className="world-showroom glass-panel max-h-[94dvh] w-full max-w-6xl overflow-hidden rounded"
+        style={
+          {
+            "--showroom-accent": district.accent,
+            "--showroom-secondary": district.secondary,
+          } as CSSProperties
+        }
+      >
+        <div className="grid max-h-[94dvh] overflow-y-auto lg:grid-cols-[1.08fr_.92fr]">
+          <section className="relative min-h-[420px] overflow-hidden border-b border-white/10 bg-black lg:border-r lg:border-b-0">
+            <div
+              className="absolute inset-0 opacity-55"
+              style={{
+                background: `radial-gradient(circle at 25% 15%, ${district.glow}, transparent 32%), linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.01))`,
+              }}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:28px_28px]" />
+            <div className="relative p-3 md:p-5">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="rounded border border-white/12 bg-black/62 px-3 py-2 backdrop-blur">
+                  <p className="font-mono text-[10px] tracking-[0.18em] text-white/55 uppercase">
+                    {preset.room}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">{entity.title}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="space-y-4">
-            {project && (
-              <div className="rounded border border-white/10 bg-black/35 p-4">
-                <p className="text-fg-muted font-mono text-[10px] uppercase">Project Stack</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {project.techStack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="text-fg-secondary rounded border border-white/12 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px]"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {caseStudy && (
-              <div className="rounded border border-white/10 bg-black/35 p-4">
-                <p className="text-fg-muted font-mono text-[10px] uppercase">Case Study Signal</p>
-                <p className="text-fg-secondary mt-2 text-sm leading-6">{caseStudy.summary}</p>
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              {project?.githubUrl && (
-                <a
-                  href={project.githubUrl}
-                  className="text-fg-secondary inline-flex h-10 items-center gap-2 rounded border border-white/20 px-3 font-mono text-xs transition hover:border-white/45 hover:text-white"
-                >
-                  <Github size={14} aria-hidden />
-                  GitHub
-                </a>
-              )}
-              {project?.liveUrl && (
-                <a
-                  href={project.liveUrl}
-                  className="text-fg-secondary inline-flex h-10 items-center gap-2 rounded border border-white/20 px-3 font-mono text-xs transition hover:border-white/45 hover:text-white"
-                >
-                  <Maximize2 size={14} aria-hidden />
-                  Live
-                </a>
-              )}
-              {caseStudy && (
-                <Link
-                  href={`/case-studies/${caseStudy.slug}`}
-                  className="hover:bg-accent-dim inline-flex h-10 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black transition"
-                >
-                  Case Study
-                </Link>
-              )}
-              {entity.actionLabel && (
                 <button
                   type="button"
-                  onClick={onRecruiterMode}
-                  className="hover:bg-accent-dim inline-flex h-10 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black transition"
+                  onClick={onClose}
+                  aria-label="Close proof panel"
+                  className="text-fg-secondary flex size-10 shrink-0 items-center justify-center rounded border border-white/15 bg-black/60 transition hover:border-white/40 hover:text-white"
                 >
-                  {entity.actionLabel}
+                  <X size={16} aria-hidden />
                 </button>
+              </div>
+
+              {selectedMedia ? (
+                <div
+                  className={cn(
+                    "world-showroom-media relative overflow-hidden rounded border border-white/16 bg-[#050505] shadow-[0_24px_90px_rgba(0,0,0,.45)]",
+                    preset.visualMode === "mobile"
+                      ? "mx-auto aspect-[9/16] max-h-[620px] max-w-[380px]"
+                      : preset.visualMode === "report"
+                        ? "aspect-[13/10]"
+                        : "aspect-[16/10]",
+                  )}
+                >
+                  <Image
+                    src={selectedMedia.src}
+                    alt={selectedMedia.alt}
+                    fill
+                    sizes={
+                      preset.visualMode === "mobile"
+                        ? "(min-width: 1024px) 380px, 88vw"
+                        : "(min-width: 1024px) 640px, 92vw"
+                    }
+                    className={cn(
+                      "object-top transition duration-500 hover:scale-[1.015]",
+                      preset.visualMode === "mobile" || preset.visualMode === "report"
+                        ? "object-contain"
+                        : "object-cover",
+                      preset.visualMode === "mobile" &&
+                        "brightness-[1.13] contrast-[1.08] saturate-[1.04]",
+                      preset.visualMode === "security" && "brightness-[1.08] contrast-[1.08]",
+                      preset.visualMode === "report" && "bg-white",
+                    )}
+                    priority={project?.featured}
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                  <div className="absolute right-3 bottom-3 left-3 rounded border border-white/10 bg-black/68 p-3 backdrop-blur">
+                    <p className="font-mono text-[10px] tracking-[0.14em] text-white/58 uppercase">
+                      Active media
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">{selectedMedia.label}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex aspect-[16/10] items-center justify-center rounded border border-dashed border-white/16 bg-white/[0.035]">
+                  <div className="text-center">
+                    <Images className="mx-auto text-white/45" size={28} aria-hidden />
+                    <p className="mt-3 font-mono text-[10px] tracking-[0.18em] text-white/50 uppercase">
+                      Media coming soon
+                    </p>
+                    <p className="text-fg-secondary mt-2 max-w-sm text-sm">
+                      This room is ready for real screenshots once the project surface is captured.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {media.length > 1 && (
+                <div className="scrollbar-hide mt-3 flex gap-2 overflow-x-auto pb-1">
+                  {media.slice(0, 8).map((item, index) => (
+                    <button
+                      key={item.src}
+                      type="button"
+                      onClick={() => setSelectedMediaIndex(index)}
+                      className={cn(
+                        "group relative h-20 w-28 shrink-0 overflow-hidden rounded border bg-black transition",
+                        selectedMediaIndex === index
+                          ? "border-white"
+                          : "border-white/12 hover:border-white/36",
+                      )}
+                      aria-label={`Show ${item.label}`}
+                    >
+                      <Image
+                        src={item.src}
+                        alt=""
+                        fill
+                        sizes="112px"
+                        className="object-cover object-top opacity-75 brightness-[1.08] contrast-[1.05] transition group-hover:opacity-100"
+                      />
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-black/72 px-2 py-1 text-left font-mono text-[9px] text-white/72">
+                        {item.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
-          </aside>
+          </section>
+
+          <section className="relative p-4 md:p-6">
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-32 opacity-20"
+              style={{ background: `linear-gradient(180deg, ${district.accent}, transparent)` }}
+            />
+            <div className="relative">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[10px] uppercase"
+                  style={{
+                    borderColor: `${district.accent}66`,
+                    color: district.accent,
+                    backgroundColor: `${district.accent}12`,
+                  }}
+                >
+                  <Sparkles size={12} aria-hidden />
+                  {preset.proofType}
+                </span>
+                <span className="text-fg-muted rounded-full border border-white/10 px-3 py-1 font-mono text-[10px] uppercase">
+                  {district.title}
+                </span>
+              </div>
+
+              <h2 className="mt-4 text-3xl font-semibold md:text-5xl">{entity.title}</h2>
+              <p className="text-fg-secondary mt-3 text-sm leading-6 md:text-base">
+                {project?.longDescription ?? preset.proofLine}
+              </p>
+
+              <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {facts.map((fact) => (
+                  <div key={fact.label} className="rounded border border-white/10 bg-black/32 p-3">
+                    <p className="text-fg-muted font-mono text-[9px] uppercase">{fact.label}</p>
+                    <p className="mt-1 line-clamp-2 text-sm font-semibold">{fact.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded border border-white/10 bg-white/[0.035] p-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck
+                    className="mt-0.5 shrink-0"
+                    size={17}
+                    style={{ color: district.accent }}
+                    aria-hidden
+                  />
+                  <div>
+                    <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+                      Recruiter read
+                    </p>
+                    <p className="text-fg-secondary mt-2 text-sm leading-6">
+                      {preset.recruiterRead}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 md:grid-cols-[.85fr_1.15fr]">
+                <div className="rounded border border-white/10 bg-black/32 p-4">
+                  <div className="flex items-center gap-2">
+                    <Layers size={14} aria-hidden />
+                    <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+                      Room path
+                    </p>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    {preset.workflow.map((step, index) => (
+                      <div key={`${step}-${index}`} className="flex items-center gap-3">
+                        <span
+                          className="flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-[10px]"
+                          style={{ borderColor: `${district.accent}66`, color: district.accent }}
+                        >
+                          {index + 1}
+                        </span>
+                        <span className="text-fg-secondary text-sm">{step}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded border border-white/10 bg-black/32 p-4">
+                  <div className="flex items-center gap-2">
+                    <Cpu size={14} aria-hidden />
+                    <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+                      Proof terminal
+                    </p>
+                  </div>
+                  <div className="mt-4 grid gap-2">
+                    {entity.proof.map((line) => (
+                      <div
+                        key={line}
+                        className="rounded border border-white/10 bg-white/[0.035] p-3"
+                      >
+                        <p className="text-fg-secondary text-sm leading-6">{line}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {project && (
+                <div className="mt-5 rounded border border-white/10 bg-black/32 p-4">
+                  <p className="text-fg-muted font-mono text-[10px] uppercase">Project stack</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {project.techStack.map((tech) => (
+                      <span
+                        key={tech}
+                        className="text-fg-secondary rounded border border-white/12 bg-white/[0.04] px-2.5 py-1 font-mono text-[10px]"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {caseStudy && (
+                <div className="mt-5 rounded border border-white/10 bg-white/[0.035] p-4">
+                  <p className="text-fg-muted font-mono text-[10px] uppercase">Case study signal</p>
+                  <p className="text-fg-secondary mt-2 text-sm leading-6">{caseStudy.summary}</p>
+                </div>
+              )}
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {project?.githubUrl && (
+                  <a
+                    href={project.githubUrl}
+                    className="text-fg-secondary inline-flex h-10 items-center gap-2 rounded border border-white/20 px-3 font-mono text-xs transition hover:border-white/45 hover:text-white"
+                  >
+                    <Github size={14} aria-hidden />
+                    GitHub
+                  </a>
+                )}
+                {project?.liveUrl && (
+                  <a
+                    href={project.liveUrl}
+                    className="text-fg-secondary inline-flex h-10 items-center gap-2 rounded border border-white/20 px-3 font-mono text-xs transition hover:border-white/45 hover:text-white"
+                  >
+                    <Maximize2 size={14} aria-hidden />
+                    Live
+                  </a>
+                )}
+                {caseStudy && (
+                  <Link
+                    href={`/case-studies/${caseStudy.slug}`}
+                    className="inline-flex h-10 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black transition hover:bg-white/88"
+                  >
+                    Case Study
+                  </Link>
+                )}
+                {entity.actionLabel && (
+                  <button
+                    type="button"
+                    onClick={onRecruiterMode}
+                    className="inline-flex h-10 items-center gap-2 rounded border border-white bg-white px-3 font-mono text-xs text-black transition hover:bg-white/88"
+                  >
+                    {entity.actionLabel}
+                  </button>
+                )}
+              </div>
+            </div>
+          </section>
         </div>
       </article>
     </div>
