@@ -2,10 +2,10 @@ import { Github, Linkedin } from "lucide-react";
 import { profile } from "@/lib/data";
 
 const navItems = [
+  { label: "World", href: "#world" },
   { label: "Work", href: "#featured" },
-  { label: "Media", href: "#media" },
-  { label: "Case Studies", href: "#case-studies" },
   { label: "Archive", href: "#archive" },
+  { label: "Case Studies", href: "#case-studies" },
   { label: "Resume", href: "#resume" },
   { label: "Contact", href: "#contact" },
 ];

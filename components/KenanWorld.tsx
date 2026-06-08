@@ -1266,7 +1266,7 @@ export default function KenanWorld() {
       if (event.key.toLowerCase() === "e" && started && !focusedEntity && !recruiterMode) {
         interact();
       }
-      if (event.key.toLowerCase() === "r" && started) {
+      if (event.key.toLowerCase() === "r") {
         setRecruiterMode(true);
       }
       if (event.key === "Escape") {
@@ -1431,7 +1431,7 @@ export default function KenanWorld() {
 
       <ControlPad onDirection={setDirection} onInteract={() => interact()} />
 
-      {!started && (
+      {!started && !recruiterMode && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4 backdrop-blur-md">
           <section className="glass-panel grid max-h-[92dvh] w-full max-w-5xl overflow-hidden rounded text-left md:grid-cols-[.82fr_1.18fr]">
             <div className="relative hidden min-h-[560px] border-r border-white/10 md:block">

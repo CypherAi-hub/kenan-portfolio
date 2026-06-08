@@ -9,27 +9,28 @@ import MissionModeSection from "@/components/MissionModeSection";
 import Navigation from "@/components/Navigation";
 import ProjectArchive from "@/components/ProjectArchive";
 import ProjectCategoryShowcase from "@/components/ProjectCategoryShowcase";
-import ProjectMediaShowcase from "@/components/ProjectMediaShowcase";
 import ProofBar from "@/components/ProofBar";
 import ProofCarouselSection from "@/components/ProofCarouselSection";
 import ResumeCTA from "@/components/ResumeCTA";
 import SectionHeader from "@/components/SectionHeader";
 import SecurityReportSection from "@/components/SecurityReportSection";
 import SkillsGrid from "@/components/SkillsGrid";
+import WorldProofCarousel from "@/components/WorldProofCarousel";
 
 export default function Home() {
   return (
     <>
       <Navigation />
       <Hero />
-      <ProofBar />
       <main className="mx-auto max-w-[1280px] px-4 lg:px-8">
         <MissionModeSection />
+        <WorldProofCarousel />
+        <ProofBar />
         <FeaturedBuilds />
         <FoFitEcosystem />
-        <ProjectMediaShowcase />
         <ProjectCategoryShowcase />
         <SecurityReportSection />
+        <ProofCarouselSection />
         <section id="archive" className="section-shell py-20">
           <SectionHeader eyebrow="All Builds / Repository Archive" title="Complete body of work.">
             Every listed GitHub repository is included with status, category, stack, tags, and a
@@ -37,7 +38,6 @@ export default function Home() {
           </SectionHeader>
           <ProjectArchive />
         </section>
-        <ProofCarouselSection />
         <CaseStudySection />
         <ExperienceTimeline />
         <SkillsGrid />
