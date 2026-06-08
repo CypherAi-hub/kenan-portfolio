@@ -23,6 +23,7 @@ export type ProjectVisual =
   | "aws"
   | "soc"
   | "netwatch"
+  | "report"
   | "portfolio"
   | "archive"
   | "mobile"
@@ -48,6 +49,7 @@ export type Project = {
   tags: string[];
   priority: number;
   visual: ProjectVisual;
+  proof?: string;
   notes: string;
 };
 
@@ -213,6 +215,7 @@ export const projects: Project[] = [
     tags: ["fitness-tech", "mobile", "ai", "product"],
     priority: 1,
     visual: "fofit",
+    proof: "AI product engineering",
     notes:
       "Primary media is from verified app screenshots in the active FoFit repo; the live URL currently opens an auth/login surface.",
   },
@@ -247,6 +250,7 @@ export const projects: Project[] = [
     tags: ["coach platform", "b2b", "supabase", "dashboard"],
     priority: 2,
     visual: "coach",
+    proof: "Dashboard product UX",
     notes:
       "Captured from the public FoFit Coach deployment; authenticated dashboard screenshots should be added when demo access is ready.",
   },
@@ -280,6 +284,7 @@ export const projects: Project[] = [
     tags: ["agents", "developer tools", "workflow", "validation"],
     priority: 3,
     visual: "agentroom",
+    proof: "AI agent workflow design",
     notes:
       "Captured from the public deployment; add logged-in mission-control screenshots when available.",
   },
@@ -319,7 +324,43 @@ export const projects: Project[] = [
     tags: ["aws", "python", "rekognition", "cloud"],
     priority: 4,
     visual: "aws",
+    proof: "Cloud automation",
     notes: "Output images came from the public repo; no AWS credentials were inspected or used.",
+  },
+  {
+    slug: "cyberlou-pentest-report",
+    title: "Cyberlou Penetration Test Report",
+    repo: "CypherAi-hub/kenan-portfolio",
+    category: "Cybersecurity / Cloud",
+    status: "Live",
+    description:
+      "A 49-page penetration testing report for a controlled lab engagement, covering methodology, evidence capture, severity ratings, and remediation planning.",
+    longDescription:
+      "Client-style cybersecurity report artifact showing reconnaissance documentation, exploitation evidence handling, vulnerability writeups, risk framing, and remediation communication for a controlled lab assessment.",
+    problem:
+      "Translate technical penetration-test activity into a readable, recruiter-safe security deliverable.",
+    built:
+      "A structured report with executive summary, scoped methodology, finding narratives, severity framing, evidence sections, and remediation guidance.",
+    techStack: ["Penetration Testing", "Security Reporting", "Risk Rating", "Remediation"],
+    githubUrl: github("kenan-portfolio"),
+    liveUrl: "/reports/cyberlou-pentest-report.pdf",
+    media: [
+      projectImage(
+        "/media/projects/cyberlou-pentest-report/pentest-report-preview.webp",
+        "Cyberlou penetration test report preview with title page and report sections",
+        "Report preview",
+        "local",
+      ),
+    ],
+    featured: true,
+    caseStudy: true,
+    caseStudySlug: "cyberlou-pentest-report",
+    tags: ["penetration testing", "security reporting", "risk", "documentation"],
+    priority: 4.5,
+    visual: "report",
+    proof: "Cybersecurity reporting",
+    notes:
+      "Safe preview generated from the portfolio report artifact. Do not expose credentials, exploit values, or private assessment details.",
   },
   {
     slug: "soc-monitor",
@@ -369,6 +410,7 @@ export const projects: Project[] = [
     tags: ["soc", "cybersecurity", "mitre", "defensive simulation"],
     priority: 5,
     visual: "soc",
+    proof: "Defensive security UX",
     notes:
       "Captured from a local run of the public repo in a scratch folder; no live capture or scanning was performed.",
   },
@@ -394,6 +436,7 @@ export const projects: Project[] = [
     tags: ["network monitoring", "supabase", "soc", "alerts"],
     priority: 6,
     visual: "netwatch",
+    proof: "Security monitoring architecture",
     notes:
       "Public repo currently documents the dashboard as planned; keep this card as backend/cloud proof until UI screenshots exist.",
   },
@@ -425,6 +468,7 @@ export const projects: Project[] = [
     tags: ["portfolio", "recruiting", "nextjs", "frontend"],
     priority: 7,
     visual: "portfolio",
+    proof: "Technical storytelling",
     notes:
       "Screenshot is generated from the local production build after the media showcase is wired.",
   },
@@ -784,6 +828,35 @@ export const caseStudies: CaseStudy[] = [
       "Launch readiness is a system of small verified behaviors",
     ],
     screenshotPrompt: "Add dashboard, onboarding, team, invite, and athlete-delivery screenshots.",
+  },
+  {
+    slug: "cyberlou-pentest-report",
+    title: "Cyberlou Penetration Test Report",
+    repo: "CypherAi-hub/kenan-portfolio",
+    summary:
+      "Security reporting case study for a controlled lab engagement, focused on evidence capture, severity framing, and remediation planning.",
+    problem:
+      "A penetration test is only useful if the technical work becomes a clear report that stakeholders can understand and act on.",
+    role: "Student security practitioner responsible for assessment documentation, finding writeups, severity rationale, and remediation communication.",
+    techStack: ["Reconnaissance", "Penetration Testing", "Risk Rating", "Report Writing"],
+    keyFeatures: [
+      "Executive summary and scoped methodology",
+      "Finding writeups with evidence and severity context",
+      "Remediation guidance for discovered vulnerabilities",
+      "Safe portfolio preview that avoids exposing sensitive details",
+    ],
+    technicalChallenges: [
+      "Keeping offensive-security evidence safe and appropriately redacted",
+      "Balancing technical depth with recruiter-readable communication",
+      "Turning lab exploitation steps into business-impact language",
+    ],
+    learnings: [
+      "Security work needs clear scope, severity, and remediation framing",
+      "Evidence matters, but public artifacts need careful redaction",
+      "A polished report can prove communication skill beyond tool usage",
+    ],
+    screenshotPrompt:
+      "Use only safe/redacted report previews; do not expose credentials, exploit values, or private data.",
   },
   {
     slug: "agentroom",

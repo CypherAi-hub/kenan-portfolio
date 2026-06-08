@@ -6,7 +6,7 @@ import TechStackPills from "@/components/TechStackPills";
 
 export default function ProjectArchiveCard({ project }: { project: Project }) {
   return (
-    <article className="border-border bg-bg-elevated/48 hover:border-cyan/45 group flex h-full flex-col overflow-hidden rounded border transition-colors">
+    <article className="glass-panel group flex h-full flex-col overflow-hidden rounded transition duration-300 hover:-translate-y-0.5 hover:border-white/22">
       <div className="border-border h-44 border-b">
         <ProjectMediaPreview project={project} variant="archive" />
       </div>

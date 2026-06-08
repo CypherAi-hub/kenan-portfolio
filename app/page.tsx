@@ -5,9 +5,12 @@ import FeaturedBuilds from "@/components/FeaturedBuilds";
 import Footer from "@/components/Footer";
 import FoFitEcosystem from "@/components/FoFitEcosystem";
 import Hero from "@/components/Hero";
+import Navigation from "@/components/Navigation";
 import ProjectArchive from "@/components/ProjectArchive";
 import ProjectCategoryShowcase from "@/components/ProjectCategoryShowcase";
+import ProjectMediaShowcase from "@/components/ProjectMediaShowcase";
 import ProofBar from "@/components/ProofBar";
+import ProofCarouselSection from "@/components/ProofCarouselSection";
 import ResumeCTA from "@/components/ResumeCTA";
 import SectionHeader from "@/components/SectionHeader";
 import SecurityReportSection from "@/components/SecurityReportSection";
@@ -16,11 +19,13 @@ import SkillsGrid from "@/components/SkillsGrid";
 export default function Home() {
   return (
     <>
+      <Navigation />
       <Hero />
       <ProofBar />
       <main className="mx-auto max-w-[1280px] px-4 lg:px-8">
         <FeaturedBuilds />
         <FoFitEcosystem />
+        <ProjectMediaShowcase />
         <ProjectCategoryShowcase />
         <SecurityReportSection />
         <section id="archive" className="section-shell py-20">
@@ -30,6 +35,7 @@ export default function Home() {
           </SectionHeader>
           <ProjectArchive />
         </section>
+        <ProofCarouselSection />
         <CaseStudySection />
         <ExperienceTimeline />
         <SkillsGrid />

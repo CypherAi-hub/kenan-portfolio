@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #090b0f;
-  --color-bg-elevated: #10141b;
-  --color-bg-hover: #171d26;
-  --color-border: #26303d;
-  --color-fg: #f4f7fb;
-  --color-fg-secondary: #b7c0cc;
-  --color-fg-muted: #7b8695;
-  --color-fg-dimmed: #525c69;
-  --color-accent: #77f5b1;
-  --color-accent-dim: #55c58f;
-  --color-cyan: #67d8ef;
-  --color-amber: #f3c66d;
-  --color-status-active: #f3c66d;
-  --color-status-error: #ff8a8a;
+  --color-bg: #030303;
+  --color-bg-elevated: #0c0c0d;
+  --color-bg-hover: #171717;
+  --color-border: #2a2a2a;
+  --color-fg: #fafafa;
+  --color-fg-secondary: #c8c8c8;
+  --color-fg-muted: #8e8e8e;
+  --color-fg-dimmed: #585858;
+  --color-accent: #ffffff;
+  --color-accent-dim: #d4d4d4;
+  --color-cyan: #d7d7d7;
+  --color-amber: #b8b8b8;
+  --color-status-active: #d7d7d7;
+  --color-status-error: #a6a6a6;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -81,8 +81,9 @@
   }
   body {
     background:
-      linear-gradient(135deg, rgba(119, 245, 177, 0.08), transparent 34%),
-      linear-gradient(225deg, rgba(103, 216, 239, 0.06), transparent 38%), var(--color-bg);
+      radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.1), transparent 28%),
+      radial-gradient(circle at 80% 8%, rgba(255, 255, 255, 0.06), transparent 30%),
+      linear-gradient(180deg, #060606 0%, var(--color-bg) 54%);
     color: var(--color-fg);
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -122,12 +123,40 @@
 @layer utilities {
   .bg-grid {
     background-image:
-      linear-gradient(rgba(244, 247, 251, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(244, 247, 251, 0.05) 1px, transparent 1px);
+      linear-gradient(rgba(250, 250, 250, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(250, 250, 250, 0.055) 1px, transparent 1px);
     background-size: 48px 48px;
   }
 
   .section-shell {
-    border-top: 1px solid rgba(38, 48, 61, 0.86);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .glass-panel {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)),
+      rgba(10, 10, 10, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 24px 80px rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(18px);
+  }
+
+  .premium-noise {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.12) 1px, transparent 0),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 28%);
+    background-size:
+      18px 18px,
+      100% 100%;
+  }
+
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }

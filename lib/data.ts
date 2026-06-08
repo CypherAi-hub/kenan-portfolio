@@ -33,6 +33,7 @@ export const proofPoints = [
   "React Native / Supabase / OpenAI API",
   "AWS / Cloud Projects",
   "Cybersecurity Projects",
+  "Google Cybersecurity Certificate",
   "AI Agent Tools",
   "St. Louis, MO",
 ];
@@ -66,24 +67,8 @@ export const experiences = [
 
 export const skillGroups = [
   {
-    label: "Languages",
-    skills: ["Python", "JavaScript", "TypeScript"],
-  },
-  {
-    label: "Frontend / Mobile",
-    skills: ["React", "Next.js", "React Native", "Expo", "Tailwind CSS"],
-  },
-  {
-    label: "Backend / Data",
-    skills: ["Supabase", "PostgreSQL basics", "Authentication", "APIs"],
-  },
-  {
-    label: "AI",
+    label: "AI Product Engineering",
     skills: ["OpenAI API", "LLM evaluation", "Prompt engineering", "AI product workflows"],
-  },
-  {
-    label: "Cloud",
-    skills: ["AWS S3", "AWS Rekognition", "Cloud project workflows"],
   },
   {
     label: "Cybersecurity",
@@ -96,12 +81,35 @@ export const skillGroups = [
     ],
   },
   {
+    label: "Cloud / DevOps",
+    skills: ["AWS S3", "AWS Rekognition", "Vercel", "Cloud project workflows", "GitHub"],
+  },
+  {
+    label: "Frontend / Mobile",
+    skills: ["React", "Next.js", "React Native", "Expo", "Tailwind CSS"],
+  },
+  {
+    label: "Backend / Data",
+    skills: ["Supabase", "PostgreSQL basics", "Authentication", "APIs", "TypeScript"],
+  },
+  {
     label: "Tools",
-    skills: ["Git", "GitHub", "Vercel", "VS Code"],
+    skills: ["Python", "JavaScript", "VS Code", "Git", "GitHub", "Vercel"],
   },
 ];
 
-export const certification = {
-  name: "CompTIA Security+",
-  status: "In Progress — Expected September 2026",
-};
+export const certifications = [
+  {
+    name: "Google Cybersecurity Professional Certificate",
+    status: "Completed",
+    detail: "Completed August 16, 2025",
+    media: "/media/projects/certifications/google-cybersecurity-certificate.webp",
+  },
+  {
+    name: "CompTIA Security+",
+    status: "In Progress",
+    detail: "Expected September 2026",
+  },
+];
+
+export const certification = certifications[1];

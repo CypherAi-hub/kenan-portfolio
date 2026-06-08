@@ -42,21 +42,21 @@ export default async function CaseStudyPage({ params }: Props) {
     <main className="mx-auto w-full max-w-[980px] overflow-x-hidden px-4 py-12 lg:px-8">
       <Link
         href="/#case-studies"
-        className="text-fg-secondary hover:text-accent inline-flex items-center gap-2 font-mono text-sm"
+        className="text-fg-secondary inline-flex items-center gap-2 font-mono text-sm hover:text-white"
       >
         <ArrowLeft size={16} aria-hidden />
         Back to portfolio
       </Link>
 
       <header className="border-border mt-12 min-w-0 border-b pb-10">
-        <p className="text-accent font-mono text-xs uppercase">Case Study Coming Soon</p>
+        <p className="text-fg font-mono text-xs uppercase">Case Study Proof</p>
         <h1 className="mt-4 text-4xl leading-tight font-semibold md:text-5xl">{study.title}</h1>
         <p className="text-fg-secondary mt-5 text-lg leading-8 break-words">{study.summary}</p>
         <div className="mt-6 flex flex-wrap gap-3">
           {project && (
             <a
               href={project.githubUrl}
-              className="border-border text-fg-secondary hover:border-accent/45 hover:text-accent inline-flex h-10 items-center gap-2 rounded border px-3 font-mono text-sm"
+              className="border-border text-fg-secondary inline-flex h-10 items-center gap-2 rounded border px-3 font-mono text-sm hover:border-white/45 hover:text-white"
             >
               <Github size={16} aria-hidden />
               View GitHub
@@ -65,7 +65,7 @@ export default async function CaseStudyPage({ params }: Props) {
           {project?.liveUrl && (
             <a
               href={project.liveUrl}
-              className="border-accent/45 bg-accent/10 text-accent inline-flex h-10 items-center gap-2 rounded border px-3 font-mono text-sm"
+              className="inline-flex h-10 items-center gap-2 rounded border border-white/45 bg-white/10 px-3 font-mono text-sm text-white"
             >
               View Live
             </a>

@@ -26,8 +26,8 @@ function FilterButton({
       className={cn(
         "h-9 rounded border px-3 font-mono text-xs transition-colors",
         active
-          ? "border-accent bg-accent/10 text-accent"
-          : "border-border text-fg-secondary hover:border-cyan/45 hover:text-cyan",
+          ? "border-white/45 bg-white/10 text-white"
+          : "border-border text-fg-secondary hover:border-white/35 hover:text-white",
       )}
     >
       {children}
@@ -47,7 +47,7 @@ export default function ProjectFilters({
   statuses: ProjectStatus[];
 }) {
   return (
-    <div className="border-border bg-bg-elevated/52 rounded border p-3">
+    <div className="glass-panel rounded p-3">
       <label className="relative block">
         <Search
           size={16}
@@ -59,7 +59,7 @@ export default function ProjectFilters({
           value={filters.query}
           onChange={(event) => onChange({ ...filters, query: event.target.value })}
           placeholder="Search repositories, tags, tech..."
-          className="border-border bg-bg text-fg placeholder:text-fg-dimmed focus:border-accent h-11 w-full rounded border px-10 font-mono text-sm outline-none"
+          className="border-border bg-bg text-fg placeholder:text-fg-dimmed h-11 w-full rounded border px-10 font-mono text-sm outline-none focus:border-white"
         />
       </label>
 

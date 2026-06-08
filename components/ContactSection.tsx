@@ -19,7 +19,7 @@ export default function ContactSection() {
       </SectionHeader>
 
       <div className="mt-10 grid gap-4 md:grid-cols-2">
-        <div className="border-border bg-bg-elevated/52 rounded border p-5">
+        <div className="glass-panel rounded p-5">
           <div className="text-fg-secondary flex items-center gap-3">
             <MapPin size={18} aria-hidden />
             <span>{profile.location}</span>
@@ -29,13 +29,13 @@ export default function ContactSection() {
             cloud workflows, and communication all matter.
           </p>
         </div>
-        <div className="border-border bg-bg-elevated/52 rounded border p-5">
+        <div className="glass-panel rounded p-5">
           <ul className="space-y-3">
             {contactLinks.map(({ label, href, value, icon: Icon }) => (
               <li key={label}>
                 <a
                   href={href}
-                  className="border-border bg-bg text-fg-secondary hover:border-accent/45 hover:text-accent flex items-center justify-between gap-4 rounded border px-3 py-3 text-sm transition-colors"
+                  className="border-border bg-bg text-fg-secondary flex items-center justify-between gap-4 rounded border px-3 py-3 text-sm transition-colors hover:border-white/45 hover:text-white"
                 >
                   <span className="flex items-center gap-3">
                     <Icon size={16} aria-hidden />

@@ -19,8 +19,8 @@ function ProjectLink({
   const className = cn(
     "inline-flex h-9 items-center gap-2 rounded border px-3 font-mono text-xs transition-colors",
     muted
-      ? "border-border text-fg-secondary hover:border-cyan/50 hover:text-cyan"
-      : "border-accent/35 bg-accent/10 text-accent hover:border-accent hover:bg-accent/15",
+      ? "border-border text-fg-secondary hover:border-white/45 hover:text-white"
+      : "border-white/35 bg-white/10 text-white hover:border-white hover:bg-white/15",
   );
 
   if (external) {

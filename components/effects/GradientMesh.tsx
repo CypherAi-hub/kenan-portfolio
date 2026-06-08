@@ -5,12 +5,12 @@ export default function GradientMesh() {
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <motion.div
-        animate={{ opacity: [0.5, 0.82, 0.5] }}
+        animate={{ opacity: [0.36, 0.7, 0.36] }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-x-0 top-0 h-80 opacity-70"
+        className="absolute inset-x-0 top-0 h-[520px] opacity-70"
         style={{
           background:
-            "linear-gradient(110deg, rgba(119,245,177,0.20), transparent 38%, rgba(103,216,239,0.16) 66%, transparent)",
+            "radial-gradient(circle at 20% 15%, rgba(255,255,255,0.15), transparent 28%), radial-gradient(circle at 74% 20%, rgba(255,255,255,0.10), transparent 30%)",
         }}
       />
       <motion.div
@@ -22,7 +22,7 @@ export default function GradientMesh() {
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, transparent 0%, rgba(9,11,15,0.74) 48%, #090b0f 100%)",
+            "linear-gradient(180deg, transparent 0%, rgba(3,3,3,0.7) 48%, #030303 100%)",
         }}
       />
     </div>

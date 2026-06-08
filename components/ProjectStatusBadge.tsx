@@ -2,10 +2,10 @@ import type { ProjectStatus } from "@/data/projects";
 import { cn } from "@/lib/utils";
 
 const statusStyle: Record<ProjectStatus, string> = {
-  Live: "border-accent/45 bg-accent/10 text-accent",
-  "In Progress": "border-amber/45 bg-amber/10 text-amber",
-  Prototype: "border-cyan/45 bg-cyan/10 text-cyan",
-  Archived: "border-fg-dimmed/55 bg-bg-hover text-fg-muted",
+  Live: "border-white/45 bg-white/10 text-white",
+  "In Progress": "border-white/25 bg-white/[0.075] text-fg-secondary",
+  Prototype: "border-white/20 bg-white/[0.055] text-fg-secondary",
+  Archived: "border-white/12 bg-bg-hover text-fg-muted",
 };
 
 export default function ProjectStatusBadge({
