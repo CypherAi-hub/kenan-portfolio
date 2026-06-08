@@ -208,6 +208,48 @@ export const projects: Project[] = [
         "Nutrition screen",
         "local",
       ),
+      projectImage(
+        "/media/projects/fofit/fofit-mobile-ready-home.webp",
+        "FoFit mobile home screen with a readiness prompt, athlete card, recovery day status, and training callout",
+        "Current mobile home",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-discover-stack-labs.webp",
+        "FoFit Discover screen with local gyms, learn content, stack modules, marketplace, and progress lab previews",
+        "Discover stack",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-cypher-training-coach.webp",
+        "FoFit Cypher athlete coach screen explaining a guard speed and power block with training plan actions",
+        "Cypher training coach",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-active-workout-logged-set.webp",
+        "FoFit active workout screen with exercise tiles, coach moment controls, and logged set state",
+        "Logged workout set",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-coach-builder-mobile.webp",
+        "FoFit coach role mobile builder screen showing a training library and program builder entry points",
+        "Coach mobile builder",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-coach-analytics-mobile.webp",
+        "FoFit coach role mobile analytics screen showing that analytics need roster data before insights are available",
+        "Coach mobile analytics",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/fofit/fofit-coach-profile-mobile.webp",
+        "FoFit coach role mobile profile screen with operational profile and roster call to action",
+        "Coach mobile profile",
+        "local",
+      ),
     ],
     featured: true,
     caseStudy: true,
@@ -429,7 +471,14 @@ export const projects: Project[] = [
       "Realtime dashboard patterns for metrics ingestion, anomaly flags, alert review, and security operations practice.",
     techStack: ["TypeScript", "Supabase", "PostgreSQL", "Realtime", "Security Monitoring"],
     githubUrl: github("Netwatch"),
-    media: [],
+    media: [
+      projectImage(
+        "/media/projects/netwatch/netwatch-architecture-proof.webp",
+        "Netwatch architecture proof card showing simulator, Supabase Postgres, trigger-driven alerts, offline detection, and planned dashboard status",
+        "Architecture proof",
+        "generated",
+      ),
+    ],
     featured: true,
     caseStudy: true,
     caseStudySlug: "netwatch",
@@ -438,7 +487,7 @@ export const projects: Project[] = [
     visual: "netwatch",
     proof: "Security monitoring architecture",
     notes:
-      "Public repo currently documents the dashboard as planned; keep this card as backend/cloud proof until UI screenshots exist.",
+      "Architecture proof is generated from the local README and labels the React dashboard as planned; add real UI screenshots when the dashboard exists.",
   },
   {
     slug: "kenan-portfolio",
@@ -646,13 +695,32 @@ export const projects: Project[] = [
         "Live staffing site",
         "live",
       ),
+      projectImage(
+        "/media/projects/hirecrate-staffing/hirecrate-hero-staffing-workers.webp",
+        "Hirecrate Staffing supporting hero image showing a staffing team reviewing warehouse operations",
+        "Staffing hero image",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/hirecrate-staffing/hirecrate-employer-request-workers.webp",
+        "Hirecrate Staffing supporting image showing an employer request-workers conversation near a warehouse dock",
+        "Employer request image",
+        "local",
+      ),
+      projectImage(
+        "/media/projects/hirecrate-staffing/hirecrate-job-seeker-find-work.webp",
+        "Hirecrate Staffing supporting image showing a job seeker consultation for find-work flow context",
+        "Job seeker image",
+        "local",
+      ),
     ],
     featured: false,
     caseStudy: false,
     tags: ["business", "staffing", "frontend"],
     priority: 14,
     visual: "business",
-    notes: "Captured from the live deployment.",
+    notes:
+      "Lead screenshot captured from the live deployment; secondary staffing images were found in Downloads and used only as supporting business context.",
   },
   {
     slug: "ruflo-os",
@@ -665,13 +733,21 @@ export const projects: Project[] = [
       "Experimental AI/tooling repository included for completeness. Keep claims conservative until the product direction is documented.",
     techStack: ["Details Coming Soon"],
     githubUrl: github("ruflo-os"),
-    media: [],
+    media: [
+      projectImage(
+        "/media/projects/ruflo-os/ruflo-control-proof.webp",
+        "Ruflo OS control workspace proof card showing LOOM agent setup, write guardrails, and content draft workflow",
+        "Control workspace proof",
+        "generated",
+      ),
+    ],
     featured: false,
     caseStudy: false,
     tags: ["experimental", "ai tools"],
     priority: 15,
     visual: "archive",
-    notes: "No reliable UI/media found in the local search pass.",
+    notes:
+      "Control-workspace proof is generated from the local Ruflo README; treat this as agent-operations evidence, not a finished app UI.",
   },
   {
     slug: "omni",
@@ -687,6 +763,12 @@ export const projects: Project[] = [
     githubUrl: github("omni"),
     media: [
       projectImage(
+        "/media/projects/omni/omni-ide-dashboard.webp",
+        "Omni local IDE surface with file explorer, code editor, terminal panel, and AI assistant pane",
+        "Local IDE surface",
+        "local",
+      ),
+      projectImage(
         "/media/projects/omni/omni-opengraph.png",
         "Omni local OpenGraph project artwork",
         "Omni project artwork",
@@ -699,7 +781,7 @@ export const projects: Project[] = [
     priority: 16,
     visual: "agentroom",
     notes:
-      "Local OpenGraph artwork found; add product UI screenshots once the IDE surface is ready for portfolio use.",
+      "Captured from the local Omni IDE package; API persistence was unavailable in this standalone run, so the screenshot shows the bundled fallback IDE surface.",
   },
   {
     slug: "ultraflips-mobile",
@@ -733,13 +815,21 @@ export const projects: Project[] = [
       "Personal-finance mobile product concept around debt payoff, savings buckets, paycheck allocation, and bank-sync planning.",
     techStack: ["Expo", "React Native", "Supabase", "Plaid", "TypeScript"],
     githubUrl: github("stack-mode"),
-    media: [],
+    media: [
+      projectImage(
+        "/media/projects/stack-mode/stack-mode-readme-proof.webp",
+        "Stack Mode foundation proof card documenting the Expo React Native money-discipline app and noting that web capture is blocked by the native Plaid SDK",
+        "Foundation proof",
+        "generated",
+      ),
+    ],
     featured: false,
     caseStudy: false,
     tags: ["finance", "mobile", "supabase", "plaid"],
     priority: 18,
     visual: "mobile",
-    notes: "No screenshot found in this pass; add mobile mockups or simulator captures later.",
+    notes:
+      "Foundation proof is generated from README details. Expo web capture was blocked by the native Plaid SDK, so add simulator screenshots later.",
   },
   {
     slug: "get-funded",

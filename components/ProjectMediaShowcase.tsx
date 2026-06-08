@@ -3,11 +3,14 @@ import CarouselRail, { type CarouselItem } from "@/components/CarouselRail";
 import SectionHeader from "@/components/SectionHeader";
 
 const mediaPlan = [
-  { slug: "fofit", index: 0, variant: "phone" as const, meta: "Mobile app execution" },
-  { slug: "fofit", index: 2, variant: "phone" as const, meta: "Workout flow" },
+  { slug: "fofit", index: 16, variant: "phone" as const, meta: "Current mobile home" },
+  { slug: "fofit", index: 18, variant: "phone" as const, meta: "Cypher training coach" },
+  { slug: "fofit", index: 19, variant: "phone" as const, meta: "Logged workout flow" },
   { slug: "fofit-coach", index: 0, variant: "dashboard" as const, meta: "Coach platform" },
   { slug: "agentroom", index: 0, variant: "dashboard" as const, meta: "Agent workflow" },
   { slug: "soc-monitor", index: 0, variant: "terminal" as const, meta: "SOC dashboard" },
+  { slug: "netwatch", index: 0, variant: "terminal" as const, meta: "Backend architecture" },
+  { slug: "omni", index: 0, variant: "dashboard" as const, meta: "Local AI IDE" },
   {
     slug: "aws-image-label-generator",
     index: 0,

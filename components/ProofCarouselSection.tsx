@@ -72,9 +72,21 @@ export default function ProofCarouselSection() {
       "dashboard",
     ),
     projectMediaItem(
+      "omni",
+      "Omni IDE Surface",
+      "Local AI browser IDE proof with file explorer, editor, terminal panel, and assistant surface.",
+      "dashboard",
+    ),
+    projectMediaItem(
       "soc-monitor",
       "SOC Monitor Dashboard",
       "Defensive security simulation with analyst-style triage, packet investigation, and MITRE context.",
+      "terminal",
+    ),
+    projectMediaItem(
+      "netwatch",
+      "Netwatch Architecture",
+      "Backend monitoring proof showing Supabase schema, simulator flow, trigger-driven alerts, and honest dashboard status.",
       "terminal",
     ),
     projectMediaItem(
