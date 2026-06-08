@@ -96,6 +96,14 @@ type WorldProp = {
   label?: string;
 };
 
+type Achievement = {
+  id: string;
+  title: string;
+  detail: string;
+  accent: string;
+  unlocked: boolean;
+};
+
 type ShowroomPreset = {
   room: string;
   visualMode: "mobile" | "dashboard" | "security" | "cloud" | "agent" | "report" | "proof";
@@ -921,6 +929,79 @@ const worldProps: WorldProp[] = [
 const unlockableEntityIds = entities
   .filter((entity) => entity.kind !== "collectible")
   .map((entity) => entity.id);
+
+function countUnlocked(ids: string[], proofSet: Set<string>) {
+  return ids.filter((id) => proofSet.has(id)).length;
+}
+
+function getAchievements({
+  collected,
+  unlockedProof,
+  visitedDistricts,
+  recruiterViewed,
+}: {
+  collected: string[];
+  unlockedProof: string[];
+  visitedDistricts: DistrictId[];
+  recruiterViewed: boolean;
+}): Achievement[] {
+  const proofSet = new Set(unlockedProof);
+  const productStops = ["fofit-mobile", "fofit-coach", "cypher-lab"];
+  const cyberStops = ["soc-monitor", "netwatch", "pentest-lab", "aws-generator"];
+  const agentStops = ["agentroom", "omni", "ruflo", "stack-mode"];
+
+  return [
+    {
+      id: "product-ecosystem",
+      title: "Product Ecosystem",
+      detail: "FoFit Mobile, Coach Center, and Cypher AI Lab reviewed.",
+      accent: "#76f4df",
+      unlocked: productStops.every((id) => proofSet.has(id)),
+    },
+    {
+      id: "cyber-proof",
+      title: "Cyber Proof",
+      detail: "Two cyber, cloud, or report proof stops reviewed.",
+      accent: "#78c7ff",
+      unlocked: countUnlocked(cyberStops, proofSet) >= 2,
+    },
+    {
+      id: "agent-workflow",
+      title: "Agent Workflow",
+      detail: "Two AI or agent workflow labs reviewed.",
+      accent: "#bfa7ff",
+      unlocked: countUnlocked(agentStops, proofSet) >= 2,
+    },
+    {
+      id: "founder-signal",
+      title: "Founder Signal",
+      detail: "Larry Investments HQ and venture direction reviewed.",
+      accent: "#f3d7a6",
+      unlocked: proofSet.has("larry-investments"),
+    },
+    {
+      id: "proof-collector",
+      title: "Proof Collector",
+      detail: "Three proof tokens collected around the world.",
+      accent: "#ffffff",
+      unlocked: collected.length >= 3,
+    },
+    {
+      id: "world-explorer",
+      title: "World Explorer",
+      detail: "Three districts discovered through movement.",
+      accent: "#d5d5d5",
+      unlocked: visitedDistricts.length >= 3,
+    },
+    {
+      id: "recruiter-ready",
+      title: "Recruiter Ready",
+      detail: "Traditional recruiter summary opened.",
+      accent: "#f6d777",
+      unlocked: recruiterViewed || proofSet.has("resume-terminal"),
+    },
+  ];
+}
 
 const showroomPresets: Record<string, ShowroomPreset> = {
   "fofit-mobile": {
@@ -1918,12 +1999,20 @@ function DetailOverlay({
 function RecruiterMode({
   collectedCount,
   collectibleCount,
+  achievements,
+  unlockedProofCount,
   onClose,
 }: {
   collectedCount: number;
   collectibleCount: number;
+  achievements: Achievement[];
+  unlockedProofCount: number;
   onClose: () => void;
 }) {
+  const unlockedAchievementCount = achievements.filter(
+    (achievement) => achievement.unlocked,
+  ).length;
+
   return (
     <div className="fixed inset-0 z-[95] overflow-y-auto bg-black/86 p-3 backdrop-blur-xl md:p-6">
       <div className="mx-auto max-w-6xl">
@@ -1989,10 +2078,57 @@ function RecruiterMode({
             </div>
             <div className="rounded border border-white/10 bg-black/35 p-4">
               <p className="text-fg-muted font-mono text-[10px] uppercase">World Progress</p>
-              <p className="mt-3 text-3xl font-semibold">
-                {collectedCount} / {collectibleCount}{" "}
-                <span className="text-fg-muted text-base">proof tokens</span>
-              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-2xl font-semibold">
+                    {collectedCount}/{collectibleCount}
+                  </p>
+                  <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">Proof tokens</p>
+                </div>
+                <div className="rounded border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-2xl font-semibold">
+                    {unlockedProofCount}/{unlockableEntityIds.length}
+                  </p>
+                  <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">Proof stops</p>
+                </div>
+                <div className="rounded border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-2xl font-semibold">
+                    {unlockedAchievementCount}/{achievements.length}
+                  </p>
+                  <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">Achievements</p>
+                </div>
+                <div className="rounded border border-white/10 bg-white/[0.03] p-3">
+                  <p className="text-2xl font-semibold">{profile.location.split(",")[0]}</p>
+                  <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">Base</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2">
+                {achievements.map((achievement) => (
+                  <div
+                    key={achievement.id}
+                    className={cn(
+                      "rounded border p-3 transition",
+                      achievement.unlocked
+                        ? "border-white/18 bg-white/[0.045]"
+                        : "border-white/8 bg-black/22 opacity-58",
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 rounded-full"
+                        style={{
+                          backgroundColor: achievement.unlocked ? achievement.accent : "#555",
+                          boxShadow: achievement.unlocked
+                            ? `0 0 14px ${achievement.accent}`
+                            : "none",
+                        }}
+                      />
+                      <p className="text-sm font-semibold">{achievement.title}</p>
+                    </div>
+                    <p className="text-fg-muted mt-1 text-xs leading-4">{achievement.detail}</p>
+                  </div>
+                ))}
+              </div>
               <div className="mt-5 grid gap-2">
                 {certifications.map((cert) => (
                   <div key={cert.name} className="rounded border border-white/10 p-3">
@@ -2073,11 +2209,13 @@ function QuestBoard({
   visitedDistricts,
   collected,
   unlockedProof,
+  achievements,
   recruiterViewed,
 }: {
   visitedDistricts: DistrictId[];
   collected: string[];
   unlockedProof: string[];
+  achievements: Achievement[];
   recruiterViewed: boolean;
 }) {
   const tokenTotal = entities.filter((entity) => entity.kind === "collectible").length;
@@ -2123,6 +2261,13 @@ function QuestBoard({
 
   const completedCount = quests.filter((quest) => quest.complete).length;
   const nextQuest = quests.find((quest) => !quest.complete);
+  const unlockedAchievementCount = achievements.filter(
+    (achievement) => achievement.unlocked,
+  ).length;
+  const visibleAchievements = achievements.filter((achievement) => achievement.unlocked).slice(-3);
+  const achievementPreview = visibleAchievements.length
+    ? visibleAchievements
+    : achievements.slice(0, 3);
 
   return (
     <aside className="pointer-events-none fixed top-16 right-5 z-40 hidden w-80 rounded border border-white/12 bg-black/72 p-4 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur xl:block">
@@ -2144,6 +2289,34 @@ function QuestBoard({
         <p className="text-fg-secondary mt-1 text-xs leading-5">
           {nextQuest?.detail ?? "Open Recruiter Mode when you want the traditional summary."}
         </p>
+      </div>
+
+      <div className="mt-3 rounded border border-white/10 bg-white/[0.035] p-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-fg-muted font-mono text-[9px] uppercase">Achievements</p>
+          <span className="font-mono text-[9px] text-white/58">
+            {unlockedAchievementCount}/{achievements.length}
+          </span>
+        </div>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {achievementPreview.map((achievement) => (
+            <span
+              key={achievement.id}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded border px-2 py-1 font-mono text-[9px] uppercase",
+                achievement.unlocked
+                  ? "border-white/18 bg-white/[0.06] text-white"
+                  : "border-white/8 bg-black/24 text-white/42",
+              )}
+            >
+              <span
+                className="size-1.5 rounded-full"
+                style={{ backgroundColor: achievement.unlocked ? achievement.accent : "#555" }}
+              />
+              {achievement.unlocked ? achievement.title : "Locked"}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="mt-3 grid gap-2">
@@ -2289,6 +2462,7 @@ function ControlPad({
         <span />
         <button
           type="button"
+          aria-label="Move up"
           className={buttonClass}
           onPointerDown={() => onDirection("ArrowUp", true)}
           onPointerUp={() => onDirection("ArrowUp", false)}
@@ -2299,6 +2473,7 @@ function ControlPad({
         <span />
         <button
           type="button"
+          aria-label="Move left"
           className={buttonClass}
           onPointerDown={() => onDirection("ArrowLeft", true)}
           onPointerUp={() => onDirection("ArrowLeft", false)}
@@ -2308,6 +2483,7 @@ function ControlPad({
         </button>
         <button
           type="button"
+          aria-label="Move down"
           className={buttonClass}
           onPointerDown={() => onDirection("ArrowDown", true)}
           onPointerUp={() => onDirection("ArrowDown", false)}
@@ -2317,6 +2493,7 @@ function ControlPad({
         </button>
         <button
           type="button"
+          aria-label="Move right"
           className={buttonClass}
           onPointerDown={() => onDirection("ArrowRight", true)}
           onPointerUp={() => onDirection("ArrowRight", false)}
@@ -2327,6 +2504,7 @@ function ControlPad({
       </div>
       <button
         type="button"
+        aria-label="Interact with nearby proof stop"
         onClick={onInteract}
         className="h-14 rounded border border-white bg-white px-5 font-mono text-sm text-black"
       >
@@ -2356,6 +2534,8 @@ export default function KenanWorld() {
   const pressed = useRef<Record<string, boolean>>({});
   const movingRef = useRef(false);
   const facingRef = useRef<Facing>("down");
+  const achievementCountRef = useRef(0);
+  const achievementIdsRef = useRef<Set<string>>(new Set());
 
   const collectibleCount = useMemo(
     () => entities.filter((entity) => entity.kind === "collectible").length,
@@ -2364,10 +2544,19 @@ export default function KenanWorld() {
 
   const currentDistrict = useMemo(() => getCurrentDistrict(player), [player]);
 
-  const progressTotal = districts.length + collectibleCount + unlockableEntityIds.length;
+  const achievements = useMemo(
+    () => getAchievements({ collected, unlockedProof, visitedDistricts, recruiterViewed }),
+    [collected, unlockedProof, visitedDistricts, recruiterViewed],
+  );
+  const unlockedAchievementCount = achievements.filter(
+    (achievement) => achievement.unlocked,
+  ).length;
+
+  const progressTotal =
+    districts.length + collectibleCount + unlockableEntityIds.length + achievements.length;
   const progressCount = Math.min(
     progressTotal,
-    visitedDistricts.length + collected.length + unlockedProof.length,
+    visitedDistricts.length + collected.length + unlockedProof.length + unlockedAchievementCount,
   );
   const completionPercent = Math.round((progressCount / progressTotal) * 100);
 
@@ -2457,6 +2646,46 @@ export default function KenanWorld() {
       currentDistrict.accent,
     );
   }, [announce, currentDistrict, started, visitedDistricts]);
+
+  useEffect(() => {
+    if (!started && !recruiterViewed) {
+      achievementCountRef.current = unlockedAchievementCount;
+      achievementIdsRef.current = new Set(
+        achievements
+          .filter((achievement) => achievement.unlocked)
+          .map((achievement) => achievement.id),
+      );
+      return;
+    }
+    if (unlockedAchievementCount <= achievementCountRef.current) {
+      achievementCountRef.current = unlockedAchievementCount;
+      achievementIdsRef.current = new Set(
+        achievements
+          .filter((achievement) => achievement.unlocked)
+          .map((achievement) => achievement.id),
+      );
+      return;
+    }
+
+    const previousAchievementIds = achievementIdsRef.current;
+    const latestAchievement = achievements.find(
+      (achievement) => achievement.unlocked && !previousAchievementIds.has(achievement.id),
+    );
+
+    if (latestAchievement) {
+      announce(
+        "Achievement unlocked",
+        `${latestAchievement.title}: ${latestAchievement.detail}`,
+        latestAchievement.accent,
+      );
+    }
+    achievementCountRef.current = unlockedAchievementCount;
+    achievementIdsRef.current = new Set(
+      achievements
+        .filter((achievement) => achievement.unlocked)
+        .map((achievement) => achievement.id),
+    );
+  }, [achievements, announce, recruiterViewed, started, unlockedAchievementCount]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -2688,6 +2917,7 @@ export default function KenanWorld() {
         visitedDistricts={visitedDistricts}
         collected={collected}
         unlockedProof={unlockedProof}
+        achievements={achievements}
         recruiterViewed={recruiterViewed}
       />
 
@@ -2718,6 +2948,9 @@ export default function KenanWorld() {
               />
             ))}
         </div>
+        <p className="text-fg-muted mt-3 border-t border-white/10 pt-2 font-mono text-[9px] uppercase">
+          Achievements {unlockedAchievementCount} / {achievements.length}
+        </p>
       </div>
 
       <ControlPad onDirection={setDirection} onInteract={() => interact()} />
@@ -2788,6 +3021,8 @@ export default function KenanWorld() {
         <RecruiterMode
           collectedCount={collected.length}
           collectibleCount={collectibleCount}
+          achievements={achievements}
+          unlockedProofCount={unlockedProof.length}
           onClose={() => setRecruiterMode(false)}
         />
       )}
