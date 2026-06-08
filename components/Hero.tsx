@@ -156,7 +156,7 @@ function WorldPreview() {
         </div>
 
         <div className="mt-4 grid gap-2 border-t border-white/12 pt-4 sm:grid-cols-3">
-          {["Walk districts", "Open project proof", "Skip with Recruiter Mode"].map((item) => (
+          {["Explore districts", "Open project rooms", "Recruiter shortcut"].map((item) => (
             <div
               key={item}
               className="text-fg-secondary rounded border border-white/10 bg-black/35 px-3 py-2 font-mono text-[10px] uppercase"
@@ -172,7 +172,7 @@ function WorldPreview() {
 
 export default function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden pt-28 pb-14 md:pt-36 md:pb-20">
+    <section id="top" className="relative overflow-hidden pt-24 pb-12 md:pt-36 md:pb-20">
       <GradientMesh />
       <div className="mx-auto max-w-[1280px] px-4 lg:px-8">
         <div className="grid min-w-0 items-center gap-12 lg:grid-cols-[0.82fr_1.18fr]">
@@ -189,7 +189,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.06, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 text-5xl leading-none font-semibold tracking-normal md:text-7xl"
+              className="mt-5 text-5xl leading-none font-semibold tracking-normal md:mt-6 md:text-7xl"
             >
               {profile.name}
             </motion.h1>
@@ -197,7 +197,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
-              className="text-fg mt-5 max-w-3xl text-2xl leading-tight break-words md:text-4xl"
+              className="text-fg mt-4 max-w-3xl text-2xl leading-tight break-words md:mt-5 md:text-4xl"
             >
               {profile.headline}
             </motion.p>
@@ -205,7 +205,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.18, duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
-              className="text-fg-secondary mt-6 max-w-2xl text-base leading-7 break-words md:text-lg"
+              className="text-fg-secondary mt-5 max-w-2xl text-base leading-7 break-words md:mt-6 md:text-lg"
             >
               {profile.intro}
             </motion.p>
@@ -214,7 +214,7 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.24, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-7 flex flex-wrap gap-2"
+              className="mt-6 flex flex-wrap gap-2 md:mt-7"
             >
               {heroSignals.map((signal) => (
                 <span
@@ -230,17 +230,17 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="glass-panel mt-8 max-w-xl rounded p-4"
+              className="glass-panel mt-6 max-w-xl rounded p-3.5 md:mt-8 md:p-4"
             >
               <div className="flex items-start gap-3">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded border border-white/15 bg-white/10">
                   <ShieldCheck size={18} aria-hidden />
                 </div>
                 <div>
-                  <p className="text-fg-muted font-mono text-xs uppercase">Fast read</p>
+                  <p className="text-fg-muted font-mono text-xs uppercase">Recruiter path</p>
                   <p className="text-fg-secondary mt-1 text-sm leading-6">
-                    The normal portfolio is still below. Kenan World is the centerpiece for people
-                    who want to explore the work instead of scanning another project grid.
+                    Scan the featured work below, or launch Kenan World for an interactive proof
+                    tour through projects, cyber work, AI tools, and experience.
                   </p>
                 </div>
               </div>
@@ -250,14 +250,14 @@ export default function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.36, duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-8 flex flex-wrap gap-3"
+              className="mt-6 flex flex-wrap gap-3 md:mt-8"
             >
               <HeroLink href="/world" primary>
                 <Gamepad2 size={16} aria-hidden />
                 Enter Kenan World
               </HeroLink>
               <HeroLink href="#featured">
-                Skip to Projects
+                View Featured Work
                 <ArrowDownRight size={16} aria-hidden />
               </HeroLink>
               {profile.resumeUrl ? (

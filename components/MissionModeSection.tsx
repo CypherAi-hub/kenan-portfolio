@@ -134,7 +134,7 @@ export default function MissionModeSection() {
                 <div>
                   <p className="text-fg-muted font-mono text-[10px] uppercase">Proof tokens</p>
                   <p className="text-fg-secondary mt-1 text-sm leading-6">
-                    Collectibles unlock the same story the normal portfolio tells: product,
+                    Collectibles unlock the same proof system recruiters need: product,
                     cybersecurity, cloud, AI, athletic discipline, and consistent shipping.
                   </p>
                 </div>

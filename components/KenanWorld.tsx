@@ -2554,7 +2554,7 @@ export default function KenanWorld() {
             </div>
             <div className="p-6 md:p-10">
               <p className="text-fg-muted font-mono text-[11px] tracking-[0.22em] uppercase">
-                Hidden Portfolio Route
+                Interactive Portfolio Route
               </p>
               <h2 className="mt-4 text-5xl font-semibold md:text-7xl">Kenan World</h2>
               <p className="text-fg-secondary mt-5 max-w-2xl text-base leading-7 md:text-lg">
@@ -2568,7 +2568,7 @@ export default function KenanWorld() {
                   onClick={() => setStarted(true)}
                   className="hover:bg-accent-dim inline-flex h-12 items-center rounded border border-white bg-white px-5 font-mono text-sm text-black transition"
                 >
-                  Press Enter To Start
+                  Start Kenan World
                 </button>
                 <button
                   type="button"
@@ -2579,8 +2579,8 @@ export default function KenanWorld() {
                 </button>
               </div>
               <div className="text-fg-muted mt-8 grid gap-2 border-t border-white/10 pt-5 font-mono text-[10px] uppercase sm:grid-cols-3">
-                <span>Move: WASD / arrows</span>
-                <span>Interact: E / Enter</span>
+                <span>Move: WASD / arrows / touch</span>
+                <span>Interact: E / Enter / tap</span>
                 <span>Recruiter: R</span>
               </div>
             </div>
