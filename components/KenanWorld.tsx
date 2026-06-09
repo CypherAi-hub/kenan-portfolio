@@ -1617,6 +1617,232 @@ function ProofArchitectureMap({
   );
 }
 
+type ProofDeckItem = {
+  label: string;
+  title: string;
+  detail: string;
+};
+
+function getProofDeckItems(
+  preset: ShowroomPreset,
+  entity: WorldEntity,
+  project?: Project,
+  caseStudy?: (typeof caseStudies)[number],
+): ProofDeckItem[] {
+  const workflow = preset.workflow;
+
+  switch (preset.visualMode) {
+    case "security":
+      return [
+        {
+          label: "Triage",
+          title: workflow[0] ?? "Alert review",
+          detail:
+            "Start with simulated defensive context: alert state, packet clues, timeline, or monitoring signal.",
+        },
+        {
+          label: "Evidence",
+          title: workflow[1] ?? "Investigation context",
+          detail:
+            "Use screenshots and architecture notes to explain what is happening without exposing live systems.",
+        },
+        {
+          label: "Decision",
+          title: workflow[workflow.length - 1] ?? "Analyst decision",
+          detail:
+            "Translate the signal into remediation, operational next steps, and recruiter-safe security reasoning.",
+        },
+      ];
+    case "cloud":
+      return [
+        {
+          label: "Input",
+          title: workflow[0] ?? "Image input",
+          detail:
+            "A small cloud workflow begins with a concrete object, not abstract cloud claims.",
+        },
+        {
+          label: "AWS",
+          title: workflow[1] ?? "S3 storage",
+          detail:
+            "Service boundaries stay visible so recruiters can see where storage, model inference, and code meet.",
+        },
+        {
+          label: "Output",
+          title: workflow[workflow.length - 1] ?? "Python output",
+          detail:
+            "The proof is the generated label output, visualization, and readable explanation of the pipeline.",
+        },
+      ];
+    case "agent":
+      return [
+        {
+          label: "Plan",
+          title: workflow[0] ?? "Plan",
+          detail: "The room frames agent work as a controlled workflow with human-readable intent.",
+        },
+        {
+          label: "Validate",
+          title: workflow[2] ?? workflow[1] ?? "Validation",
+          detail:
+            "Checkpoints, blockers, screenshots, and test results turn vague automation into inspectable proof.",
+        },
+        {
+          label: "Ship",
+          title: workflow[workflow.length - 1] ?? "Deploy",
+          detail:
+            "The final signal is whether the work can be reviewed, verified, and handed to a real user.",
+        },
+      ];
+    case "report":
+      return [
+        {
+          label: "Scope",
+          title: caseStudy?.problem ? "Controlled engagement" : (workflow[0] ?? "Scope"),
+          detail:
+            "The exhibit stays focused on scoped, controlled-lab reporting rather than unsafe public exploit detail.",
+        },
+        {
+          label: "Findings",
+          title: workflow[2] ?? "Severity",
+          detail:
+            "Evidence, severity, and impact are presented as communication proof, not as a live attack guide.",
+        },
+        {
+          label: "Remediate",
+          title: workflow[workflow.length - 1] ?? "Remediation",
+          detail:
+            "The recruiter takeaway is risk documentation, business-readable recommendations, and responsible redaction.",
+        },
+      ];
+    case "dashboard":
+      return [
+        {
+          label: "Operate",
+          title: workflow[0] ?? "Operational view",
+          detail:
+            "The dashboard room emphasizes repeated work: rosters, status, delivery, review, or business process.",
+        },
+        {
+          label: "Scale",
+          title: workflow[2] ?? workflow[1] ?? "Team workflow",
+          detail:
+            "Cards and proof panels show how the product supports more than a one-screen demo.",
+        },
+        {
+          label: "Handoff",
+          title: workflow[workflow.length - 1] ?? "Operations",
+          detail: "The goal is a surface another person could understand, operate, and trust.",
+        },
+      ];
+    case "mobile":
+      return [
+        {
+          label: "User",
+          title: workflow[0] ?? "User context",
+          detail:
+            "The mobile room starts with the person using the product: athlete, coach, or daily workflow.",
+        },
+        {
+          label: "Action",
+          title: workflow[2] ?? workflow[1] ?? "Product action",
+          detail:
+            "Screenshots prove the interaction path, not just the app idea or repository title.",
+        },
+        {
+          label: "Signal",
+          title: workflow[workflow.length - 1] ?? "Outcome",
+          detail:
+            "The room connects product UI to the proof it gives a recruiter: mobile execution and product judgment.",
+        },
+      ];
+    default:
+      return [
+        {
+          label: "Signal",
+          title: entity.subtitle,
+          detail: project?.proof ?? preset.proofType,
+        },
+        {
+          label: "Artifact",
+          title: project ? project.repo : preset.room,
+          detail:
+            project?.notes ??
+            "This room keeps the claim tied to a visible portfolio artifact or honest placeholder.",
+        },
+        {
+          label: "Next",
+          title: "Recruiter path",
+          detail: "Open Recruiter Mode any time for the traditional summary, resume, and links.",
+        },
+      ];
+  }
+}
+
+function ProofModeDeck({
+  preset,
+  district,
+  entity,
+  project,
+  caseStudy,
+}: {
+  preset: ShowroomPreset;
+  district: District;
+  entity: WorldEntity;
+  project?: Project;
+  caseStudy?: (typeof caseStudies)[number];
+}) {
+  const items = getProofDeckItems(preset, entity, project, caseStudy);
+
+  return (
+    <div className="mt-5 rounded border border-white/10 bg-black/32 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          {preset.visualMode === "security" || preset.visualMode === "report" ? (
+            <ShieldCheck size={14} aria-hidden />
+          ) : preset.visualMode === "cloud" || preset.visualMode === "agent" ? (
+            <Cpu size={14} aria-hidden />
+          ) : (
+            <Layers size={14} aria-hidden />
+          )}
+          <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+            Mode proof deck
+          </p>
+        </div>
+        <span
+          className="rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase"
+          style={{
+            borderColor: `${district.accent}55`,
+            color: district.accent,
+            backgroundColor: `${district.accent}10`,
+          }}
+        >
+          {preset.visualMode}
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-2 md:grid-cols-3">
+        {items.map((item, index) => (
+          <div
+            key={`${item.label}-${item.title}`}
+            className="relative overflow-hidden rounded border border-white/10 bg-white/[0.035] p-3"
+          >
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px"
+              style={{ backgroundColor: index === 0 ? district.accent : "rgba(255,255,255,.16)" }}
+            />
+            <p className="font-mono text-[9px] tracking-[0.14em] text-white/45 uppercase">
+              {String(index + 1).padStart(2, "0")} / {item.label}
+            </p>
+            <h3 className="mt-2 text-sm font-semibold text-white">{item.title}</h3>
+            <p className="text-fg-secondary mt-2 text-xs leading-5">{item.detail}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] {
   if (project?.media.length) return project.media;
   if (entity.id === "laptop") {
@@ -2540,6 +2766,14 @@ function DetailOverlay({
                   </div>
                 </div>
               </div>
+
+              <ProofModeDeck
+                preset={preset}
+                district={district}
+                entity={entity}
+                project={project}
+                caseStudy={caseStudy}
+              />
 
               <div className="mt-5 grid gap-4 md:grid-cols-[1.2fr_.8fr]">
                 <ProofArchitectureMap preset={preset} district={district} project={project} />
