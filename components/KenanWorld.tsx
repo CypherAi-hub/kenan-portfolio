@@ -18,6 +18,7 @@ import {
   Mail,
   Map as MapIcon,
   Maximize2,
+  RotateCcw,
   ShieldCheck,
   Sparkles,
   Trophy,
@@ -129,9 +130,18 @@ type ShowroomPreset = {
   recruiterRead: string;
 };
 
+type WorldSaveState = {
+  collected: string[];
+  unlockedProof: string[];
+  visitedDistricts: DistrictId[];
+  recruiterViewed: boolean;
+  player: { x: number; y: number };
+};
+
 const WORLD = { width: 2360, height: 1540 };
 const PLAYER = { width: 34, height: 46 };
 const INTERACTION_DISTANCE = 168;
+const WORLD_SAVE_KEY = "kenan-world-progress-v1";
 
 const districts = [
   {
@@ -1107,6 +1117,45 @@ function getDistrictProgress({
     tokenTotal: tokenStops.length,
     tokenCollected: collectedTokens.length,
     nextStop,
+  };
+}
+
+function uniqueKnownIds(values: string[], knownIds: Set<string>) {
+  return Array.from(new Set(values.filter((value) => knownIds.has(value))));
+}
+
+function isDistrictId(value: string): value is DistrictId {
+  return districts.some((district) => district.id === value);
+}
+
+function normalizeSavedWorldState(value: unknown): WorldSaveState | null {
+  if (!value || typeof value !== "object") return null;
+
+  const saved = value as Partial<WorldSaveState>;
+  const collectibleIds = new Set(
+    entities.filter((entity) => entity.kind === "collectible").map((entity) => entity.id),
+  );
+  const proofIds = new Set(unlockableEntityIds);
+  const savedPlayer = saved.player;
+
+  return {
+    collected: Array.isArray(saved.collected)
+      ? uniqueKnownIds(saved.collected, collectibleIds)
+      : [],
+    unlockedProof: Array.isArray(saved.unlockedProof)
+      ? uniqueKnownIds(saved.unlockedProof, proofIds)
+      : [],
+    visitedDistricts: Array.isArray(saved.visitedDistricts)
+      ? Array.from(new Set(saved.visitedDistricts.filter(isDistrictId)))
+      : ["hometown"],
+    recruiterViewed: Boolean(saved.recruiterViewed),
+    player:
+      savedPlayer && typeof savedPlayer.x === "number" && typeof savedPlayer.y === "number"
+        ? {
+            x: clamp(savedPlayer.x, 20, WORLD.width - PLAYER.width - 20),
+            y: clamp(savedPlayer.y, 20, WORLD.height - PLAYER.height - 20),
+          }
+        : spawn,
   };
 }
 
@@ -2256,12 +2305,14 @@ function RecruiterMode({
   collectibleCount,
   achievements,
   unlockedProofCount,
+  onResetProgress,
   onClose,
 }: {
   collectedCount: number;
   collectibleCount: number;
   achievements: Achievement[];
   unlockedProofCount: number;
+  onResetProgress: () => void;
   onClose: () => void;
 }) {
   const unlockedAchievementCount = achievements.filter(
@@ -2279,14 +2330,24 @@ function RecruiterMode({
             <ArrowLeft size={14} aria-hidden />
             Portfolio
           </Link>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close Recruiter Mode"
-            className="text-fg-secondary flex size-10 items-center justify-center rounded border border-white/15 transition hover:border-white/45 hover:text-white"
-          >
-            <X size={16} aria-hidden />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onResetProgress}
+              className="text-fg-secondary hidden h-10 items-center gap-2 rounded border border-white/15 px-3 font-mono text-xs transition hover:border-white/45 hover:text-white sm:inline-flex"
+            >
+              <RotateCcw size={14} aria-hidden />
+              Reset World
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close Recruiter Mode"
+              className="text-fg-secondary flex size-10 items-center justify-center rounded border border-white/15 transition hover:border-white/45 hover:text-white"
+            >
+              <X size={16} aria-hidden />
+            </button>
+          </div>
         </div>
 
         <section className="glass-panel rounded p-5 md:p-8">
@@ -3242,6 +3303,7 @@ export default function KenanWorld() {
   } | null>(null);
   const [facing, setFacing] = useState<Facing>("down");
   const [moving, setMoving] = useState(false);
+  const [saveLoaded, setSaveLoaded] = useState(false);
   const pressed = useRef<Record<string, boolean>>({});
   const movingRef = useRef(false);
   const facingRef = useRef<Facing>("down");
@@ -3304,6 +3366,34 @@ export default function KenanWorld() {
     setMapOpen(false);
     setRecruiterMode(true);
   }, []);
+
+  const resetWorldProgress = useCallback(() => {
+    try {
+      window.localStorage.removeItem(WORLD_SAVE_KEY);
+    } catch {}
+
+    pressed.current = {};
+    movingRef.current = false;
+    setStarted(false);
+    setPlayer(spawn);
+    setFocusedEntity(null);
+    setCollected([]);
+    setRecruiterMode(false);
+    setMapOpen(false);
+    setRecruiterViewed(false);
+    setVisitedDistricts(["hometown"]);
+    setUnlockedProof([]);
+    setFacing("down");
+    facingRef.current = "down";
+    setMoving(false);
+    achievementCountRef.current = 0;
+    achievementIdsRef.current = new Set();
+    announce(
+      "World reset",
+      "Progress cleared on this device. Recruiter Mode still works anytime.",
+      "#ffffff",
+    );
+  }, [announce]);
 
   const travelToDistrict = useCallback(
     (districtId: DistrictId) => {
@@ -3387,6 +3477,60 @@ export default function KenanWorld() {
     window.addEventListener("resize", syncViewport);
     return () => window.removeEventListener("resize", syncViewport);
   }, []);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(WORLD_SAVE_KEY);
+      if (raw) {
+        const saved = normalizeSavedWorldState(JSON.parse(raw));
+        if (saved) {
+          setCollected(saved.collected);
+          setUnlockedProof(saved.unlockedProof);
+          setVisitedDistricts(
+            saved.visitedDistricts.length ? saved.visitedDistricts : ["hometown"],
+          );
+          setRecruiterViewed(saved.recruiterViewed);
+          setPlayer(saved.player);
+        }
+      }
+    } catch {}
+
+    setSaveLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!saveLoaded) return;
+
+    const hasProgress =
+      collected.length > 0 ||
+      unlockedProof.length > 0 ||
+      visitedDistricts.length > 1 ||
+      recruiterViewed ||
+      player.x !== spawn.x ||
+      player.y !== spawn.y;
+
+    if (!hasProgress) {
+      try {
+        window.localStorage.removeItem(WORLD_SAVE_KEY);
+      } catch {}
+      return;
+    }
+
+    const saveTimer = window.setTimeout(() => {
+      try {
+        const nextSave: WorldSaveState = {
+          collected,
+          unlockedProof,
+          visitedDistricts,
+          recruiterViewed,
+          player,
+        };
+        window.localStorage.setItem(WORLD_SAVE_KEY, JSON.stringify(nextSave));
+      } catch {}
+    }, 250);
+
+    return () => window.clearTimeout(saveTimer);
+  }, [collected, player, recruiterViewed, saveLoaded, unlockedProof, visitedDistricts]);
 
   useEffect(() => {
     if (!started || !currentDistrict || visitedDistricts.includes(currentDistrict.id)) return;
@@ -3803,8 +3947,18 @@ export default function KenanWorld() {
                   onClick={() => setStarted(true)}
                   className="hover:bg-accent-dim inline-flex h-12 items-center rounded border border-white bg-white px-5 font-mono text-sm text-black transition"
                 >
-                  Start Kenan World
+                  {saveLoaded && progressCount > 1 ? "Resume Kenan World" : "Start Kenan World"}
                 </button>
+                {saveLoaded && progressCount > 1 && (
+                  <button
+                    type="button"
+                    onClick={resetWorldProgress}
+                    className="text-fg-muted inline-flex h-12 items-center gap-2 rounded border border-white/12 px-4 font-mono text-sm transition hover:border-white/35 hover:text-white"
+                  >
+                    <RotateCcw size={14} aria-hidden />
+                    Reset progress
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={openRecruiterMode}
@@ -3838,6 +3992,7 @@ export default function KenanWorld() {
           collectibleCount={collectibleCount}
           achievements={achievements}
           unlockedProofCount={unlockedProof.length}
+          onResetProgress={resetWorldProgress}
           onClose={() => setRecruiterMode(false)}
         />
       )}
