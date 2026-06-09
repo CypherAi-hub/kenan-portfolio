@@ -1473,6 +1473,150 @@ function getShowroomPreset(entity: WorldEntity, project?: Project): ShowroomPres
   );
 }
 
+function getWorkflowStageLabel(mode: ShowroomPreset["visualMode"], index: number) {
+  const labels: Record<ShowroomPreset["visualMode"], string[]> = {
+    mobile: ["Context", "Intelligence", "Action", "Signal", "Handoff"],
+    dashboard: ["Intake", "Operate", "Review", "Scale", "Report"],
+    security: ["Detect", "Investigate", "Map", "Decide", "Report"],
+    cloud: ["Input", "Storage", "Model", "Output", "Review"],
+    agent: ["Plan", "Build", "Validate", "Evidence", "Ship"],
+    report: ["Scope", "Evidence", "Rate", "Remediate", "Present"],
+    proof: ["Signal", "Proof", "Context", "Action", "Next"],
+  };
+
+  return labels[mode][index] ?? `Stage ${index + 1}`;
+}
+
+function getArchitectureSignal(mode: ShowroomPreset["visualMode"]) {
+  switch (mode) {
+    case "mobile":
+      return "Mobile product loop";
+    case "dashboard":
+      return "Operational product loop";
+    case "security":
+      return "Defensive analyst loop";
+    case "cloud":
+      return "Cloud service pipeline";
+    case "agent":
+      return "Agent workflow loop";
+    case "report":
+      return "Report evidence chain";
+    default:
+      return "Recruiter proof chain";
+  }
+}
+
+function ProofArchitectureMap({
+  preset,
+  district,
+  project,
+}: {
+  preset: ShowroomPreset;
+  district: District;
+  project?: Project;
+}) {
+  const stackPreview = project?.techStack.slice(0, 3).join(" / ") ?? district.title;
+  const architectureSignal = getArchitectureSignal(preset.visualMode);
+
+  return (
+    <div className="rounded border border-white/10 bg-black/32 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Layers size={14} aria-hidden />
+          <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
+            Architecture path
+          </p>
+        </div>
+        <span
+          className="rounded-full border px-2 py-1 font-mono text-[9px] uppercase"
+          style={{
+            borderColor: `${district.accent}55`,
+            color: district.accent,
+            backgroundColor: `${district.accent}10`,
+          }}
+        >
+          {architectureSignal}
+        </span>
+      </div>
+
+      <div className="relative mt-4 overflow-hidden rounded border border-white/10 bg-black/40 p-3">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-35"
+          style={{
+            background: `radial-gradient(circle at 20% 0%, ${district.glow}, transparent 34%), linear-gradient(135deg, rgba(255,255,255,.06), transparent 42%)`,
+          }}
+        />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:22px_22px]" />
+        <div className="relative grid gap-2 sm:grid-cols-2">
+          {preset.workflow.map((step, index) => (
+            <div
+              key={`${step}-${index}`}
+              className={cn(
+                "group relative overflow-hidden rounded border border-white/10 bg-black/48 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-white/24",
+                index % 2 === 1 && "sm:translate-y-3",
+              )}
+            >
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-px opacity-80"
+                style={{ backgroundColor: district.accent }}
+              />
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex size-7 shrink-0 items-center justify-center rounded border font-mono text-[10px]"
+                  style={{
+                    borderColor: `${district.accent}66`,
+                    color: district.accent,
+                    boxShadow: `0 0 18px ${district.glow}`,
+                  }}
+                >
+                  {index + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="font-mono text-[9px] tracking-[0.13em] text-white/45 uppercase">
+                    {getWorkflowStageLabel(preset.visualMode, index)}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-white">{step}</p>
+                </div>
+              </div>
+              <div className="mt-3 h-1 rounded-full bg-white/[0.06]">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${Math.round(((index + 1) / preset.workflow.length) * 100)}%`,
+                    backgroundColor: district.accent,
+                    boxShadow: `0 0 14px ${district.glow}`,
+                  }}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+          <p className="font-mono text-[9px] tracking-[0.12em] text-white/45 uppercase">
+            Proof type
+          </p>
+          <p className="text-fg-secondary mt-1 text-xs leading-4">{preset.proofType}</p>
+        </div>
+        <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+          <p className="font-mono text-[9px] tracking-[0.12em] text-white/45 uppercase">
+            Stack signal
+          </p>
+          <p className="text-fg-secondary mt-1 line-clamp-2 text-xs leading-4">{stackPreview}</p>
+        </div>
+        <div className="rounded border border-white/10 bg-white/[0.035] p-3">
+          <p className="font-mono text-[9px] tracking-[0.12em] text-white/45 uppercase">
+            Room goal
+          </p>
+          <p className="text-fg-secondary mt-1 text-xs leading-4">{preset.room}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] {
   if (project?.media.length) return project.media;
   if (entity.id === "laptop") {
@@ -2397,29 +2541,8 @@ function DetailOverlay({
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-[.85fr_1.15fr]">
-                <div className="rounded border border-white/10 bg-black/32 p-4">
-                  <div className="flex items-center gap-2">
-                    <Layers size={14} aria-hidden />
-                    <p className="font-mono text-[10px] tracking-[0.16em] text-white/55 uppercase">
-                      Room path
-                    </p>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    {preset.workflow.map((step, index) => (
-                      <div key={`${step}-${index}`} className="flex items-center gap-3">
-                        <span
-                          className="flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-[10px]"
-                          style={{ borderColor: `${district.accent}66`, color: district.accent }}
-                        >
-                          {index + 1}
-                        </span>
-                        <span className="text-fg-secondary text-sm">{step}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
+              <div className="mt-5 grid gap-4 md:grid-cols-[1.2fr_.8fr]">
+                <ProofArchitectureMap preset={preset} district={district} project={project} />
                 <div className="rounded border border-white/10 bg-black/32 p-4">
                   <div className="flex items-center gap-2">
                     <Cpu size={14} aria-hidden />
