@@ -2983,35 +2983,105 @@ function DistrictNavigator({
   );
 }
 
-function NearbyPrompt({ entity, unlocked }: { entity: WorldEntity; unlocked: boolean }) {
+function NearbyPrompt({
+  entity,
+  unlocked,
+  project,
+}: {
+  entity: WorldEntity;
+  unlocked: boolean;
+  project?: Project;
+}) {
   const district = districtById.get(entity.district)!;
+  const preset = getShowroomPreset(entity, project);
+  const media = getEntityMedia(entity, project);
+  const previewMedia = media[0];
+  const caseStudy = project?.caseStudySlug
+    ? caseStudies.find((study) => study.slug === project.caseStudySlug)
+    : undefined;
   const verb =
     entity.kind === "collectible"
       ? "Collect proof token"
       : unlocked
         ? "Review proof room"
         : (entity.actionLabel ?? (entity.kind === "npc" ? "Talk" : "Open proof room"));
+  const statusLabel =
+    entity.kind === "collectible" ? "Proof token" : (project?.status ?? preset.proofType);
 
   return (
-    <div className="fixed bottom-24 left-1/2 z-50 w-[min(92vw,420px)] -translate-x-1/2 rounded border border-white/18 bg-black/78 p-3 text-left shadow-[0_18px_70px_rgba(0,0,0,.38)] backdrop-blur md:bottom-8">
-      <div className="flex items-start gap-3">
-        <span
-          className="mt-1 size-2 shrink-0 rounded-full"
-          style={{ backgroundColor: district.accent, boxShadow: `0 0 18px ${district.accent}` }}
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-fg-muted font-mono text-[10px] uppercase">Nearby</p>
-            <span className="rounded border border-white/10 px-2 py-0.5 font-mono text-[9px] text-white/55 uppercase">
-              {district.title}
-            </span>
+    <div className="fixed bottom-24 left-1/2 z-50 w-[min(94vw,640px)] -translate-x-1/2 rounded border border-white/18 bg-black/80 p-3 text-left shadow-[0_18px_70px_rgba(0,0,0,.38)] backdrop-blur md:bottom-8">
+      <div className="grid gap-3 sm:grid-cols-[1fr_9.5rem]">
+        <div className="flex items-start gap-3">
+          <span
+            className="mt-1 size-2 shrink-0 rounded-full"
+            style={{ backgroundColor: district.accent, boxShadow: `0 0 18px ${district.accent}` }}
+          />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-fg-muted font-mono text-[10px] uppercase">Nearby proof stop</p>
+              <span
+                className="rounded border px-2 py-0.5 font-mono text-[9px] uppercase"
+                style={{
+                  borderColor: `${district.accent}55`,
+                  color: district.accent,
+                  backgroundColor: `${district.accent}10`,
+                }}
+              >
+                {district.title}
+              </span>
+              <span className="text-fg-muted rounded border border-white/10 px-2 py-0.5 font-mono text-[9px] uppercase">
+                {statusLabel}
+              </span>
+              {caseStudy && (
+                <span className="rounded border border-white/16 px-2 py-0.5 font-mono text-[9px] text-white/68 uppercase">
+                  Case study
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm font-semibold md:text-base">{entity.title}</p>
+            <p className="text-fg-secondary mt-1 line-clamp-2 text-xs leading-5">
+              {project?.description ?? entity.subtitle}
+            </p>
+            <div className="mt-2 rounded border border-white/10 bg-white/[0.035] p-2">
+              <p className="text-fg-muted font-mono text-[9px] uppercase">What this proves</p>
+              <p className="mt-1 line-clamp-2 text-xs leading-5 text-white/72">
+                {project?.proof ?? preset.recruiterRead}
+              </p>
+            </div>
           </div>
-          <p className="mt-1 text-sm font-semibold">{entity.title}</p>
-          <p className="text-fg-secondary mt-1 line-clamp-2 text-xs leading-5">{entity.subtitle}</p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className="font-mono text-[10px] text-white/70 uppercase">{verb}</p>
-          <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">E / Enter</p>
+
+        <div className="grid grid-cols-[1fr_auto] gap-3 sm:block">
+          <div className="relative min-h-20 overflow-hidden rounded border border-white/12 bg-white/[0.035] sm:h-24">
+            {previewMedia ? (
+              <Image
+                src={previewMedia.src}
+                alt=""
+                fill
+                sizes="160px"
+                className="object-cover object-top brightness-[1.08] contrast-[1.05]"
+              />
+            ) : (
+              <div
+                className="flex h-full min-h-20 items-center justify-center font-mono text-[10px] font-semibold text-black uppercase"
+                style={{
+                  background: `linear-gradient(135deg, ${entity.accent}, ${district.secondary})`,
+                }}
+              >
+                {entity.collectibleLabel ?? preset.proofType.slice(0, 3)}
+              </div>
+            )}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/68 via-transparent to-transparent" />
+            <p className="absolute right-2 bottom-2 left-2 truncate font-mono text-[9px] text-white/76 uppercase">
+              {previewMedia
+                ? `${media.length} media asset${media.length === 1 ? "" : "s"}`
+                : "Open proof"}
+            </p>
+          </div>
+          <div className="flex shrink-0 flex-col justify-center text-right sm:mt-2">
+            <p className="font-mono text-[10px] text-white/75 uppercase">{verb}</p>
+            <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">E / Enter</p>
+          </div>
         </div>
       </div>
     </div>
@@ -3635,7 +3705,11 @@ export default function KenanWorld() {
       )}
 
       {activeEntity && started && !focusedEntity && !recruiterMode && !mapOpen && (
-        <NearbyPrompt entity={activeEntity} unlocked={unlockedProof.includes(activeEntity.id)} />
+        <NearbyPrompt
+          entity={activeEntity}
+          unlocked={unlockedProof.includes(activeEntity.id)}
+          project={getProject(activeEntity.projectSlug)}
+        />
       )}
 
       <QuestBoard
