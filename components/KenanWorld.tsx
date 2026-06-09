@@ -99,6 +99,18 @@ type WorldProp = {
   label?: string;
 };
 
+type WorldBillboard = {
+  id: string;
+  entityId: string;
+  title: string;
+  subtitle: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  variant: "wide" | "phone" | "report" | "terminal";
+};
+
 type Achievement = {
   id: string;
   title: string;
@@ -958,6 +970,97 @@ const worldProps: WorldProp[] = [
     h: 72,
     color: "#f6d777",
     label: "Proof",
+  },
+];
+
+const worldBillboards: WorldBillboard[] = [
+  {
+    id: "fofit-mobile-proof-wall",
+    entityId: "fofit-mobile",
+    title: "FoFit app flow",
+    subtitle: "mobile proof wall",
+    x: 966,
+    y: 300,
+    w: 126,
+    h: 188,
+    variant: "phone",
+  },
+  {
+    id: "fofit-coach-proof-wall",
+    entityId: "fofit-coach",
+    title: "Coach dashboard",
+    subtitle: "team product surface",
+    x: 1214,
+    y: 318,
+    w: 214,
+    h: 126,
+    variant: "wide",
+  },
+  {
+    id: "soc-monitor-proof-wall",
+    entityId: "soc-monitor",
+    title: "SOC console",
+    subtitle: "defensive workflow",
+    x: 385,
+    y: 650,
+    w: 196,
+    h: 116,
+    variant: "terminal",
+  },
+  {
+    id: "pentest-proof-wall",
+    entityId: "pentest-lab",
+    title: "Pentest report",
+    subtitle: "safe redacted preview",
+    x: 548,
+    y: 1010,
+    w: 150,
+    h: 118,
+    variant: "report",
+  },
+  {
+    id: "aws-proof-wall",
+    entityId: "aws-generator",
+    title: "AWS output",
+    subtitle: "rekognition labels",
+    x: 706,
+    y: 1164,
+    w: 148,
+    h: 94,
+    variant: "wide",
+  },
+  {
+    id: "agentroom-proof-wall",
+    entityId: "agentroom",
+    title: "Agent workflow",
+    subtitle: "mission control proof",
+    x: 1262,
+    y: 1048,
+    w: 248,
+    h: 138,
+    variant: "terminal",
+  },
+  {
+    id: "portfolio-proof-wall",
+    entityId: "resume-terminal",
+    title: "Recruiter summary",
+    subtitle: "fast scan mode",
+    x: 1744,
+    y: 1056,
+    w: 156,
+    h: 98,
+    variant: "wide",
+  },
+  {
+    id: "certificate-proof-wall",
+    entityId: "google-cert",
+    title: "Google Cybersecurity",
+    subtitle: "certificate proof",
+    x: 2004,
+    y: 944,
+    w: 172,
+    h: 120,
+    variant: "report",
   },
 ];
 
@@ -1822,6 +1925,117 @@ function EntitySprite({
       {active && (
         <span className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-full border border-white/20 bg-black/80 px-2 py-1 font-mono text-[9px] whitespace-nowrap text-white uppercase shadow-lg">
           Press E
+        </span>
+      )}
+    </button>
+  );
+}
+
+function WorldBillboardSprite({
+  billboard,
+  active,
+  unlocked,
+  onOpen,
+}: {
+  billboard: WorldBillboard;
+  active: boolean;
+  unlocked: boolean;
+  onOpen: () => void;
+}) {
+  const entity = entityById.get(billboard.entityId);
+  if (!entity) return null;
+
+  const project = getProject(entity.projectSlug);
+  const district = districtById.get(entity.district)!;
+  const media = getEntityMedia(entity, project);
+  const previewMedia = media[0];
+  const isPhone = billboard.variant === "phone";
+  const isReport = billboard.variant === "report";
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`Open ${entity.title} media proof`}
+      className={cn(
+        "world-billboard group absolute z-20 overflow-hidden rounded border bg-black/80 text-left shadow-[0_18px_55px_rgba(0,0,0,.36)] backdrop-blur-sm transition duration-200 focus:outline-none",
+        active && "z-30 scale-[1.035]",
+      )}
+      style={
+        {
+          left: billboard.x,
+          top: billboard.y,
+          width: billboard.w,
+          height: billboard.h,
+          borderColor: active ? district.accent : `${district.accent}66`,
+          boxShadow: active
+            ? `0 0 0 1px ${district.accent}, 0 0 34px ${district.accent}70, 0 22px 60px rgba(0,0,0,.42)`
+            : `0 0 22px ${district.accent}24, 0 18px 55px rgba(0,0,0,.36)`,
+          "--billboard-accent": district.accent,
+          "--billboard-glow": district.glow,
+          imageRendering: "auto",
+        } as CSSProperties
+      }
+    >
+      <div
+        className="absolute inset-0 opacity-70"
+        style={{
+          background: `radial-gradient(circle at 22% 15%, ${district.glow}, transparent 44%), linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.015))`,
+        }}
+      />
+
+      {previewMedia ? (
+        <div
+          className={cn(
+            "absolute overflow-hidden border border-white/14 bg-black",
+            isPhone
+              ? "inset-x-[22%] top-5 bottom-8 rounded-[12px]"
+              : isReport
+                ? "inset-3 rounded bg-white"
+                : "inset-x-3 top-7 bottom-9 rounded",
+          )}
+        >
+          <Image
+            src={previewMedia.src}
+            alt=""
+            fill
+            sizes={`${billboard.w}px`}
+            className={cn(
+              "object-top transition duration-500 group-hover:scale-[1.035]",
+              isPhone || isReport ? "object-contain" : "object-cover",
+              isReport ? "bg-white" : "brightness-[1.08] contrast-[1.08]",
+            )}
+            style={{ imageRendering: "auto" }}
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-transparent to-white/8" />
+        </div>
+      ) : (
+        <div className="absolute inset-x-3 top-7 bottom-9 flex items-center justify-center rounded border border-dashed border-white/18 bg-white/[0.045]">
+          <span className="font-mono text-[10px] text-white/58 uppercase">Media soon</span>
+        </div>
+      )}
+
+      <div className="world-billboard-scan pointer-events-none absolute inset-0" />
+      <div className="absolute inset-x-2 top-2 flex items-center justify-between gap-2">
+        <span
+          className="size-1.5 shrink-0 rounded-full"
+          style={{ backgroundColor: district.accent, boxShadow: `0 0 12px ${district.accent}` }}
+        />
+        <span className="truncate font-mono text-[8px] tracking-[0.14em] text-white/55 uppercase">
+          {billboard.subtitle}
+        </span>
+      </div>
+      <div className="absolute right-2 bottom-2 left-2 flex items-center justify-between gap-2 rounded border border-white/10 bg-black/72 px-2 py-1 backdrop-blur">
+        <span className="truncate font-mono text-[9px] text-white/80 uppercase">
+          {billboard.title}
+        </span>
+        <span className="shrink-0 font-mono text-[8px] text-white/44 uppercase">
+          {unlocked ? "Reviewed" : "Open"}
+        </span>
+      </div>
+      {unlocked && (
+        <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full border border-white bg-white text-black shadow-[0_0_16px_rgba(255,255,255,.38)]">
+          <CheckCircle2 size={12} aria-hidden />
         </span>
       )}
     </button>
@@ -3772,6 +3986,21 @@ export default function KenanWorld() {
               <PropSprite prop={prop} />
             </div>
           ))}
+
+          {worldBillboards.map((billboard) => {
+            const entity = entityById.get(billboard.entityId);
+            if (!entity) return null;
+
+            return (
+              <WorldBillboardSprite
+                key={billboard.id}
+                billboard={billboard}
+                active={activeEntity?.id === entity.id}
+                unlocked={unlockedProof.includes(entity.id)}
+                onOpen={() => interact(entity)}
+              />
+            );
+          })}
 
           {started && guideState.guideTarget && !focusedEntity && !recruiterMode && !mapOpen && (
             <GuideBeacon entity={guideState.guideTarget} step={guideState.activeGuideStep} />

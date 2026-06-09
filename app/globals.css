@@ -257,6 +257,45 @@
     filter: drop-shadow(0 0 10px currentColor);
   }
 
+  .world-billboard {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 0 1px color-mix(in srgb, var(--billboard-accent, #fff) 18%, transparent),
+      0 18px 60px rgba(0, 0, 0, 0.42),
+      0 0 44px color-mix(in srgb, var(--billboard-accent, #fff) 12%, transparent);
+  }
+
+  .world-billboard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      110deg,
+      transparent 0%,
+      transparent 38%,
+      rgba(255, 255, 255, 0.16) 48%,
+      transparent 60%,
+      transparent 100%
+    );
+    transform: translateX(-125%);
+    animation: world-sheen 6.8s linear infinite;
+    opacity: 0.74;
+  }
+
+  .world-billboard-scan {
+    background:
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 5px),
+      radial-gradient(
+        circle at 20% 8%,
+        color-mix(in srgb, var(--billboard-accent, #fff) 20%, transparent),
+        transparent 42%
+      );
+    mix-blend-mode: screen;
+    opacity: 0.36;
+  }
+
   .world-showroom {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.08),
