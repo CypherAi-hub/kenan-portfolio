@@ -99,6 +99,15 @@ type WorldProp = {
   label?: string;
 };
 
+type DistrictSignalNode = {
+  id: string;
+  district: DistrictId;
+  x: number;
+  y: number;
+  label: string;
+  detail: string;
+};
+
 type WorldBillboard = {
   id: string;
   entityId: string;
@@ -269,6 +278,50 @@ const districtTravelPoints: Record<DistrictId, DistrictTravelPoint> = {
   ai: { x: 972, y: 860, label: "Agent Lab Gate" },
   career: { x: 1718, y: 190, label: "Career Plaza" },
   museum: { x: 1748, y: 742, label: "Proof Hall Steps" },
+};
+
+const districtDispatch: Record<
+  DistrictId,
+  { status: string; headline: string; detail: string; signal: string }
+> = {
+  hometown: {
+    status: "Boot sequence",
+    headline: "Ground the story first.",
+    detail: "Start with the room artifacts: MacBook, whiteboard, volleyball, and proof tokens.",
+    signal: "Identity + direction",
+  },
+  fofit: {
+    status: "Product campus online",
+    headline: "FoFit is the flagship proof system.",
+    detail: "Open the mobile HQ, coach center, Cypher lab, marketplace, and nutrition workflows.",
+    signal: "Applied AI product",
+  },
+  cyber: {
+    status: "Defensive ops active",
+    headline: "Cyber proof stays safe and recruiter-readable.",
+    detail:
+      "Inspect SOC Monitor, Netwatch, Cyberlou, and AWS output without unsafe exploit detail.",
+    signal: "Security + cloud",
+  },
+  ai: {
+    status: "Agent labs syncing",
+    headline: "Agent tools show workflow taste.",
+    detail: "Review planning, validation, checkpoints, and builder tooling across the AI district.",
+    signal: "AI operations",
+  },
+  career: {
+    status: "Experience plaza",
+    headline: "NPCs connect the work to real-world communication.",
+    detail: "Talk to each experience NPC and visit Larry Investments HQ for the founder layer.",
+    signal: "Consulting + support",
+  },
+  museum: {
+    status: "Proof hall unlocked",
+    headline: "Turn the world back into a clean recruiter packet.",
+    detail:
+      "Review certifications and open Recruiter Mode when the visitor wants the fast version.",
+    signal: "Resume handoff",
+  },
 };
 
 const entities: WorldEntity[] = [
@@ -973,6 +1026,73 @@ const worldProps: WorldProp[] = [
   },
 ];
 
+const districtSignalNodes: DistrictSignalNode[] = [
+  {
+    id: "spawn-signal",
+    district: "hometown",
+    x: 318,
+    y: 112,
+    label: "START",
+    detail: "Room artifacts",
+  },
+  {
+    id: "fofit-product-signal",
+    district: "fofit",
+    x: 1375,
+    y: 100,
+    label: "AI",
+    detail: "Product system",
+  },
+  {
+    id: "fofit-training-signal",
+    district: "fofit",
+    x: 1232,
+    y: 560,
+    label: "TRAIN",
+    detail: "Mobile flow",
+  },
+  {
+    id: "cyber-soc-signal",
+    district: "cyber",
+    x: 392,
+    y: 820,
+    label: "SOC",
+    detail: "Triage lane",
+  },
+  {
+    id: "cyber-cloud-signal",
+    district: "cyber",
+    x: 744,
+    y: 1072,
+    label: "AWS",
+    detail: "Cloud output",
+  },
+  {
+    id: "ai-agent-signal",
+    district: "ai",
+    x: 1564,
+    y: 1016,
+    label: "AGENT",
+    detail: "Workflow loop",
+  },
+  {
+    id: "career-proof-signal",
+    district: "career",
+    x: 2090,
+    y: 538,
+    label: "OPS",
+    detail: "Experience NPCs",
+  },
+  {
+    id: "museum-proof-signal",
+    district: "museum",
+    x: 1840,
+    y: 1168,
+    label: "REPORT",
+    detail: "Recruiter packet",
+  },
+];
+
 const worldBillboards: WorldBillboard[] = [
   {
     id: "fofit-mobile-proof-wall",
@@ -1221,6 +1341,12 @@ function getDistrictProgress({
     tokenCollected: collectedTokens.length,
     nextStop,
   };
+}
+
+function getDistrictCompletionPercent(stats: ReturnType<typeof getDistrictProgress>) {
+  const total = stats.proofTotal + stats.tokenTotal;
+  if (!total) return 100;
+  return Math.round(((stats.proofUnlocked + stats.tokenCollected) / total) * 100);
 }
 
 function uniqueKnownIds(values: string[], knownIds: Set<string>) {
@@ -3259,7 +3385,7 @@ function GuidePanel({
   const direction = target ? getDirectionHint(player, target) : undefined;
 
   return (
-    <aside className="pointer-events-none fixed top-[10.6rem] left-3 z-40 hidden w-[min(92vw,420px)] rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5 md:block">
+    <aside className="pointer-events-none fixed top-[25.5rem] left-3 z-40 hidden max-h-[calc(100dvh-27rem)] w-[min(92vw,420px)] overflow-hidden rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5 md:block">
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-fg-muted font-mono text-[10px] tracking-[0.16em] uppercase">
@@ -3343,6 +3469,164 @@ function GuideBeacon({ entity, step }: { entity: WorldEntity; step?: GuidedStep 
       >
         Next: {step?.title ?? entity.title}
       </div>
+    </div>
+  );
+}
+
+function LiveObjectivePanel({
+  currentDistrict,
+  currentDistrictStats,
+  objectiveText,
+  completionPercent,
+  activeEntity,
+  guideTarget,
+  collectedCount,
+  collectibleCount,
+  unlockedAchievementCount,
+  achievementTotal,
+}: {
+  currentDistrict?: District;
+  currentDistrictStats?: ReturnType<typeof getDistrictProgress>;
+  objectiveText: string;
+  completionPercent: number;
+  activeEntity?: WorldEntity;
+  guideTarget?: WorldEntity;
+  collectedCount: number;
+  collectibleCount: number;
+  unlockedAchievementCount: number;
+  achievementTotal: number;
+}) {
+  const dispatch = currentDistrict
+    ? districtDispatch[currentDistrict.id]
+    : {
+        status: "Cross-district path",
+        headline: "Move into any district to continue.",
+        detail: "Use the world map or walk toward the next proof beacon.",
+        signal: "World route",
+      };
+  const localPercent = currentDistrictStats
+    ? getDistrictCompletionPercent(currentDistrictStats)
+    : completionPercent;
+  const nextStop = currentDistrictStats?.nextStop ?? guideTarget;
+  const accent = currentDistrict?.accent ?? "#ffffff";
+
+  return (
+    <section className="pointer-events-none fixed top-16 left-3 z-40 w-[min(calc(100vw-1.5rem),31rem)] rounded border border-white/12 bg-black/76 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5 md:p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className="world-token size-2 rounded-full"
+          style={{ backgroundColor: accent, boxShadow: `0 0 16px ${accent}` }}
+        />
+        <p className="text-fg-muted font-mono text-[10px] tracking-[0.16em] uppercase">
+          Live Dispatch · {currentDistrict?.title ?? "World Path"}
+        </p>
+        <span
+          className="rounded border px-2 py-0.5 font-mono text-[9px] uppercase"
+          style={{
+            borderColor: `${accent}55`,
+            color: accent,
+            backgroundColor: `${accent}10`,
+          }}
+        >
+          {dispatch.status}
+        </span>
+      </div>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-[1fr_8.5rem]">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold text-white md:text-lg">{dispatch.headline}</h2>
+          <p className="text-fg-secondary mt-1 text-sm leading-5">{objectiveText}</p>
+          <p className="text-fg-muted mt-2 hidden text-xs leading-5 sm:block">{dispatch.detail}</p>
+        </div>
+        <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+          <p className="text-fg-muted font-mono text-[8px] uppercase">Area signal</p>
+          <p className="mt-1 text-sm font-semibold">{dispatch.signal}</p>
+          <p className="text-fg-muted mt-1 font-mono text-[9px] uppercase">{localPercent}% local</p>
+        </div>
+      </div>
+
+      <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+          <p className="text-fg-muted font-mono text-[8px] uppercase">Next room</p>
+          <p className="mt-1 truncate text-xs font-semibold">
+            {nextStop?.title ?? "Recruiter Mode"}
+          </p>
+        </div>
+        <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+          <p className="text-fg-muted font-mono text-[8px] uppercase">Nearby</p>
+          <p className="mt-1 truncate text-xs font-semibold">
+            {activeEntity?.title ?? "Find a beacon"}
+          </p>
+        </div>
+        <div className="rounded border border-white/10 bg-white/[0.035] p-2">
+          <p className="text-fg-muted font-mono text-[8px] uppercase">Proof</p>
+          <p className="mt-1 font-mono text-[10px] leading-4 font-semibold text-white/82">
+            Tokens {collectedCount}/{collectibleCount}
+            <br />
+            Ach {unlockedAchievementCount}/{achievementTotal}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <div className="flex items-center justify-between gap-3 font-mono text-[9px] text-white/46 uppercase">
+          <span>Global completion</span>
+          <span>{completionPercent}%</span>
+        </div>
+        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${completionPercent}%`,
+              background: `linear-gradient(90deg, ${accent}, #ffffff)`,
+            }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function WorldSignalNode({
+  node,
+  active,
+  visited,
+  index,
+}: {
+  node: DistrictSignalNode;
+  active: boolean;
+  visited: boolean;
+  index: number;
+}) {
+  const district = districtById.get(node.district)!;
+  const accent = active || visited ? district.accent : "rgba(255,255,255,.48)";
+
+  return (
+    <div
+      className={cn(
+        "world-signal-node pointer-events-none absolute z-[15] min-w-20 rounded border bg-black/68 px-2 py-1.5 shadow-[0_16px_40px_rgba(0,0,0,.30)] backdrop-blur",
+        active ? "opacity-100" : visited ? "opacity-78" : "opacity-48",
+      )}
+      style={{
+        left: node.x,
+        top: node.y,
+        borderColor: active ? district.accent : `${district.accent}55`,
+        boxShadow: active
+          ? `0 0 0 1px ${district.accent}66, 0 0 28px ${district.accent}45, 0 16px 40px rgba(0,0,0,.30)`
+          : undefined,
+        animationDelay: `${index * 180}ms`,
+      }}
+    >
+      <span
+        className="absolute -top-1.5 -left-1.5 size-3 rounded-full border border-black"
+        style={{ backgroundColor: accent, boxShadow: active ? `0 0 16px ${district.accent}` : "" }}
+      />
+      <p className="font-mono text-[8px] tracking-[0.14em] uppercase" style={{ color: accent }}>
+        {node.label}
+      </p>
+      <p className="mt-0.5 max-w-24 truncate font-mono text-[7px] text-white/48 uppercase">
+        {node.detail}
+      </p>
     </div>
   );
 }
@@ -3887,6 +4171,17 @@ export default function KenanWorld() {
   );
 
   const currentDistrict = useMemo(() => getCurrentDistrict(player), [player]);
+  const currentDistrictStats = useMemo(
+    () =>
+      currentDistrict
+        ? getDistrictProgress({
+            districtId: currentDistrict.id,
+            unlockedProof,
+            collected,
+          })
+        : undefined,
+    [collected, currentDistrict, unlockedProof],
+  );
 
   const achievements = useMemo(
     () => getAchievements({ collected, unlockedProof, visitedDistricts, recruiterViewed }),
@@ -4359,6 +4654,16 @@ export default function KenanWorld() {
             );
           })}
 
+          {districtSignalNodes.map((node, index) => (
+            <WorldSignalNode
+              key={node.id}
+              node={node}
+              active={currentDistrict?.id === node.district}
+              visited={visitedDistricts.includes(node.district)}
+              index={index}
+            />
+          ))}
+
           {started && guideState.guideTarget && !focusedEntity && !recruiterMode && !mapOpen && (
             <GuideBeacon entity={guideState.guideTarget} step={guideState.activeGuideStep} />
           )}
@@ -4383,27 +4688,18 @@ export default function KenanWorld() {
         </div>
       </div>
 
-      <div className="pointer-events-none fixed top-16 left-3 z-40 max-w-[calc(100vw-1.5rem)] rounded border border-white/12 bg-black/72 p-3 shadow-[0_18px_50px_rgba(0,0,0,.34)] backdrop-blur md:left-5">
-        <div className="flex items-center gap-2">
-          <span
-            className="size-2 rounded-full"
-            style={{ backgroundColor: currentDistrict?.accent ?? "#fff" }}
-          />
-          <p className="text-fg-muted font-mono text-[10px] uppercase">
-            Current Objective · {currentDistrict?.title ?? "World Path"}
-          </p>
-        </div>
-        <p className="text-fg-secondary mt-1 max-w-md text-sm">{objectiveText}</p>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${completionPercent}%`,
-              background: `linear-gradient(90deg, ${currentDistrict?.accent ?? "#fff"}, #ffffff)`,
-            }}
-          />
-        </div>
-      </div>
+      <LiveObjectivePanel
+        currentDistrict={currentDistrict}
+        currentDistrictStats={currentDistrictStats}
+        objectiveText={objectiveText}
+        completionPercent={completionPercent}
+        activeEntity={activeEntity}
+        guideTarget={guideState.guideTarget}
+        collectedCount={collected.length}
+        collectibleCount={collectibleCount}
+        unlockedAchievementCount={unlockedAchievementCount}
+        achievementTotal={achievements.length}
+      />
 
       {started && !focusedEntity && !recruiterMode && !mapOpen && (
         <GuidePanel

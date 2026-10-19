@@ -108,6 +108,16 @@
   }
 }
 
+@keyframes world-signal-node {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
 @keyframes npc-idle {
   0%,
   100% {
@@ -255,6 +265,10 @@
 
   .world-window-glow {
     filter: drop-shadow(0 0 10px currentColor);
+  }
+
+  .world-signal-node {
+    animation: world-signal-node 4.6s ease-in-out infinite;
   }
 
   .world-billboard {
