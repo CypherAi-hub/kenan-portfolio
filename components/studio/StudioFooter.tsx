@@ -6,7 +6,7 @@ export default function StudioFooter() {
     <footer className="studio-footer studio-shell">
       <div className="footer-top">
         <Link href="/" className="footer-name">
-          KJL Designs<span aria-hidden="true">✳</span>
+          KJL Designs
         </Link>
         <p>
           Thoughtful design.

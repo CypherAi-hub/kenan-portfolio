@@ -220,16 +220,16 @@ const existing: LibraryProject[] = projects.map((p) => ({
 const additions: LibraryProject[] = [
   {
     slug: "general-services",
-    title: "General Services Request Desk",
+    title: "Maryville General Services",
     category: "Websites",
     status: "Live website",
     monogram: "GS",
     description:
       "A campus service portal for printing, badges, business cards, paper, and toner requests.",
     detail:
-      "Built for Maryville’s General Services team, with mobile-friendly service forms, request references, requester accounts, and restricted staff workflows.",
+      "Built for Maryville University’s General Services team, with six mobile-friendly service forms, PDF attachments for copy jobs, request references, requester accounts, and restricted staff workflows.",
     tags: ["Web design", "Forms", "Workflow", "Maryville"],
-    image: "/media/current/general-services.jpg",
+    image: "/media/current/maryville-request-desk.jpg",
     imageAlt: "General Services public request website",
     imageNote: "Public request page. Staff information stays private.",
     overview: "/work/general-services",

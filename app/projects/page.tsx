@@ -23,13 +23,13 @@ export default function Projects() {
         <header className="archive-intro library-intro">
           <p className="eyebrow">THE FULL COLLECTION / {projectLibrary.length} PROJECTS</p>
           <h1>
-            A curious mind.
+            The complete
             <br />
-            <em>A lot of builds.</em>
+            body of work.
           </h1>
           <p>
-            Websites for real people. Apps I’m bringing to life. Experiments that taught me
-            something new. Explore the work, from the first prototypes to what I’m building now.
+            Explore client websites, independent products, and research projects. Each entry
+            includes the purpose, current stage, and a closer look at the build.
           </p>
           <Link className="text-link" style={{ marginTop: 24 }} href="/book">
             Have your own idea? Let’s talk <ArrowUpRight size={17} aria-hidden="true" />

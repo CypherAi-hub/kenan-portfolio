@@ -37,7 +37,7 @@ export default async function WorkPage({ params }: Props) {
               Back to selected work
             </Link>
             <p className="eyebrow">
-              {p.category.toUpperCase()} / {p.status.toUpperCase()}
+              {p.name.toUpperCase()} / {p.status.toUpperCase()}
             </p>
             <h1>{p.headline}</h1>
             <p>{p.summary}</p>

@@ -3,14 +3,14 @@ export const selectedWork = [
   {
     slug: "general-services",
     number: "01",
-    name: "General Services",
+    name: "Maryville General Services",
     category: "Website + request portal",
     status: "Live website",
     theme: "coral",
     headline: "Less back-and-forth. More getting things done.",
     summary:
       "A central request desk for Maryville’s Mail & Document Center, bringing everyday campus services into one clear, mobile-friendly experience.",
-    image: "/media/current/general-services.jpg",
+    image: "/media/current/maryville-request-desk.jpg",
     alt: "General Services public website showing six campus service request forms",
     url: "https://general-services-request-desk.tomuchdrip.chatgpt.site/",
     urlLabel: "Visit the website",
@@ -18,9 +18,10 @@ export const selectedWork = [
     problem:
       "People need a straightforward way to request print jobs, badges, business cards, paper, and toner. Staff need those requests organized and easy to follow up on.",
     approach:
-      "I brought the service forms into a single website with clear choices, request references, account access, and separate views for requesters and staff. The public experience works on a phone as well as a desktop.",
+      "I brought the service forms into a single website with clear choices, request references, account access, and separate views for requesters and staff. Copy requests now include PDF attachments so the document stays with the job. The public experience works on a phone as well as a desktop.",
     features: [
-      "Six service request workflows",
+      "Six campus service request workflows",
+      "PDF attachments for copy requests, with protected downloads",
       "Guest requests and personal request tracking",
       "Staff dashboard with restricted access",
       "Printable department card with a website QR code",

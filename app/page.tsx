@@ -1,14 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowDown,
-  ArrowUpRight,
-  ArrowRight,
-  Globe2,
-  PanelsTopLeft,
-  Sparkles,
-  MoveUpRight,
-} from "lucide-react";
+import { ArrowUpRight, ArrowRight, Globe2, PanelsTopLeft, Sparkles } from "lucide-react";
 import StudioHeader from "@/components/studio/StudioHeader";
 import StudioFooter from "@/components/studio/StudioFooter";
 import PricingOverview from "@/components/studio/PricingOverview";
@@ -26,89 +18,99 @@ export default function Home() {
       </a>
       <StudioHeader />
       <main id="main">
-        <section className="studio-hero studio-shell" id="top">
-          <div className="hero-copy">
-            <p className="eyebrow">
-              <span /> INDEPENDENT DESIGNER & DEVELOPER
-            </p>
-            <h1>
-              Good ideas.
-              <br />
-              Built for
-              <br />
-              <em>real life.</em>
-              <span className="hero-spark" aria-hidden="true">
-                ✳
-              </span>
-            </h1>
-            <p className="hero-description">
-              I’m Kenan, founder of KJL Designs. I build thoughtful websites, apps, and digital
-              tools that help people turn their next idea into something useful.
-            </p>
-            <div className="hero-actions">
-              <a className="studio-button" href="#book">
-                Let’s build something <ArrowUpRight size={19} aria-hidden="true" />
-              </a>
-              <a className="text-link" href="#work">
-                Explore my work <ArrowDown size={17} aria-hidden="true" />
-              </a>
-            </div>
-            <div className="hero-location">
-              <span className="location-dot" />
-              Based in St. Louis. Building wherever you are.
-            </div>
-          </div>
-          <div className="hero-art">
-            <div className="art-grid" />
-            <span className="art-kicker">FROM IDEA TO SOMETHING REAL</span>
-            <div className="hero-window">
-              <div className="hero-window-bar">
-                <span>● ● ●</span>
-                <span>General Services</span>
-                <ArrowUpRight size={12} />
-              </div>
-              <Image
-                src="/media/current/general-services.jpg"
-                alt="A recent website built for Maryville’s General Services team"
-                width={1440}
-                height={1000}
-                priority
-                sizes="(min-width: 900px) 580px, 85vw"
-              />
-            </div>
-            <div className="hero-phone">
-              <Image
-                src="/media/current/fofit-workout.webp"
-                alt="FoFit workout interface, a mobile product in development"
-                width={720}
-                height={1565}
-                sizes="(min-width: 900px) 190px, 145px"
-                priority
-              />
-            </div>
-            <div className="art-note">
-              <span className="note-star" aria-hidden="true">
-                ✳
-              </span>
-              <span>
-                Made with purpose.
+        <section className="studio-intro" id="top">
+          <div className="studio-shell intro-grid">
+            <div className="intro-copy">
+              <p className="eyebrow">
+                <span /> ST. LOUIS DESIGN & DEVELOPMENT
+              </p>
+              <h1>
+                Designed to
                 <br />
-                <strong>Built around people.</strong>
-              </span>
+                impress.
+                <br />
+                <span>Built to work.</span>
+              </h1>
+              <p className="intro-description">
+                Custom websites, apps, and digital tools for businesses ready for their next
+                chapter. Thoughtfully designed. Personally built by Kenan Larry.
+              </p>
+              <div className="intro-actions">
+                <Link className="studio-button" href="/book">
+                  Let’s talk about your project <ArrowUpRight size={18} aria-hidden="true" />
+                </Link>
+                <Link className="intro-pricing" href="/pricing">
+                  Explore pricing <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
+              <p className="intro-footnote">Your idea. A clear plan. One dedicated builder.</p>
             </div>
-            <span className="art-index">SELECTED WORK / 2026</span>
+            <Link
+              href="/work/general-services"
+              className="intro-project"
+              aria-label="Explore the Maryville University General Services project"
+            >
+              <div className="intro-project-top">
+                <span>PROJECT SPOTLIGHT</span>
+                <span className="live-label">
+                  <i /> LIVE WEBSITE
+                </span>
+              </div>
+              <div className="intro-browser">
+                <div className="intro-browser-bar">
+                  <span aria-hidden="true">● ● ●</span>
+                  <span>Maryville University</span>
+                  <ArrowUpRight size={12} aria-hidden="true" />
+                </div>
+                <Image
+                  src="/media/current/maryville-request-desk.jpg"
+                  alt="Maryville University General Services website, with a campus photograph and six service request forms"
+                  width={1440}
+                  height={1000}
+                  priority
+                  sizes="(min-width: 1000px) 560px, 90vw"
+                />
+              </div>
+              <div className="intro-project-bottom">
+                <div>
+                  <p>MARYVILLE UNIVERSITY</p>
+                  <h2>
+                    Everyday services.
+                    <br />
+                    One clear destination.
+                  </h2>
+                </div>
+                <span className="intro-project-arrow">
+                  <ArrowUpRight size={23} aria-hidden="true" />
+                </span>
+              </div>
+            </Link>
+          </div>
+          <div className="intro-capabilities studio-shell">
+            <span>FROM FIRST IMPRESSION TO EVERYDAY USE</span>
+            <div>
+              <span>Business websites</span>
+              <span>Web applications</span>
+              <span>Mobile experiences</span>
+            </div>
           </div>
         </section>
-        <div className="capability-strip">
-          <div className="studio-shell">
-            <span>WEBSITES</span>
-            <span aria-hidden="true">✳</span>
-            <span>WEB APPS</span>
-            <span aria-hidden="true">✳</span>
-            <span>MOBILE EXPERIENCES</span>
-            <span aria-hidden="true">✳</span>
-            <span>PRACTICAL AI</span>
-          </div>
+        <div className="studio-principles studio-shell">
+          <p>
+            <span>01</span>
+            <strong>Design with purpose</strong>
+            <span>Clear, thoughtful, built around your audience.</span>
+          </p>
+          <p>
+            <span>02</span>
+            <strong>A straightforward process</strong>
+            <span>Defined scope, honest pricing, regular updates.</span>
+          </p>
+          <p>
+            <span>03</span>
+            <strong>Direct collaboration</strong>
+            <span>Work with the person designing and building it.</span>
+          </p>
         </div>
         <section className="work-section studio-shell section-space" id="work">
           <span id="featured" className="legacy-anchor" aria-hidden="true" />
@@ -116,14 +118,14 @@ export default function Home() {
             <div>
               <p className="eyebrow">01 / SELECTED WORK</p>
               <h2>
-                A few things
+                Real projects.
                 <br />
-                I’ve brought <em>to life.</em>
+                Thoughtful solutions.
               </h2>
             </div>
             <p>
-              From a campus request desk to products I’m building from the ground up. Different
-              problems, the same care for the details.
+              Websites, products, and tools built around real needs. Explore the work, the thinking
+              behind it, and where each project stands.
             </p>
           </div>
           <div className="selected-grid">
@@ -141,6 +143,9 @@ export default function Home() {
                 </Link>
                 <div className="project-info">
                   <div>
+                    {i === 0 && (
+                      <p className="featured-label">FEATURED PROJECT / MARYVILLE UNIVERSITY</p>
+                    )}
                     <p className="project-category">
                       {p.category} <span> / {p.status}</span>
                     </p>
@@ -148,6 +153,14 @@ export default function Home() {
                       <Link href={`/work/${p.slug}`}>{p.name}</Link>
                     </h3>
                     <p>{p.summary}</p>
+                    <div className="project-focus">
+                      {p.stack.slice(0, 2).map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                    <Link className="text-link project-story-link" href={`/work/${p.slug}`}>
+                      Explore the project <ArrowUpRight size={16} aria-hidden="true" />
+                    </Link>
                   </div>
                   <span className="project-number">/{p.number}</span>
                 </div>
@@ -168,9 +181,9 @@ export default function Home() {
               <div>
                 <p className="eyebrow">02 / HOW I CAN HELP</p>
                 <h2>
-                  Your idea.
+                  The right experience
                   <br />
-                  The right <em>build.</em>
+                  for your next chapter.
                 </h2>
               </div>
               <p>
@@ -220,9 +233,9 @@ export default function Home() {
           <div className="process-intro">
             <p className="eyebrow">03 / WORKING TOGETHER</p>
             <h2>
-              Good work starts
+              From first conversation
               <br />
-              with a <em>conversation.</em>
+              to final details.
             </h2>
           </div>
           <div className="process-list">
@@ -260,21 +273,25 @@ export default function Home() {
           </div>
         </section>
         <section className="about-section studio-shell" id="about">
-          <div className="about-art" aria-hidden="true">
-            <span className="about-circle" />
-            <span className="about-monogram">
-              k<span>.</span>
+          <div className="founder-card">
+            <span className="founder-kicker">INDEPENDENT BY DESIGN</span>
+            <span className="founder-monogram" aria-hidden="true">
+              KJL<span>.</span>
             </span>
-            <span className="about-art-label">
-              CURIOUS BY NATURE.
-              <br />A BUILDER BY CHOICE.
-            </span>
-            <MoveUpRight size={45} />
+            <div className="founder-signature">
+              <strong>Kenan Larry</strong>
+              <span>Founder, designer & developer</span>
+            </div>
+            <div className="founder-location">
+              ST. LOUIS, MISSOURI <ArrowUpRight size={20} aria-hidden="true" />
+            </div>
           </div>
           <div className="about-copy">
             <p className="eyebrow">04 / THE PERSON BEHIND THE BUILD</p>
             <h2>
-              Hey, I’m <em>Kenan.</em>
+              Your project.
+              <br />
+              My personal attention.
             </h2>
             <p>
               I’m the founder of KJL Designs, a St. Louis–based builder, and a Maryville University
@@ -298,7 +315,9 @@ export default function Home() {
           <div>
             <p className="eyebrow">A FEW THINGS YOU MIGHT BE WONDERING</p>
             <h2>
-              Before we <em>begin.</em>
+              A little clarity,
+              <br />
+              before we begin.
             </h2>
           </div>
           <div className="faq-list">

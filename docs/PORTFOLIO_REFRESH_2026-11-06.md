@@ -4,7 +4,7 @@ The site now focuses on people hiring Kenan for websites, web apps, and product 
 
 ## Current content and media
 
-- General Services: verified public homepage at https://general-services-request-desk.tomuchdrip.chatgpt.site/. Image is the existing November 5 public-homepage capture, not an authenticated staff dashboard. Copy covers six request workflows, requester tracking, and staff access. The attachment change in another active chat is not represented as completed here.
+- General Services: verified public homepage at https://general-services-request-desk.tomuchdrip.chatgpt.site/. Updated to a fresh November 6 public-homepage capture from live version 21. The user confirmed that “Maryville ISD” refers to this General Services build. Copy covers six request workflows, requester tracking, staff access, and the now-published PDF attachment flow for copy requests. Only the public homepage is shown.
 - FoFit: official product site https://fofit.app verified reachable. App presented as in development; no public App Store launch claim. Workout and recipe screenshots copied from the existing approved website assets (`web77`), October 2026 build 77 captures. Does not claim those screenshots show today's unreleased candidate.
 - UltraFlips: in-development product with October 19 Simulator watchlist image. No App Store availability, provider coverage, verified listing, or profitability claim. Separate verified public web app and marketing links are available in the full library.
 - Older source descriptions and technical case studies remain explicitly archived; removed placeholder instructions from rendered case-study pages. Personal profile avoids the unconfirmed major and old internship pitch.
@@ -27,7 +27,7 @@ The public page and available slots were inspected. No test appointment was subm
 
 ## Maintenance
 
-Main page: app/page.tsx. Shared design: app/studio.css and components/studio. Current projects: data/selected-work.ts. Full library: data/project-library.ts. Technical archive: data/projects.ts. Booking URL: lib/booking.ts. Same existing Vercel project and public alias.
+Main page: app/page.tsx. Shared design: app/studio.css, app/studio-refinement.css, and components/studio. Current projects: data/selected-work.ts. Full library: data/project-library.ts. Technical archive: data/projects.ts. Booking URL: lib/booking.ts. Same existing Vercel project and public alias.
 
 ## Full project library
 
@@ -55,3 +55,10 @@ Five pricing tests passed, including all 256 package/add-on combinations, base b
 ## KJL Designs branding
 
 Renamed at the user’s request to **KJL Designs**. Kenan Larry remains the founder and direct contact. Header, footer, site titles, social preview, app icons, project entry, inquiry subject, and booking branding were updated. The matching public alias https://kjl-designs.vercel.app was successfully assigned to the same Vercel project. Canonical URLs, robots, and sitemap use that address; the previous portfolio alias remains available.
+
+
+## Professional design refinement
+
+Following the user’s request for another professional design pass, the homepage now uses a deep navy and pale mint identity, restrained typography, straight browser previews, a prominent Maryville project spotlight, and a split feature story. Shared navigation, services, pricing overview, founder presentation, booking area, collection headings, and social preview follow the same identity. All 30 projects and existing pricing/booking functionality remain available. No duplicate Maryville entry was added; the existing story and library entry were updated.
+
+New image: `public/media/current/maryville-request-desk.jpg`, captured from the public live homepage on November 6, 2026. No staff records, attachments, or authenticated dashboard content are in the asset.

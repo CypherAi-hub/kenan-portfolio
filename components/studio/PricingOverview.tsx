@@ -9,9 +9,9 @@ export default function PricingOverview() {
           <div>
             <p className="eyebrow">A CLEAR STARTING POINT</p>
             <h2>
-              Good work.
+              Clear scope.
               <br />
-              <em>Clear pricing.</em>
+              Confident decisions.
             </h2>
           </div>
           <p>

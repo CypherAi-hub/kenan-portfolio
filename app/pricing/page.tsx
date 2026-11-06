@@ -21,11 +21,10 @@ export default function PricingPage() {
       <StudioHeader />
       <main id="main" className="studio-shell">
         <header className="archive-intro pricing-intro">
-          <p className="eyebrow">PRICING / NO GUESSING GAMES</p>
+          <p className="eyebrow">PRICING & PROJECT PLANNING</p>
           <h1>
-            A good idea deserves
-            <br />
-            <em>a clear plan.</em>
+            A clear scope.
+            <br />A considered investment.
           </h1>
           <p>
             Here’s a starting point for the investment. We’ll talk through your goals, agree on the
@@ -81,7 +80,7 @@ export default function PricingPage() {
             <Wrench size={26} aria-hidden="true" />
             <div>
               <p className="eyebrow">AFTER THE LAUNCH</p>
-              <h2>A little ongoing care.</h2>
+              <h2>Support after launch.</h2>
             </div>
           </div>
           <div>
