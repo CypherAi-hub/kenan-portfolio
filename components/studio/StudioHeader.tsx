@@ -7,12 +7,12 @@ export default function StudioHeader() {
   return (
     <header className="studio-header">
       <div className="studio-shell nav-row">
-        <Link href="/" className="studio-brand" aria-label="Kenan Larry home">
+        <Link href="/" className="studio-brand" aria-label="KJL Designs home">
           <span className="brand-symbol" aria-hidden="true">
-            k<span>.</span>
+            KJ<span>L</span>
           </span>
           <span>
-            Kenan Larry<span className="brand-caption">DESIGN & DEVELOPMENT</span>
+            KJL Designs<span className="brand-caption">DESIGN & DEVELOPMENT</span>
           </span>
         </Link>
         <nav aria-label="Main navigation" className="desktop-nav">

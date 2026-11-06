@@ -1,4 +1,4 @@
-export const siteUrl = "https://kenan-portfolio-wine.vercel.app";
+export const siteUrl = "https://kjl-designs.vercel.app";
 export const selectedWork = [
   {
     slug: "general-services",

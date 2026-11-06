@@ -16,7 +16,7 @@ import BookingSection from "@/components/studio/BookingSection";
 import ProjectVisual from "@/components/studio/ProjectVisual";
 import { projectLibrary } from "@/data/project-library";
 import { selectedWork } from "@/data/selected-work";
-export const metadata = { alternates: { canonical: "https://kenan-portfolio-wine.vercel.app" } };
+export const metadata = { alternates: { canonical: "https://kjl-designs.vercel.app" } };
 
 export default function Home() {
   return (
@@ -42,8 +42,8 @@ export default function Home() {
               </span>
             </h1>
             <p className="hero-description">
-              I’m Kenan. I build thoughtful websites, apps, and digital tools that help people turn
-              their next idea into something useful.
+              I’m Kenan, founder of KJL Designs. I build thoughtful websites, apps, and digital
+              tools that help people turn their next idea into something useful.
             </p>
             <div className="hero-actions">
               <a className="studio-button" href="#book">
@@ -277,8 +277,8 @@ export default function Home() {
               Hey, I’m <em>Kenan.</em>
             </h2>
             <p>
-              I’m a St. Louis–based builder and Maryville University student who likes turning “what
-              if” into something people can use.
+              I’m the founder of KJL Designs, a St. Louis–based builder, and a Maryville University
+              student who likes turning “what if” into something people can use.
             </p>
             <p>
               My work spans business websites, mobile products, and the systems behind them. I care

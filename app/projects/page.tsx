@@ -9,7 +9,7 @@ import { siteUrl } from "@/data/selected-work";
 export const metadata: Metadata = {
   title: "All Projects",
   description:
-    "Explore Kenan Larry’s websites, mobile apps, research tools, AI experiments, and security projects. Search the full project collection.",
+    "Explore the KJL Designs project collection by Kenan Larry: websites, mobile apps, research tools, AI experiments, and security projects. Search the full project collection.",
   alternates: { canonical: `${siteUrl}/projects` },
 };
 export default function Projects() {

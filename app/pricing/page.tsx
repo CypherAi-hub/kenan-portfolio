@@ -9,7 +9,7 @@ import { siteUrl } from "@/data/selected-work";
 export const metadata: Metadata = {
   title: "Pricing & Project Estimates",
   description:
-    "Website projects from $750, business websites from $1,800, and custom app budgets. Explore packages and build a project estimate with Kenan Larry.",
+    "Website projects from $750, business websites from $1,800, and custom app budgets. Explore packages and build a project estimate with KJL Designs.",
   alternates: { canonical: `${siteUrl}/pricing` },
 };
 export default function PricingPage() {

@@ -6,7 +6,7 @@ export default function StudioFooter() {
     <footer className="studio-footer studio-shell">
       <div className="footer-top">
         <Link href="/" className="footer-name">
-          Kenan Larry<span aria-hidden="true">✳</span>
+          KJL Designs<span aria-hidden="true">✳</span>
         </Link>
         <p>
           Thoughtful design.
@@ -15,7 +15,7 @@ export default function StudioFooter() {
         </p>
       </div>
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} Kenan Larry · St. Louis, Missouri</span>
+        <span>© {new Date().getFullYear()} KJL Designs · St. Louis, Missouri</span>
         <nav aria-label="Footer navigation">
           <Link href="/projects">All projects</Link>
           <Link href="/pricing">Pricing</Link>

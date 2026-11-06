@@ -14,7 +14,7 @@ The site now focuses on people hiring Kenan for websites, web apps, and product 
 
 Google Calendar appointment schedule owned by kenanlarry8@gmail.com. Public URL in lib/booking.ts.
 
-- Name: Website & App Discovery Call with Kenan
+- Name: KJL Designs — Discovery Call with Kenan
 - Duration: 30 minutes, Google Meet
 - Central Time (America/Chicago): Monday–Friday 3–6 PM; Saturday–Sunday 4–7 PM
 - Minimum notice: 24 hours; maximum advance window: 21 days
@@ -51,3 +51,7 @@ Added at the user’s request to create pricing and further improve the site. Au
 The estimator adds only eligible extras, itemizes totals, bounds additional business pages to 0–5, and clears extras when the package changes. Optional project notes stay in the page until explicitly copied or emailed. Email opens a draft in the visitor’s mail application; it does not silently submit a lead. No payment processor, paid subscription, or contract is created. Final prices, scope, schedule, and payment milestones require a proposal.
 
 Five pricing tests passed, including all 256 package/add-on combinations, base budgets, duplicates, ineligible options, and page bounds. Browser checks confirmed a business-site + content + CMS + two pages estimate of $2,750–5,750, package-switch reset, the encoded email brief, successful clipboard copy, and phone widths 390/320. A final production build generates 54 routes.
+
+## KJL Designs branding
+
+Renamed at the user’s request to **KJL Designs**. Kenan Larry remains the founder and direct contact. Header, footer, site titles, social preview, app icons, project entry, inquiry subject, and booking branding were updated. The matching public alias https://kjl-designs.vercel.app was successfully assigned to the same Vercel project. Canonical URLs, robots, and sitemap use that address; the previous portfolio alias remains available.

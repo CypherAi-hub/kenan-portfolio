@@ -189,7 +189,7 @@ export default function EstimateBuilder() {
           </p>
           <a
             className="studio-button"
-            href={`mailto:${profile.email}?subject=${encodeURIComponent(`Project inquiry — ${estimate.base.name}`)}&body=${encodeURIComponent(brief)}`}
+            href={`mailto:${profile.email}?subject=${encodeURIComponent(`KJL Designs — Project inquiry — ${estimate.base.name}`)}&body=${encodeURIComponent(brief)}`}
           >
             <Mail size={17} aria-hidden="true" />
             Email my project brief

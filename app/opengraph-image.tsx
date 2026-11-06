@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 export const runtime = "edge";
-export const alt = "Kenan Larry — Websites, apps, and digital experiences";
+export const alt = "KJL Designs — Websites, apps, and digital experiences";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export default function OpenGraph() {
@@ -18,7 +18,7 @@ export default function OpenGraph() {
       }}
     >
       <div style={{ display: "flex", fontSize: 24, justifyContent: "space-between" }}>
-        <span style={{ fontWeight: 700 }}>Kenan Larry</span>
+        <span style={{ fontWeight: 700 }}>KJL Designs</span>
         <span style={{ fontSize: 17, color: "#536777" }}>DESIGN & DEVELOPMENT</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>

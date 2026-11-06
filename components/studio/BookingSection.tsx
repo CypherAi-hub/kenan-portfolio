@@ -27,7 +27,7 @@ export default function BookingSection({ standalone = false }: { standalone?: bo
           </a>
         </div>
         <div className="booking-card">
-          <span className="booking-label">BOOK WITH ME</span>
+          <span className="booking-label">BOOK WITH KJL DESIGNS</span>
           <CardHeading>
             Your next project
             <br />

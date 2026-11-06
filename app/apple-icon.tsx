@@ -14,12 +14,12 @@ export default function AppleIcon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 110,
+        fontSize: 64,
         fontWeight: 700,
         fontFamily: "monospace",
       }}
     >
-      K
+      KJL
     </div>,
     size,
   );

@@ -78,14 +78,15 @@ const overrides: Record<string, Partial<LibraryProject>> = {
       "A security assessment report presenting findings, risk ratings, and practical remediation.",
   },
   "kenan-portfolio": {
-    title: "Kenan Larry Portfolio",
+    title: "KJL Designs Portfolio",
+    monogram: "KJL",
     category: "Websites",
     status: "Live website",
-    liveUrl: "https://kenan-portfolio-wine.vercel.app",
+    liveUrl: "https://kjl-designs.vercel.app",
     description:
       "My personal design and development website, project library, pricing estimator, and discovery-call booking experience.",
     detail:
-      "A responsive Next.js portfolio with project overviews, a searchable work library, and Google Calendar booking. This is the November 2026 redesign; the earlier interactive Kenan World is also preserved.",
+      "The KJL Designs website: a responsive Next.js portfolio with project overviews, a searchable work library, and Google Calendar booking. This is the November 2026 redesign; the earlier interactive Kenan World is also preserved.",
   },
   "fofit-website": {
     category: "Websites",

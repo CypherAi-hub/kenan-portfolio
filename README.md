@@ -1,6 +1,6 @@
-# Kenan Larry — Portfolio
+# KJL Designs — Portfolio
 
-Personal portfolio for website, app, and digital product work. The public site is https://kenan-portfolio-wine.vercel.app.
+Personal portfolio for website, app, and digital product work. The public site is https://kjl-designs.vercel.app.
 
 ## Develop and verify
 

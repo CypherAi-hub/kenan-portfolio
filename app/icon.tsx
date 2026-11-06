@@ -14,12 +14,12 @@ export default function Icon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 22,
+        fontSize: 12,
         fontWeight: 700,
         fontFamily: "monospace",
       }}
     >
-      K
+      KJL
     </div>,
     size,
   );
