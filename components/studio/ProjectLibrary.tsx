@@ -4,13 +4,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Search, X } from "lucide-react";
 import { libraryCategories, projectLibrary } from "@/data/project-library";
+import { projectDetails } from "@/data/project-details";
 
 export default function ProjectLibrary() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("All work");
   const terms = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
   const filtered = projectLibrary.filter((p) => {
-    const text = [p.title, p.description, p.category, ...p.tags].join(" ").toLocaleLowerCase();
+    const detail = projectDetails[p.slug];
+    const text = [
+      p.title,
+      p.description,
+      p.category,
+      ...p.tags,
+      detail.audience,
+      ...detail.features.map((f) => `${f.title} ${f.description}`),
+    ]
+      .join(" ")
+      .toLocaleLowerCase();
     return (
       (category === "All work" || category === p.category) &&
       terms.every((term) => text.includes(term))
@@ -90,9 +101,22 @@ export default function ProjectLibrary() {
                     <span key={t}>{t}</span>
                   ))}
                 </div>
-                <Link className="text-link" href={`/projects/${p.slug}`}>
-                  Explore project <ArrowUpRight size={16} aria-hidden="true" />
-                </Link>
+                <div className="library-card-actions">
+                  <Link className="text-link" href={`/projects/${p.slug}`}>
+                    View project details <ArrowUpRight size={16} aria-hidden="true" />
+                  </Link>
+                  {projectDetails[p.slug].links[0] && (
+                    <a
+                      className="library-direct-link"
+                      href={projectDetails[p.slug].links[0].url}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {projectDetails[p.slug].links[0].label}
+                      <ArrowUpRight size={14} aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
               </div>
             </article>
           ))}

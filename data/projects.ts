@@ -472,7 +472,7 @@ export const projects: Project[] = [
       "Backend-oriented Supabase monitoring build with typed schema, RLS posture, metric ingestion scripts, alert triggers, and simulator workflow.",
     problem: "Model the cadence of a lightweight SOC monitoring surface with live-style telemetry.",
     built:
-      "Realtime dashboard patterns for metrics ingestion, anomaly flags, alert review, and security operations practice.",
+      "A typed telemetry schema, simulated metric ingestion, database alert triggers, offline detection, and repeatable seed data. The dashboard remains planned.",
     techStack: ["TypeScript", "Supabase", "PostgreSQL", "Realtime", "Security Monitoring"],
     githubUrl: github("Netwatch"),
     media: [
@@ -1039,29 +1039,28 @@ export const caseStudies: CaseStudy[] = [
     title: "Netwatch",
     repo: "CypherAi-hub/Netwatch",
     summary:
-      "Network monitoring case study for realtime metrics ingestion, alerting, and SOC-style dashboard practice.",
+      "Network monitoring backend for simulated telemetry, database-driven alerts, and offline-device detection.",
     problem:
-      "Network monitoring concepts are easier to demonstrate through a dashboard that shows telemetry, alert state, and backend automation.",
-    role: "Builder focused on realtime product surface and monitoring workflows.",
+      "Monitoring needs a repeatable way to store telemetry, detect threshold breaches, and identify devices that stop reporting.",
+    role: "Builder focused on the Supabase schema, telemetry simulator, and alert automation.",
     techStack: ["TypeScript", "Supabase", "PostgreSQL", "Realtime", "Security Monitoring"],
     keyFeatures: [
-      "Realtime-style metrics ingestion",
-      "Alert and anomaly surfaces",
-      "Backend automation patterns",
-      "SOC-style network monitoring dashboard",
+      "Typed device, metric, and alert records",
+      "CPU, memory, latency, and packet-loss alert triggers",
+      "Offline-device detection",
+      "Repeatable simulator and seed data; dashboard planned",
     ],
     technicalChallenges: [
-      "Making simulated telemetry feel legible and useful",
-      "Connecting database events to UI state",
-      "Keeping the scope clear for recruiters",
+      "Generating repeatable telemetry for development",
+      "Turning database changes into alert records",
+      "Separating public reads from server-controlled writes",
     ],
     learnings: [
-      "Monitoring dashboards need strong information hierarchy",
-      "Realtime data needs clear empty, normal, and alert states",
-      "Supabase is useful for fast security-dashboard prototypes",
+      "Repeatable simulations make alert behavior easier to inspect",
+      "Missing telemetry needs its own detection path",
+      "Database access rules belong in the monitoring foundation",
     ],
-    screenshotPrompt:
-      "Add dashboard, alert table, realtime metrics, and anomaly-detail screenshots.",
+    screenshotPrompt: "Show the backend architecture and label the dashboard as planned.",
   },
 ];
 

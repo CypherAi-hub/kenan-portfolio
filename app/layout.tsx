@@ -7,6 +7,7 @@ import SmoothScroll from "@/components/effects/SmoothScroll";
 import "./globals.css";
 import "./studio.css";
 import "./studio-refinement.css";
+import "./project-details.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kjl-designs.vercel.app"),

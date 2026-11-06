@@ -63,16 +63,16 @@ export const selectedWork = [
     number: "03",
     name: "UltraFlips",
     category: "Mobile app + research tools",
-    status: "In development",
+    status: "iOS internal beta",
     theme: "lilac",
     headline: "A clearer view of a collector’s next move.",
     summary:
-      "A mobile workspace for researching trading cards, reviewing dated price references, organizing a collection, and keeping a watchlist.",
+      "A card-show companion for scanning cards, confirming exact versions, inspecting price evidence, and calculating buying offers.",
     image: "/media/current/ultraflips-watchlist.webp",
     alt: "UltraFlips development screen showing a saved card, dated price references, and watchlist controls",
     url: "",
     urlLabel: "",
-    role: "Product design, mobile development, and research workflow integration",
+    role: "Product lead and developer, using AI-assisted engineering",
     problem:
       "Collectors need to keep the exact card, printing, condition, and price source in view. A single unexplained price can hide the details that matter.",
     approach:
@@ -100,7 +100,7 @@ export const selectedWork = [
     alt: "Meridian Atlas company graph with a financial research notebook",
     url: "",
     urlLabel: "",
-    role: "Product design, research workflows, data modeling, and development",
+    role: "Creator and product lead: concept, research priorities, interface direction, and acceptance review",
     problem:
       "Company information is spread across filings, registries, and financial tables. Research becomes difficult when the relationships and their original evidence are separated.",
     approach:

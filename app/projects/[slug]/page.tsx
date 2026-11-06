@@ -7,6 +7,9 @@ import { projectLibrary } from "@/data/project-library";
 import { siteUrl } from "@/data/selected-work";
 import StudioHeader from "@/components/studio/StudioHeader";
 import StudioFooter from "@/components/studio/StudioFooter";
+import ProjectDetails from "@/components/studio/ProjectDetails";
+import ProjectShare from "@/components/studio/ProjectShare";
+import { projectDetails } from "@/data/project-details";
 
 type Props = { params: Promise<{ slug: string }> };
 export function generateStaticParams() {
@@ -27,10 +30,14 @@ export default async function ProjectPage({ params }: Props) {
   const { slug } = await params;
   const p = projectLibrary.find((x) => x.slug === slug);
   if (!p) notFound();
+  const d = projectDetails[p.slug];
   return (
     <div className="studio">
+      <a className="studio-skip" href="#main">
+        Skip to content
+      </a>
       <StudioHeader />
-      <main className="studio-shell library-detail">
+      <main id="main" className="studio-shell library-detail">
         <header className="detail-header">
           <Link href="/projects" className="text-link">
             <ArrowLeft size={16} aria-hidden="true" />
@@ -41,6 +48,18 @@ export default async function ProjectPage({ params }: Props) {
           </p>
           <h1>{p.title}</h1>
           <p>{p.description}</p>
+          <div className="project-header-actions">
+            {d.links[0] && (
+              <a className="studio-button" href={d.links[0].url} target="_blank" rel="noreferrer">
+                {d.links[0].label}
+                <ArrowUpRight size={17} aria-hidden="true" />
+              </a>
+            )}
+            <a className="text-link" href="#project-links">
+              All links & availability <ArrowUpRight size={16} aria-hidden="true" />
+            </a>
+            <ProjectShare url={`${siteUrl}/projects/${p.slug}`} />
+          </div>
         </header>
         {p.image && (
           <figure
@@ -57,57 +76,7 @@ export default async function ProjectPage({ params }: Props) {
             <figcaption>{p.imageNote}</figcaption>
           </figure>
         )}
-        <div className="detail-body">
-          <aside className="detail-aside">
-            <div>
-              <h2>Project stage</h2>
-              <p>{p.status}</p>
-            </div>
-            <div>
-              <h2>Focus</h2>
-              <p>{p.tags.join(" · ")}</p>
-            </div>
-          </aside>
-          <div className="detail-copy">
-            <section>
-              <h2>About the project</h2>
-              <p>{p.detail}</p>
-              <div className="library-detail-links">
-                {p.overview && (
-                  <Link className="studio-button" href={p.overview}>
-                    Read the project story <ArrowUpRight size={17} aria-hidden="true" />
-                  </Link>
-                )}
-                {p.liveUrl && (
-                  <a className="text-link" href={p.liveUrl} target="_blank" rel="noreferrer">
-                    {p.liveUrl.endsWith(".pdf") ? "Read the report" : "Visit the website"}
-                    <ArrowUpRight size={17} aria-hidden="true" />
-                  </a>
-                )}
-                {p.notesUrl && (
-                  <Link className="text-link" href={p.notesUrl}>
-                    Earlier project notes <ArrowUpRight size={17} aria-hidden="true" />
-                  </Link>
-                )}
-                {p.sourceUrl && (
-                  <a className="text-link" href={p.sourceUrl} target="_blank" rel="noreferrer">
-                    Public source <ArrowUpRight size={17} aria-hidden="true" />
-                  </a>
-                )}
-              </div>
-            </section>
-            <section>
-              <h2>Let’s build your next idea.</h2>
-              <p>
-                Have a website, app, or workflow in mind? We can start with a short conversation
-                about what you need.
-              </p>
-              <Link href="/book" className="text-link" style={{ marginTop: 20 }}>
-                Book with me <ArrowUpRight size={17} aria-hidden="true" />
-              </Link>
-            </section>
-          </div>
-        </div>
+        <ProjectDetails project={p} />
       </main>
       <StudioFooter />
     </div>

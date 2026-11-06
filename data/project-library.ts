@@ -39,6 +39,7 @@ const publicRepos = new Set([
 ]);
 const overrides: Record<string, Partial<LibraryProject>> = {
   fofit: {
+    liveUrl: "https://www.fofit.app/",
     category: "Apps",
     status: "In development",
     overview: "/work/fofit",
@@ -59,12 +60,28 @@ const overrides: Record<string, Partial<LibraryProject>> = {
       "The professional side of the FoFit ecosystem, with a web interface for coaching operations and training programs. The public product site is live; the platform continues to develop.",
   },
   agentroom: {
+    image: "/media/projects/agentroom/agentroom-dashboard.png",
+    imageAlt: "AgentRoom public product website",
+    imageNote: "Archived public website capture. The documented source MVP uses mock data.",
     category: "AI & tools",
     liveUrl: "https://www.agentroom.app",
     description:
       "A web experience for organizing AI agents and repeatable work in a shared workspace.",
     detail:
       "An early agent workspace exploring how people can structure tasks and collaborate with AI through a focused browser interface.",
+  },
+  "soc-monitor": {
+    status: "Defensive simulation",
+    image: "/media/projects/soc-monitor/soc-monitor-dashboard.png",
+    imageAlt: "SOC Monitor dashboard with simulated network events and alert charts",
+    imageNote: "Local demonstration with simulated network data.",
+  },
+  netwatch: {
+    status: "Backend prototype",
+    description:
+      "A Supabase monitoring backend with device telemetry, database-triggered alerts, and a TypeScript simulator.",
+    detail:
+      "A backend learning project with typed device, metric, and alert records, SQL migrations, threshold rules, and repeatable demo data. Its React dashboard remains planned.",
   },
   "aws-image-label-generator": {
     category: "Security",
@@ -113,8 +130,8 @@ const overrides: Record<string, Partial<LibraryProject>> = {
   ultraflips: {
     title: "UltraFlips Web App",
     category: "Apps",
-    status: "Web prototype",
-    liveUrl: "https://ultraflips-app-cypherai-hubs-projects.vercel.app",
+    status: "Web app in development",
+    liveUrl: "https://app.ultraflips.com/",
     description:
       "A browser-based trading-card product exploring collection, pricing, and marketplace research.",
   },
@@ -161,15 +178,15 @@ const overrides: Record<string, Partial<LibraryProject>> = {
   },
   "ultraflips-mobile": {
     category: "Apps",
-    status: "In development",
+    status: "iOS internal beta",
     overview: "/work/ultraflips",
     image: "/media/current/ultraflips-watchlist.webp",
     imageAlt: "UltraFlips mobile watchlist",
     imageNote: "October 2026 Simulator development preview.",
     description:
-      "A mobile workspace for exact-card research, dated price references, watchlists, and collection management.",
+      "A card-show companion for scanning cards, confirming exact versions, inspecting price evidence, and calculating buying offers.",
     detail:
-      "The mobile UltraFlips product brings card research and collection records together. Its workflows keep card variants, conditions, and source context visible. It remains in development.",
+      "The mobile UltraFlips product connects card research, buying groups, and collection records. Its internal iOS beta keeps card variants, conditions, and source context visible.",
     tags: ["React Native", "Expo", "Supabase", "TCG", "Mobile"],
   },
   "stack-mode": {
@@ -182,7 +199,7 @@ const overrides: Record<string, Partial<LibraryProject>> = {
   "get-funded": {
     title: "Get Funded",
     category: "Research",
-    status: "Early experiment",
+    status: "Concept archive",
     description:
       "An early AI-assisted trading research experiment exploring a focused funding goal.",
     detail:
@@ -270,6 +287,7 @@ const additions: LibraryProject[] = [
   {
     slug: "fofit-web",
     title: "FoFit Web",
+    liveUrl: "https://app.fofit.app/",
     category: "Apps",
     status: "In development",
     monogram: "FW",
