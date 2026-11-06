@@ -3,6 +3,7 @@ import { profile } from "@/lib/data";
 import { bookingUrl } from "@/lib/booking";
 export default function BookingSection({ standalone = false }: { standalone?: boolean }) {
   const Heading = standalone ? "h1" : "h2";
+  const CardHeading = standalone ? "h2" : "h3";
   return (
     <section className="booking-section" id="book">
       <span id="contact" className="legacy-anchor" aria-hidden="true" />
@@ -27,11 +28,11 @@ export default function BookingSection({ standalone = false }: { standalone?: bo
         </div>
         <div className="booking-card">
           <span className="booking-label">BOOK WITH ME</span>
-          <h3>
+          <CardHeading>
             Your next project
             <br />
             starts here.
-          </h3>
+          </CardHeading>
           <div className="meeting-meta">
             <span>
               <Clock3 size={17} aria-hidden="true" />

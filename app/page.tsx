@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import StudioHeader from "@/components/studio/StudioHeader";
 import StudioFooter from "@/components/studio/StudioFooter";
+import PricingOverview from "@/components/studio/PricingOverview";
 import BookingSection from "@/components/studio/BookingSection";
 import ProjectVisual from "@/components/studio/ProjectVisual";
 import { projectLibrary } from "@/data/project-library";
@@ -214,6 +215,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        <PricingOverview />
         <section className="process-section studio-shell section-space">
           <div className="process-intro">
             <p className="eyebrow">03 / WORKING TOGETHER</p>
@@ -307,7 +309,7 @@ export default function Home() {
               ],
               [
                 "How much does a project cost?",
-                "It depends on the scope, features, content, and timeline. After we talk, I’ll put together a proposal so you know what’s included before you commit.",
+                "Website projects start at $750, business websites at $1,800, and custom web apps at $4,000. Explore the pricing page for package details and an interactive estimate. After we talk, I’ll put together a final quote for your scope.",
               ],
               [
                 "Do I need to know exactly what I want?",

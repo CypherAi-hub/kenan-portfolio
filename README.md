@@ -4,13 +4,15 @@ Personal portfolio for website, app, and digital product work. The public site i
 
 ## Develop and verify
 
-Run `npm ci`, then `npm run dev`. Run `npm run lint` and `npm run build` before deploying. `npm run start` serves the production build. Uses Next.js 15, React 19, TypeScript, and Tailwind CSS 4.
+Run `npm ci`, then `npm run dev`. Run `npm run lint`, `npm run test:pricing`, and `npm run build` before deploying. `npm run start` serves the production build. Uses Next.js 15, React 19, TypeScript, and Tailwind CSS 4.
 
 ## Content
 
 - `app/page.tsx`: services, process, about, selected projects, and booking.
 - `data/selected-work.ts`: current project descriptions, screenshots, and verified public links.
 - `components/studio` and `app/studio.css`: shared visual design.
+- `data/pricing.ts`: package budgets, optional extras, and the estimate calculation.
+- `/pricing`: package comparison, ongoing support, and interactive project brief builder. Email opens the visitor’s email app; the website does not submit messages or collect payments.
 - `lib/booking.ts`: Google Calendar appointment URL.
 - `/book`: shareable entry to booking. The provider handles availability, invitations, cancellations, and video links.
 - `data/project-library.ts`: 30 project entries with status, categories, and public links.

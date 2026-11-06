@@ -19,6 +19,7 @@ export default function StudioHeader() {
           <Link href="/#work">Selected work</Link>
           <Link href="/projects">All projects</Link>
           <Link href="/#services">Services</Link>
+          <Link href="/pricing">Pricing</Link>
           <Link href="/#about">About</Link>
         </nav>
         <Link className="studio-button button-small" href="/#book">
@@ -44,6 +45,7 @@ export default function StudioHeader() {
             ["Selected work", "/#work"],
             ["All projects", "/projects"],
             ["Services", "/#services"],
+            ["Pricing", "/pricing"],
             ["About", "/#about"],
             ["Book with me", "/#book"],
           ].map(([name, href]) => (

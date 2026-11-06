@@ -859,7 +859,7 @@
   font-weight: 800;
   color: #225b46;
 }
-.booking-card h3 {
+.booking-card :is(h2, h3) {
   font-size: 37px;
   margin-top: 18px;
 }
@@ -1392,7 +1392,7 @@
   .booking-card {
     padding: 28px;
   }
-  .booking-card h3 {
+  .booking-card :is(h2, h3) {
     font-size: 30px;
   }
   .booking-intro {
@@ -1718,7 +1718,7 @@
   .booking-card {
     padding: 28px;
   }
-  .booking-card h3 {
+  .booking-card :is(h2, h3) {
     font-size: 34px;
   }
   .booking-card li {
@@ -1871,7 +1871,7 @@
   .booking-card {
     padding: 24px;
   }
-  .booking-card h3 {
+  .booking-card :is(h2, h3) {
     font-size: 30px;
   }
   .collector-note {
@@ -2247,5 +2247,541 @@
   }
   .library-empty h2 {
     font-size: 30px;
+  }
+}
+
+/* Pricing, packages, and the interactive project brief. */
+.pricing-overview {
+  background: #edf2ed;
+}
+.pricing-teaser-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+.price-teaser {
+  background: var(--paper);
+  padding: 32px;
+  border: 1px solid #d6dfd8;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+.price-teaser-featured {
+  background: #d3eddf;
+  border-color: #bbd8c7;
+}
+.price-teaser .eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  margin-bottom: 20px;
+}
+.price-teaser h3 {
+  font-size: 29px;
+}
+.price-from {
+  padding: 25px 0;
+  font-size: 10px;
+  font-weight: 700;
+}
+.price-from strong {
+  display: block;
+  font-size: 45px;
+  letter-spacing: -0.06em;
+  line-height: 1.1;
+}
+.price-from > span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.price-description {
+  font-size: 14px;
+  color: var(--muted);
+}
+.price-teaser ul,
+.package-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 25px 0 30px;
+}
+.price-teaser li,
+.package-card li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  margin-bottom: 11px;
+}
+.price-teaser li svg,
+.package-card li svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: #245d47;
+}
+.price-teaser > .text-link {
+  margin-top: auto;
+  font-size: 13px;
+}
+.pricing-intro > p:not(.eyebrow) {
+  max-width: 680px;
+  color: var(--muted);
+  margin-top: 25px;
+  font-size: 18px;
+}
+.pricing-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 25px;
+  margin-top: 35px;
+}
+.package-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 25px;
+}
+.package-card {
+  padding: 40px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  scroll-margin-top: 120px;
+  display: flex;
+  flex-direction: column;
+}
+.package-highlight {
+  background: #e0eee6;
+  border-color: #c5dbc9;
+}
+.package-card > .eyebrow {
+  font-size: 10px;
+  margin-bottom: 20px;
+}
+.package-card h2 {
+  font-size: 35px;
+}
+.package-price {
+  font-size: 45px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  margin-top: 25px !important;
+}
+.package-price span {
+  font-size: 30px;
+  margin-left: 6px;
+  font-weight: 400;
+}
+.package-currency {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 8px 0 25px !important;
+}
+.package-card > p:not(.eyebrow):not(.package-price):not(.package-currency) {
+  font-size: 14px;
+  color: var(--muted);
+}
+.package-card h3 {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-top: 27px;
+}
+.package-card ul {
+  margin-top: 17px;
+}
+.package-card > .text-link {
+  margin-top: auto;
+  font-size: 14px;
+}
+.pricing-scope-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 25px 0 48px !important;
+  max-width: 1000px;
+}
+.care-banner {
+  background: var(--ink);
+  color: #fff;
+  display: grid;
+  grid-template-columns: 0.9fr 1.4fr;
+  gap: 25px 40px;
+  border-radius: 6px;
+  padding: 35px;
+}
+.care-heading {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.care-heading .eyebrow {
+  color: #bdddcf;
+  margin-bottom: 8px;
+  font-size: 10px;
+}
+.care-heading h2 {
+  font-size: 28px;
+}
+.care-banner p {
+  font-size: 14px;
+}
+.care-banner p.care-small {
+  color: #b8c8cf;
+  font-size: 11px;
+  margin-top: 12px;
+}
+.care-banner > .text-link {
+  grid-column: 2;
+  font-size: 13px;
+  color: #c5eed6;
+}
+.estimate-section {
+  scroll-margin-top: 110px;
+}
+.estimate-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 65px;
+  align-items: start;
+}
+.estimate-options fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 35px;
+  min-width: 0;
+}
+.estimate-options legend,
+.estimate-idea > span:first-child {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  display: block;
+}
+.estimate-options legend span,
+.estimate-idea small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 10px;
+}
+.estimate-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.estimate-type {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 18px 14px;
+  border: 1px solid #ccd4d4;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.estimate-type.selected {
+  border-color: var(--blue);
+  background: #edf1fe;
+}
+.estimate-type input,
+.estimate-extra input {
+  accent-color: var(--blue);
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+.estimate-type strong {
+  font-size: 12px;
+  line-height: 1.4;
+  display: block;
+}
+.estimate-type > span > span {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  padding-top: 6px;
+}
+.estimate-extra {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+}
+.estimate-extra strong {
+  display: block;
+  font-size: 14px;
+}
+.estimate-extra span span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.estimate-extra small {
+  display: block;
+  font-size: 11px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-top: 6px;
+}
+.estimate-pages {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 25px;
+}
+.estimate-pages select {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  border: 1px solid #bbc7ca;
+  border-radius: 5px;
+  padding: 12px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+.estimate-idea textarea,
+.manual-brief textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #bbc7ca;
+  background: #fff;
+  color: var(--ink);
+  padding: 15px;
+  border-radius: 5px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+.estimate-private-note {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.estimate-summary {
+  position: sticky;
+  top: 125px;
+  background: #e3eee7;
+  border: 1px solid #cbded0;
+  border-radius: 6px;
+  padding: 32px;
+}
+.estimate-summary > .eyebrow {
+  font-size: 10px;
+  margin-bottom: 20px;
+}
+.estimate-total {
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.06em;
+}
+.estimate-total span {
+  display: block;
+  font-size: 38px;
+  font-weight: 400;
+}
+.estimate-currency {
+  font-size: 11px;
+  color: #4e6258;
+  margin-top: 12px !important;
+}
+.estimate-summary dl {
+  padding: 24px 0;
+  margin: 25px 0 20px;
+  border-top: 1px solid #c3d4c8;
+  border-bottom: 1px solid #c3d4c8;
+}
+.estimate-summary dl div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 12px;
+}
+.estimate-summary dl div:first-child {
+  margin-top: 0;
+}
+.estimate-summary dt,
+.estimate-summary dd {
+  font-size: 11px;
+  margin: 0;
+}
+.estimate-summary dd {
+  white-space: nowrap;
+  font-weight: 700;
+}
+.estimate-disclaimer {
+  font-size: 11px;
+  color: #4b6156;
+  line-height: 1.7;
+}
+.estimate-summary > .studio-button {
+  width: 100%;
+  justify-content: center;
+  margin-top: 24px;
+  font-size: 13px;
+}
+.estimate-mail-note {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #4b6156;
+  margin-top: 10px !important;
+}
+.estimate-copy {
+  width: 100%;
+  padding: 15px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--ink);
+}
+.estimate-book {
+  border-top: 1px solid #c3d4c8;
+  padding-top: 20px;
+  margin-top: 10px;
+}
+.estimate-book > span {
+  display: block;
+  font-size: 11px;
+  color: #4b6156;
+  margin-bottom: 8px;
+}
+.estimate-book .text-link {
+  font-size: 12px;
+}
+.manual-brief {
+  display: block;
+  font-size: 12px;
+}
+.manual-brief textarea {
+  margin-top: 10px;
+  font-size: 11px;
+}
+.pricing-faq {
+  border-top: 1px solid var(--line);
+}
+.pricing-final {
+  padding: 0 0 90px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 25px;
+}
+.pricing-final h2 {
+  font-size: 43px;
+  max-width: 620px;
+}
+.booking-card h2 {
+  font-size: 38px;
+}
+@media (max-width: 1100px) {
+  .pricing-teaser-grid {
+    gap: 14px;
+  }
+  .price-teaser {
+    padding: 25px;
+  }
+  .price-teaser h3 {
+    font-size: 24px;
+  }
+  .estimate-grid {
+    gap: 30px;
+  }
+  .estimate-summary {
+    padding: 26px;
+  }
+  .package-card {
+    padding: 30px;
+  }
+  .package-price {
+    font-size: 38px;
+  }
+  .package-price span {
+    font-size: 27px;
+  }
+  .desktop-nav {
+    gap: 16px;
+  }
+}
+@media (max-width: 900px) {
+  .pricing-teaser-grid {
+    grid-template-columns: 1fr;
+  }
+  .estimate-grid {
+    grid-template-columns: 1fr;
+  }
+  .estimate-summary {
+    position: static;
+  }
+  .care-banner {
+    grid-template-columns: 1fr;
+  }
+  .care-banner > .text-link {
+    grid-column: auto;
+  }
+  .pricing-final {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 700px) {
+  .package-grid {
+    grid-template-columns: 1fr;
+  }
+  .package-card {
+    padding: 27px;
+  }
+  .package-price {
+    font-size: 39px;
+  }
+  .package-price span {
+    font-size: 27px;
+  }
+  .pricing-intro > p:not(.eyebrow) {
+    font-size: 16px;
+  }
+  .pricing-intro-actions {
+    gap: 22px;
+  }
+  .care-banner {
+    padding: 26px;
+  }
+  .estimate-type-grid {
+    grid-template-columns: 1fr;
+  }
+  .estimate-type strong {
+    font-size: 14px;
+  }
+  .estimate-summary {
+    padding: 26px;
+  }
+  .pricing-final h2 {
+    font-size: 36px;
+  }
+  .booking-card h2 {
+    font-size: 30px;
+  }
+}
+@media (min-width: 801px) and (max-width: 1000px) {
+  .desktop-nav {
+    display: none;
+  }
+  .menu-toggle {
+    display: flex;
+  }
+  .nav-row > .studio-button {
+    margin-left: auto;
   }
 }

@@ -6,6 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     "",
     "/book",
+    "/pricing",
     "/projects",
     ...projectLibrary.map((p) => `/projects/${p.slug}`),
     ...selectedWork.map((p) => `/work/${p.slug}`),

@@ -43,3 +43,11 @@ Additional local/Sites builds: General Services, Meridian Atlas, Support Shift, 
 - Live Google Calendar booking verified through its public page and intake form, without submitting an appointment.
 
 Validation: Next.js production build and typecheck passed with 53 generated routes. ESLint passed with one existing postcss config style warning and no errors. HTTP checks covered every sitemap page, legacy World, key assets, single H1s, internal anchors, and invalid-project 404 behavior. Browser checks covered search, case/whitespace handling, category intersections, empty results/reset, and layouts at 1440, 390, and 320 pixels. No appointment was created as a test.
+
+## Pricing system
+
+Added at the user’s request to create pricing and further improve the site. Authored starting budgets, not market-rate claims: launch website $750–1,500; business website $1,800–3,500; scoped web app $4,000–9,000; mobile prototype $6,000–12,000. Optional website care starts at $75/month with scope and response expectations agreed before starting. Hosting, domains, provider subscriptions and usage are separate. Public app-store release work is outside the base mobile prototype scope.
+
+The estimator adds only eligible extras, itemizes totals, bounds additional business pages to 0–5, and clears extras when the package changes. Optional project notes stay in the page until explicitly copied or emailed. Email opens a draft in the visitor’s mail application; it does not silently submit a lead. No payment processor, paid subscription, or contract is created. Final prices, scope, schedule, and payment milestones require a proposal.
+
+Five pricing tests passed, including all 256 package/add-on combinations, base budgets, duplicates, ineligible options, and page bounds. Browser checks confirmed a business-site + content + CMS + two pages estimate of $2,750–5,750, package-switch reset, the encoded email brief, successful clipboard copy, and phone widths 390/320. A final production build generates 54 routes.
