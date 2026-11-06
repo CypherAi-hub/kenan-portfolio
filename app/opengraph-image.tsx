@@ -1,53 +1,56 @@
 import { ImageResponse } from "next/og";
-
 export const runtime = "edge";
-export const alt = "Kenan Larry | Cybersecurity & AI Student";
+export const alt = "Kenan Larry — Websites, apps, and digital experiences";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-export default async function Image() {
+export default function OpenGraph() {
   return new ImageResponse(
     <div
       style={{
         width: "100%",
         height: "100%",
-        background: "#090b0f",
-        color: "#f4f7fb",
+        background: "#fbfaf7",
+        color: "#162a37",
         display: "flex",
+        padding: "65px 75px",
         flexDirection: "column",
         justifyContent: "space-between",
-        padding: "72px 80px",
-        fontFamily: "system-ui",
       }}
     >
+      <div style={{ display: "flex", fontSize: 24, justifyContent: "space-between" }}>
+        <span style={{ fontWeight: 700 }}>Kenan Larry</span>
+        <span style={{ fontSize: 17, color: "#536777" }}>DESIGN & DEVELOPMENT</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontSize: 86, fontWeight: 700, lineHeight: 1.1, letterSpacing: -4 }}>
+          Good ideas.
+        </span>
+        <span
+          style={{
+            fontSize: 86,
+            fontWeight: 700,
+            lineHeight: 1.1,
+            letterSpacing: -4,
+            color: "#174de5",
+          }}
+        >
+          Built for real life.
+        </span>
+      </div>
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 12,
-          fontSize: 18,
-          color: "#77f5b1",
-        }}
-      >
-        <span style={{ width: 10, height: 10, borderRadius: 999, background: "#77f5b1" }} />
-        KENAN LARRY PORTFOLIO
-      </div>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <div style={{ fontSize: 112, fontWeight: 700, lineHeight: 1 }}>Kenan Larry</div>
-        <div style={{ marginTop: 24, fontSize: 34, color: "#b7c0cc" }}>
-          Cybersecurity & AI Student Building Applied AI Products
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
           justifyContent: "space-between",
-          fontSize: 18,
-          color: "#7b8695",
+          fontSize: 20,
         }}
       >
-        <span>FoFit · AgentRoom · AWS · SOC Monitor · Netwatch</span>
-        <span>github.com/CypherAi-hub</span>
+        <span>Websites · Apps · Digital tools</span>
+        <span
+          style={{ background: "#174de5", color: "#fff", padding: "18px 26px", borderRadius: 9 }}
+        >
+          Book with me ↗
+        </span>
       </div>
     </div>,
     size,

@@ -99,7 +99,7 @@ export const projects: Project[] = [
     title: "FoFit",
     repo: "CypherAi-hub/fofit",
     category: "FoFit Ecosystem",
-    status: "Live",
+    status: "In Progress",
     description:
       "AI-powered fitness tracking app built with React Native, Expo, TypeScript, and Supabase.",
     longDescription:
@@ -110,7 +110,7 @@ export const projects: Project[] = [
       "A mobile-first product foundation with auth, workout flows, Supabase-backed data, and AI-assisted fitness workflows.",
     techStack: ["React Native", "Expo", "TypeScript", "Supabase", "OpenAI API"],
     githubUrl: github("fofit"),
-    liveUrl: "https://fofit.vercel.app",
+    liveUrl: "https://fofit.app",
     media: [
       projectImage(
         "/media/projects/fofit/fofit-athlete-home.webp",
@@ -283,7 +283,6 @@ export const projects: Project[] = [
       "Dashboard, team setup, athlete access patterns, invite flow hardening, and launch-readiness workflows.",
     techStack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Vercel"],
     githubUrl: github("fofit-coach"),
-    liveUrl: "https://fofit-coach.vercel.app",
     media: [
       projectImage(
         "/media/projects/fofit-coach/fofit-coach-live.png",
@@ -317,7 +316,6 @@ export const projects: Project[] = [
       "A command-center interface for agent runs, status tracking, validation checkpoints, and screenshot/video proof.",
     techStack: ["TypeScript", "React", "Next.js", "Agent Workflows", "Vercel"],
     githubUrl: github("AgentRoom"),
-    liveUrl: "https://agent-room-theta.vercel.app",
     media: [
       projectImage(
         "/media/projects/agentroom/agentroom-dashboard.png",
@@ -539,7 +537,7 @@ export const projects: Project[] = [
       "Public FoFit marketing/product surface with product storytelling, app-screen assets, waitlist direction, and ecosystem positioning.",
     techStack: ["TypeScript", "React", "Vite", "Product Marketing", "Vercel"],
     githubUrl: github("fofit-website"),
-    liveUrl: "https://fofit-website.vercel.app",
+    liveUrl: "https://fofit.app",
     media: [
       projectImage(
         "/media/projects/fofit-website/fofit-website-home.png",
@@ -620,7 +618,6 @@ export const projects: Project[] = [
       "UltraFlips is a TCG/product-commerce build exploring scanning, pricing, portfolio intelligence, and marketplace workflows.",
     techStack: ["TypeScript", "React", "Marketplace UX", "AI Workflow", "Vercel"],
     githubUrl: github("ultraflips"),
-    liveUrl: "https://ultraflips-app.vercel.app",
     media: [
       projectImage(
         "/media/projects/ultraflips/ultraflips-home.png",
@@ -647,7 +644,6 @@ export const projects: Project[] = [
       "Marketing website for the UltraFlips product family, focused on communicating the AI-powered TCG flipping concept.",
     techStack: ["TypeScript", "React", "Marketing Site", "Vercel"],
     githubUrl: github("ultraflips-website"),
-    liveUrl: "https://ultraflips-website.vercel.app",
     media: [
       projectImage(
         "/media/projects/ultraflips-website/ultraflips-website-home.png",
@@ -693,7 +689,6 @@ export const projects: Project[] = [
       "Hirecrate Staffing is a business-facing web build for staffing requests, job-seeker flow, and lightweight operational presentation.",
     techStack: ["TypeScript", "React", "Business Workflow", "Vercel"],
     githubUrl: github("hirecrate-staffing"),
-    liveUrl: "https://hirecrate-staffing.vercel.app",
     media: [
       projectImage(
         "/media/projects/hirecrate-staffing/hirecrate-landing.png",

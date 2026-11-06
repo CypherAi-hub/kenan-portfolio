@@ -11,14 +11,14 @@ export {
 
 export const profile = {
   name: "Kenan Larry",
-  headline: "Cybersecurity & AI Student Building Applied AI Products",
+  headline: "Building Websites, Apps & Digital Experiences",
   intro:
     "I build full-stack AI, fitness-tech, cloud, and cybersecurity projects with a focus on real users, product execution, and technical problem-solving.",
-  status: "Seeking Summer 2027 Technology / Cybersecurity / AI Internships",
+  status: "Available for website and app projects",
   location: "St. Louis, MO",
-  education: "Cybersecurity & AI student at Maryville University",
+  education: "Student at Maryville University",
   currently: "Building FoFit, FoFit Coach, and applied AI/cybersecurity projects",
-  openTo: "Summer 2027 Technology / Cybersecurity / AI internships",
+  openTo: "Website, app, and digital product projects",
   email: "kenanlarry8@gmail.com",
   phone: "7082286041",
   phoneLabel: "(708) 228-6041",
@@ -30,7 +30,7 @@ export const profile = {
 };
 
 export const proofPoints = [
-  "Cybersecurity & AI Major",
+  "Maryville University Student",
   "Founder/Builder of FoFit",
   "React Native / Supabase / OpenAI API",
   "AWS / Cloud Projects",

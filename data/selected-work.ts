@@ -1,0 +1,144 @@
+export const siteUrl = "https://kenan-portfolio-wine.vercel.app";
+export const selectedWork = [
+  {
+    slug: "general-services",
+    number: "01",
+    name: "General Services",
+    category: "Website + request portal",
+    status: "Live website",
+    theme: "coral",
+    headline: "Less back-and-forth. More getting things done.",
+    summary:
+      "A central request desk for Maryville’s Mail & Document Center, bringing everyday campus services into one clear, mobile-friendly experience.",
+    image: "/media/current/general-services.jpg",
+    alt: "General Services public website showing six campus service request forms",
+    url: "https://general-services-request-desk.tomuchdrip.chatgpt.site/",
+    urlLabel: "Visit the website",
+    role: "Website design, development, request workflows, and deployment",
+    problem:
+      "People need a straightforward way to request print jobs, badges, business cards, paper, and toner. Staff need those requests organized and easy to follow up on.",
+    approach:
+      "I brought the service forms into a single website with clear choices, request references, account access, and separate views for requesters and staff. The public experience works on a phone as well as a desktop.",
+    features: [
+      "Six service request workflows",
+      "Guest requests and personal request tracking",
+      "Staff dashboard with restricted access",
+      "Printable department card with a website QR code",
+    ],
+    note: "Built for the General Services team. The preview shows the public request page; private staff information is not included.",
+    stack: ["Web design", "Forms & workflows", "Account access", "Responsive development"],
+  },
+  {
+    slug: "fofit",
+    number: "02",
+    name: "FoFit",
+    category: "Fitness app + product design",
+    status: "In development",
+    theme: "mint",
+    headline: "A connected home for training and nutrition.",
+    summary:
+      "An ongoing fitness product bringing workout planning, exercise guidance, food logging, and the Cypher assistant into one mobile experience.",
+    image: "/media/current/fofit-workout.webp",
+    alt: "FoFit mobile workout screen with exercises and a start session button",
+    secondImage: "/media/current/fofit-recipes.webp",
+    url: "https://fofit.app",
+    urlLabel: "Visit the product website",
+    role: "Founder, product design, mobile development, and backend integration",
+    problem:
+      "Planning a session, following it at the gym, and keeping track of nutrition can feel like separate jobs. The product brings those everyday tasks together.",
+    approach:
+      "I have been developing the mobile experience, connected backend, and AI-assisted workflows through repeated implementation and testing. Particular attention goes to clear workout controls, usable food workflows, and keeping generated guidance within the product’s boundaries.",
+    features: [
+      "Workout planning and session logging",
+      "Exercise discovery and movement guidance",
+      "Nutrition, recipes, and food workflows",
+      "Cypher conversations with source-aware research features",
+    ],
+    note: "An actively developed product. Screens are from an October 2026 development build and illustrate the interface; they do not imply public App Store availability.",
+    stack: ["React Native", "TypeScript", "Supabase", "AI integration"],
+  },
+  {
+    slug: "ultraflips",
+    number: "03",
+    name: "UltraFlips",
+    category: "Mobile app + research tools",
+    status: "In development",
+    theme: "lilac",
+    headline: "A clearer view of a collector’s next move.",
+    summary:
+      "A mobile workspace for researching trading cards, reviewing dated price references, organizing a collection, and keeping a watchlist.",
+    image: "/media/current/ultraflips-watchlist.webp",
+    alt: "UltraFlips development screen showing a saved card, dated price references, and watchlist controls",
+    url: "",
+    urlLabel: "",
+    role: "Product design, mobile development, and research workflow integration",
+    problem:
+      "Collectors need to keep the exact card, printing, condition, and price source in view. A single unexplained price can hide the details that matter.",
+    approach:
+      "I built workflows around specific card variants, source context, saved research, and collection management. The interface separates reference prices from a user’s own records and keeps useful research close to the collection.",
+    features: [
+      "Exact-card catalog search",
+      "Watchlists with dated reference history",
+      "Collection and inventory workflows",
+      "Photo review and buying research tools",
+    ],
+    note: "Development preview, with an October 2026 Simulator screenshot. Data availability varies by source; a displayed reference is not a guaranteed sale price.",
+    stack: ["React Native", "Expo", "Supabase", "Product research"],
+  },
+  {
+    slug: "meridian-atlas",
+    number: "04",
+    name: "Meridian Atlas",
+    category: "Research app + data visualization",
+    status: "Local research app",
+    theme: "atlas",
+    headline: "Follow the evidence. See the connections.",
+    summary:
+      "An interactive company-research workspace connecting public filings, corporate relationships, and financial evidence in one visual map.",
+    image: "/media/current/meridian-atlas.webp",
+    alt: "Meridian Atlas company graph with a financial research notebook",
+    url: "",
+    urlLabel: "",
+    role: "Product design, research workflows, data modeling, and development",
+    problem:
+      "Company information is spread across filings, registries, and financial tables. Research becomes difficult when the relationships and their original evidence are separated.",
+    approach:
+      "I built a graph-based workspace with company dossiers, source archives, saved investigations, and review controls. Financial evidence keeps its reporting period and source context as it moves from a filing into the research view.",
+    features: [
+      "Expandable company and revenue graphs",
+      "Financial dossiers and SEC filing evidence",
+      "Saved investigations and source archives",
+      "Review steps before publishing evidence to the graph",
+    ],
+    note: "November 2026 local research-app screenshot. Displayed figures are dated research context; the app is not a public trading service.",
+    stack: ["Data visualization", "JavaScript", "SQLite", "Public-data integration"],
+  },
+  {
+    slug: "hirecrate-staffing",
+    number: "05",
+    name: "HireCrate Staffing",
+    category: "Business website + inquiry flows",
+    status: "Live website",
+    theme: "apricot",
+    headline: "Two audiences. One clear next step.",
+    summary:
+      "A staffing website that helps employers request workers and gives job seekers a straightforward place to start.",
+    image: "/media/current/hirecrate.webp",
+    alt: "HireCrate Staffing website with employer and job seeker calls to action",
+    url: "https://www.hirecratestaffing.net",
+    urlLabel: "Visit the website",
+    role: "Website design, frontend development, and business inquiry flows",
+    problem:
+      "A staffing business speaks to two different groups. Employers and job seekers each need to recognize their path and understand the next step quickly.",
+    approach:
+      "I structured the site around those two journeys, with a strong visual identity, direct language, and clear calls to action for requesting workers or finding work.",
+    features: [
+      "Separate employer and job-seeker paths",
+      "Service and industry information",
+      "Clear inquiry calls to action",
+      "Responsive business website",
+    ],
+    note: "Website screenshot from the project archive. The public website is available to explore.",
+    stack: ["React", "TypeScript", "Responsive design", "Vercel"],
+  },
+];

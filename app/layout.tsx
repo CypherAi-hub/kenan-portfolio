@@ -5,24 +5,28 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import "./globals.css";
+import "./studio.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kenanlarry.dev"),
-  title: { default: "Kenan Larry | Cybersecurity & AI Student", template: "%s | Kenan Larry" },
+  metadataBase: new URL("https://kenan-portfolio-wine.vercel.app"),
+  title: {
+    default: "Kenan Larry | Websites, Apps & Digital Experiences",
+    template: "%s | Kenan Larry",
+  },
   description:
-    "Portfolio of Kenan Larry, a Cybersecurity & AI student building applied AI, fitness-tech, cloud, and cybersecurity projects.",
+    "Thoughtful websites, apps, and digital tools by Kenan Larry. Explore selected work and book a discovery call for your next project.",
   openGraph: {
-    title: "Kenan Larry | Cybersecurity & AI Student",
+    title: "Kenan Larry | Websites, Apps & Digital Experiences",
     description:
-      "Applied AI, fitness-tech, cloud, cybersecurity, and business-facing software projects by Kenan Larry.",
+      "Websites, apps, and useful digital experiences. Explore recent work and book a call with Kenan Larry.",
     type: "website",
-    url: "https://kenanlarry.dev",
+    url: "https://kenan-portfolio-wine.vercel.app",
     siteName: "Kenan Larry Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Kenan Larry | Cybersecurity & AI Student",
-    description: "Applied AI, cloud, cybersecurity, and product builds.",
+    title: "Kenan Larry | Websites, Apps & Digital Experiences",
+    description: "Websites, apps, and digital tools. Built around people.",
   },
   robots: { index: true, follow: true },
 };
