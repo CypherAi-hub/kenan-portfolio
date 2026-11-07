@@ -1,3 +1,4 @@
+import { googleStatus, connectGoogle } from "@/lib/portal/google";
 import { identity, origin } from "@/lib/portal/auth";
 import {
   assertOwner,
@@ -16,7 +17,10 @@ export async function GET() {
   try {
     const me = await identity();
     requireValue(me, "Sign in to continue.", 401);
-    return json({ appointments: await appointmentView(me) });
+    return json({
+      appointments: await appointmentView(me),
+      ...(me.role === "owner" ? { google: await googleStatus(me) } : {}),
+    });
   } catch (error) {
     return json(
       { error: error instanceof PortalError ? error.message : "Unable to load appointments." },
@@ -44,6 +48,7 @@ export async function POST(request: Request) {
     requireValue(input && typeof input === "object" && !Array.isArray(input), "Invalid request.");
     if (input.action === "request-appointment") return json(await requestAppointment(me, input));
     assertOwner(me);
+    if (input.action === "connect-google") return json(await connectGoogle(me));
     if (input.action === "review-appointment") return json(await reviewAppointment(me, input));
     if (input.action === "apply") return json(await applyProposal(me, input.id));
     requireValue(input.action === "ask", "Unknown assistant action.");

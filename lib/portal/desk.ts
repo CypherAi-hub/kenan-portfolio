@@ -18,6 +18,7 @@ export type Proposal = {
   created: number;
   status: "pending" | "applied";
   label: string;
+  delivery?: { status: "sending" | "sent" | "failed" | "unknown"; at: string; reference?: string };
   input: Record<string, unknown>;
 };
 type Desk = {
@@ -114,7 +115,7 @@ export async function studioContext(me: Account) {
   assertOwner(me);
   const clients = (await directory()).accounts
     .filter((a) => a.role === "client")
-    .map(({ id, name }) => ({ id, name }));
+    .map(({ id, name, email }) => ({ id, name, email }));
   const { workspace } = await import("./store");
   const records = await Promise.all(
     clients.map(async (client) => {

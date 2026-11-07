@@ -138,7 +138,17 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
     [text, setText] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
+    [google, setGoogle] = useState<{ connected: boolean; email?: string; error?: string } | null>(
+      null,
+    ),
     [applied, setApplied] = useState<string[]>([]);
+  useEffect(() => {
+    if (open)
+      fetch("/api/portal/assistant", { cache: "no-store" })
+        .then((r) => r.json())
+        .then((d) => setGoogle(d.google || null))
+        .catch(() => setGoogle(null));
+  }, [open]);
   const input = useRef<HTMLTextAreaElement>(null),
     launch = useRef<HTMLButtonElement>(null),
     end = useRef<HTMLDivElement>(null);
@@ -207,6 +217,31 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
               <X size={20} />
             </button>
           </header>
+          <div className="assistant-google">
+            {google?.connected ? (
+              <small>Google connected · {google.email}</small>
+            ) : (
+              <button
+                disabled={busy}
+                onClick={async () => {
+                  setBusy(true);
+                  setError("");
+                  try {
+                    const data = await api({ action: "connect-google" });
+                    const destination = new URL(data.url);
+                    if (destination.protocol !== "https:")
+                      throw new Error("Invalid connection link.");
+                    window.location.assign(destination.href);
+                  } catch (e) {
+                    setError(e instanceof Error ? e.message : "Could not connect Google.");
+                    setBusy(false);
+                  }
+                }}
+              >
+                Connect Google for email &amp; Calendar
+              </button>
+            )}
+          </div>
           <div
             className="assistant-conversation"
             data-lenis-prevent
@@ -244,12 +279,31 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
                         .filter(
                           ([key, value]) =>
                             value &&
-                            ["body", "phase", "title", "brief", "amount", "decision"].includes(key),
+                            [
+                              "to",
+                              "body",
+                              "phase",
+                              "title",
+                              "brief",
+                              "amount",
+                              "decision",
+                              "start",
+                            ].includes(key),
                         )
                         .map(([key, value]) => (
                           <div key={key}>
                             <dt>{key}</dt>
-                            <dd>{String(value)}</dd>
+                            <dd>
+                              {key === "start"
+                                ? new Date(String(value)).toLocaleString(undefined, {
+                                    dateStyle: "full",
+                                    timeStyle: "long",
+                                  }) +
+                                  " (" +
+                                  String(value) +
+                                  ")"
+                                : String(value)}
+                            </dd>
                           </div>
                         ))}
                     </dl>
@@ -274,6 +328,10 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
                           <Check size={14} />
                           Applied
                         </>
+                      ) : p.input.action === "email" ? (
+                        "Approve and send email"
+                      ) : p.input.action === "calendar" ? (
+                        "Approve event and send invitation"
                       ) : (
                         "Apply this change"
                       )}
@@ -313,8 +371,8 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
             </button>
           </form>
           <footer>
-            Review proposed changes before applying. External email and calendar access need a
-            separate connection.
+            Review every recipient, message and time before approving. Google events check your
+            primary Calendar; portal appointment approvals are separate.
           </footer>
         </aside>
       )}
