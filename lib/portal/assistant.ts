@@ -35,6 +35,26 @@ export async function askAssistant(me: Account, input: Record<string, unknown>) 
     ...(await studioContext(me)),
     google: await googleStatus(me),
     portfolio: projectCatalog(),
+    paymentGuide: {
+      verifiedOn: "2026-11-07",
+      provider:
+        "Stripe hosted Checkout; methods vary by buyer, device, location, currency and amount",
+      enabled: [
+        "Cards",
+        "Apple Pay",
+        "Google Pay",
+        "Cash App Pay",
+        "Link",
+        "Amazon Pay",
+        "Eligible Klarna",
+        "Stablecoins and Crypto",
+      ],
+      crypto:
+        "The live crypto screen offered Coinbase Wallet, Phantom, MetaMask, Trust and Crypto.com Pay. USDC on Solana and other displayed networks was verified. Crypto.com Pay lists BTC as supported; buyers use Crypto then Crypto.com Pay. Native SOL was not confirmed. Always use the exact token/network choices shown in checkout.",
+      settlement:
+        "Invoices are priced in USD; Stripe confirms successful payments before the invoice is marked paid. No direct merchant wallet address is published.",
+      note: "This is a dated account verification guide; current buyer-specific options are shown at checkout. Never promise every token or method to every buyer.",
+    },
   };
   requireValue(
     JSON.stringify(context).length < 160000,

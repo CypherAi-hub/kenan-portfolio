@@ -23,7 +23,7 @@ Completed but unpaid sessions remain open invoices marked processing. They are n
 - checkout.session.async_payment_succeeded
 - checkout.session.async_payment_failed
 
-The public pricing FAQ and client Payments tab describe eligible cards, wallets and crypto without promising that every method or token appears for every buyer. The assistant receives processing/failure state to avoid asking for another payment while confirmation is pending.
+The public pricing FAQ and client Payments tab describe eligible cards, wallets and crypto without promising that every method or token appears for every buyer. The assistant receives processing/failure state to avoid asking for another payment while confirmation is pending, plus a dated guide to the enabled methods and verified crypto routes.
 
 Validation includes 32 automated tests; a real Stripe sandbox checkout created through the portal API with card, Link, Cash App Pay, Amazon Pay and Klarna eligible; signed endpoint tests for pending/failure/success, mismatched amounts, signature rejection, cross-client isolation and webhook replay. Sandbox Checkout UI is inspected separately from live method enablement. No real payment is collected during QA.
 
