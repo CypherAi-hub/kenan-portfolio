@@ -68,24 +68,15 @@ export default function ProjectLibrary() {
             <article key={p.slug} className="library-card">
               <Link
                 href={`/projects/${p.slug}`}
-                className={`library-art library-art-${p.category.split(" ")[0].toLowerCase()} ${p.image?.includes("fofit-workout") || p.image?.includes("ultraflips-watchlist") ? "library-art-phone" : ""}`}
+                className={`library-art library-art-${p.category.split(" ")[0].toLowerCase()} ${p.contain ? "library-art-fit" : ""}`}
                 aria-label={`Explore ${p.title}`}
               >
-                {p.image ? (
-                  <Image
-                    src={p.image}
-                    alt={p.imageAlt || p.title}
-                    fill
-                    sizes="(min-width: 1100px) 30vw, (min-width: 700px) 45vw, 90vw"
-                  />
-                ) : (
-                  <>
-                    <span className="library-monogram" aria-hidden="true">
-                      {p.monogram}
-                    </span>
-                    <span className="library-art-type">{p.category}</span>
-                  </>
-                )}
+                <Image
+                  src={p.image}
+                  alt={p.imageAlt}
+                  fill
+                  sizes="(min-width: 1100px) 30vw, (min-width: 700px) 45vw, 90vw"
+                />
                 <span className="library-open">
                   <ArrowUpRight size={20} aria-hidden="true" />
                 </span>

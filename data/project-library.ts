@@ -1,4 +1,5 @@
 import { projects } from "./projects";
+import { projectCover, type ProjectCover } from "./project-media";
 
 export const libraryCategories = [
   "All work",
@@ -9,7 +10,7 @@ export const libraryCategories = [
   "Security",
 ] as const;
 export type LibraryCategory = Exclude<(typeof libraryCategories)[number], "All work">;
-export type LibraryProject = {
+type ProjectListing = {
   slug: string;
   title: string;
   category: LibraryCategory;
@@ -18,9 +19,6 @@ export type LibraryProject = {
   detail: string;
   tags: string[];
   monogram: string;
-  image?: string;
-  imageAlt?: string;
-  imageNote?: string;
   overview?: string;
   liveUrl?: string;
   sourceUrl?: string;
@@ -37,15 +35,13 @@ const publicRepos = new Set([
   "fofit-website",
   "cypher-ai-hub",
 ]);
-const overrides: Record<string, Partial<LibraryProject>> = {
+export type LibraryProject = ProjectListing & ProjectCover;
+const overrides: Record<string, Partial<ProjectListing>> = {
   fofit: {
     liveUrl: "https://www.fofit.app/",
     category: "Apps",
     status: "In development",
     overview: "/work/fofit",
-    image: "/media/current/fofit-workout.webp",
-    imageAlt: "FoFit workout screen",
-    imageNote: "October 2026 development build.",
     description:
       "A fitness app connecting workout planning, session logging, nutrition, and the Cypher assistant.",
     detail:
@@ -60,9 +56,6 @@ const overrides: Record<string, Partial<LibraryProject>> = {
       "The professional side of the FoFit ecosystem, with a web interface for coaching operations and training programs. The public product site is live; the platform continues to develop.",
   },
   agentroom: {
-    image: "/media/projects/agentroom/agentroom-dashboard.png",
-    imageAlt: "AgentRoom public product website",
-    imageNote: "Archived public website capture. The documented source MVP uses mock data.",
     category: "AI & tools",
     liveUrl: "https://www.agentroom.app",
     description:
@@ -72,9 +65,6 @@ const overrides: Record<string, Partial<LibraryProject>> = {
   },
   "soc-monitor": {
     status: "Defensive simulation",
-    image: "/media/projects/soc-monitor/soc-monitor-dashboard.png",
-    imageAlt: "SOC Monitor dashboard with simulated network events and alert charts",
-    imageNote: "Local demonstration with simulated network data.",
   },
   netwatch: {
     status: "Backend prototype",
@@ -155,9 +145,6 @@ const overrides: Record<string, Partial<LibraryProject>> = {
     status: "Live website",
     liveUrl: "https://www.hirecratestaffing.net",
     overview: "/work/hirecrate-staffing",
-    image: "/media/current/hirecrate.webp",
-    imageAlt: "HireCrate staffing website with employer and job-seeker paths",
-    imageNote: "Website screenshot from the project archive.",
     description:
       "A staffing business website with clear paths for employers requesting workers and people looking for work.",
   },
@@ -180,9 +167,6 @@ const overrides: Record<string, Partial<LibraryProject>> = {
     category: "Apps",
     status: "iOS internal beta",
     overview: "/work/ultraflips",
-    image: "/media/current/ultraflips-watchlist.webp",
-    imageAlt: "UltraFlips mobile watchlist",
-    imageNote: "October 2026 Simulator development preview.",
     description:
       "A card-show companion for scanning cards, confirming exact versions, inspecting price evidence, and calculating buying offers.",
     detail:
@@ -208,7 +192,7 @@ const overrides: Record<string, Partial<LibraryProject>> = {
   },
 };
 
-const existing: LibraryProject[] = projects.map((p) => ({
+const existing: ProjectListing[] = projects.map((p) => ({
   slug: p.slug,
   title: p.title,
   category:
@@ -234,7 +218,7 @@ const existing: LibraryProject[] = projects.map((p) => ({
   ...overrides[p.slug],
 }));
 
-const additions: LibraryProject[] = [
+const additions: ProjectListing[] = [
   {
     slug: "general-services",
     title: "Maryville General Services",
@@ -246,9 +230,6 @@ const additions: LibraryProject[] = [
     detail:
       "Built for Maryville University’s General Services team, with six mobile-friendly service forms, PDF attachments for copy jobs, request references, requester accounts, and restricted staff workflows.",
     tags: ["Web design", "Forms", "Workflow", "Maryville"],
-    image: "/media/current/maryville-request-desk.jpg",
-    imageAlt: "General Services public request website",
-    imageNote: "Public request page. Staff information stays private.",
     overview: "/work/general-services",
     liveUrl: "https://general-services-request-desk.tomuchdrip.chatgpt.site/",
   },
@@ -263,9 +244,6 @@ const additions: LibraryProject[] = [
     detail:
       "A visual research tool with expandable company graphs, financial dossiers, a source library, and saved investigations. SEC filing evidence and revenue breakdowns move through a review step before entering the graph. The workspace is a local research application.",
     tags: ["Research", "Data visualization", "SEC filings", "SQLite", "JavaScript"],
-    image: "/media/current/meridian-atlas.webp",
-    imageAlt: "Meridian Atlas company graph and financial research notebook",
-    imageNote: "November 2026 local app screenshot. Figures shown are dated research context.",
     overview: "/work/meridian-atlas",
   },
   {
@@ -279,9 +257,6 @@ const additions: LibraryProject[] = [
     detail:
       "Meridian evolved into the Omni market terminal: a research interface for reviewing Solana market data and paper experiments. It keeps simulated accounts and research records separate. The project is paper-only; it does not demonstrate profitable trading or funded execution.",
     tags: ["React", "TypeScript", "PostgreSQL", "Charts", "Solana", "Paper trading"],
-    image: "/media/current/meridian.webp",
-    imageAlt: "Meridian Omni terminal with market chart and visibly labeled paper account",
-    imageNote: "October 2026 paper-terminal screenshot. Balances and orders are simulated.",
     sourceUrl: "https://github.com/CypherAi-hub/meridian",
   },
   {
@@ -384,7 +359,9 @@ const order = [
   "ultraflips",
   "agentroom",
 ];
-export const projectLibrary = [...existing, ...additions].sort((a, b) => {
-  const rank = (slug: string) => (order.includes(slug) ? order.indexOf(slug) : order.length);
-  return rank(a.slug) - rank(b.slug);
-});
+export const projectLibrary: LibraryProject[] = [...existing, ...additions]
+  .map((p) => ({ ...p, ...projectCover(p.slug) }))
+  .sort((a, b) => {
+    const rank = (slug: string) => (order.includes(slug) ? order.indexOf(slug) : order.length);
+    return rank(a.slug) - rank(b.slug);
+  });

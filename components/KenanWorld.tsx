@@ -1,5 +1,6 @@
 "use client";
 
+import { projectCover } from "@/data/project-media";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -1845,6 +1846,10 @@ function ProofModeDeck({
 
 function getEntityMedia(entity: WorldEntity, project?: Project): ProjectMedia[] {
   if (project?.media.length) return project.media;
+  if (project) {
+    const cover = projectCover(project.slug);
+    return [{src: cover.image, alt: cover.imageAlt, label: cover.imageNote, source: "local", type: "image"}];
+  }
   if (entity.id === "laptop") {
     return [
       {

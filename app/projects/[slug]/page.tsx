@@ -1,3 +1,5 @@
+import { access } from "node:fs/promises";
+import path from "node:path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,7 +14,8 @@ import ProjectShare from "@/components/studio/ProjectShare";
 import { projectDetails } from "@/data/project-details";
 
 type Props = { params: Promise<{ slug: string }> };
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  await Promise.all(projectLibrary.map((p) => access(path.join(process.cwd(), "public", p.image))));
   return projectLibrary.map((p) => ({ slug: p.slug }));
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -22,6 +25,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? {
         title: p.title,
         description: p.description,
+        openGraph: {
+          title: p.title,
+          description: p.description,
+          images: [{ url: p.image, alt: p.imageAlt }],
+        },
         alternates: { canonical: `${siteUrl}/projects/${slug}` },
       }
     : {};
@@ -61,21 +69,18 @@ export default async function ProjectPage({ params }: Props) {
             <ProjectShare url={`${siteUrl}/projects/${p.slug}`} />
           </div>
         </header>
-        {p.image && (
-          <figure
-            className={`library-detail-image ${p.image.includes("fofit-workout") || p.image.includes("ultraflips-watchlist") ? "library-detail-phone" : ""}`}
-          >
-            <Image
-              src={p.image}
-              alt={p.imageAlt || p.title}
-              width={1440}
-              height={1000}
-              sizes="(min-width: 900px) 80vw, 90vw"
-              priority
-            />
-            <figcaption>{p.imageNote}</figcaption>
-          </figure>
-        )}
+
+        <figure className={`library-detail-image ${p.contain ? "library-detail-fit" : ""}`}>
+          <Image
+            src={p.image}
+            alt={p.imageAlt}
+            width={1440}
+            height={1000}
+            sizes="(min-width: 900px) 80vw, 90vw"
+            priority
+          />
+          <figcaption>{p.imageNote}</figcaption>
+        </figure>
         <ProjectDetails project={p} />
       </main>
       <StudioFooter />

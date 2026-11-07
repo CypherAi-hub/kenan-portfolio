@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import ProjectSpotlight from "@/components/studio/ProjectSpotlight";
 import { ArrowUpRight, ArrowRight, Globe2, PanelsTopLeft, Sparkles } from "lucide-react";
 import StudioHeader from "@/components/studio/StudioHeader";
 import StudioFooter from "@/components/studio/StudioFooter";
@@ -43,48 +43,8 @@ export default function Home() {
                   Explore pricing <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
-              <p className="intro-footnote">Your idea. A clear plan. One dedicated builder.</p>
             </div>
-            <Link
-              href="/work/general-services"
-              className="intro-project"
-              aria-label="Explore the Maryville University General Services project"
-            >
-              <div className="intro-project-top">
-                <span>PROJECT SPOTLIGHT</span>
-                <span className="live-label">
-                  <i /> LIVE WEBSITE
-                </span>
-              </div>
-              <div className="intro-browser">
-                <div className="intro-browser-bar">
-                  <span aria-hidden="true">● ● ●</span>
-                  <span>Maryville University</span>
-                  <ArrowUpRight size={12} aria-hidden="true" />
-                </div>
-                <Image
-                  src="/media/current/maryville-request-desk.jpg"
-                  alt="Maryville University General Services website, with a campus photograph and six service request forms"
-                  width={1440}
-                  height={1000}
-                  priority
-                  sizes="(min-width: 1000px) 560px, 90vw"
-                />
-              </div>
-              <div className="intro-project-bottom">
-                <div>
-                  <p>MARYVILLE UNIVERSITY</p>
-                  <h2>
-                    Everyday services.
-                    <br />
-                    One clear destination.
-                  </h2>
-                </div>
-                <span className="intro-project-arrow">
-                  <ArrowUpRight size={23} aria-hidden="true" />
-                </span>
-              </div>
-            </Link>
+            <ProjectSpotlight />
           </div>
           <div className="intro-capabilities studio-shell">
             <span>FROM FIRST IMPRESSION TO EVERYDAY USE</span>

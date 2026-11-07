@@ -2,17 +2,39 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { projectLibrary, type LibraryProject } from "@/data/project-library";
+import { projectVideos } from "@/data/project-media";
 import { projectDetails } from "@/data/project-details";
 import { siteUrl } from "@/data/selected-work";
 import { profile } from "@/lib/data";
 
 export default function ProjectDetails({ project: p }: { project: LibraryProject }) {
   const d = projectDetails[p.slug];
+  const video = projectVideos[p.slug];
   const related = d.related
     .map((slug) => projectLibrary.find((x) => x.slug === slug))
     .filter((x): x is LibraryProject => Boolean(x));
   return (
     <>
+      {video && (
+        <section className="project-film" aria-labelledby="project-film-title">
+          <div>
+            <h2 id="project-film-title">{video.title}</h2>
+            <p>{video.description}</p>
+          </div>
+          <video
+            className={video.portrait ? "portrait-film" : ""}
+            controls
+            playsInline
+            preload="none"
+            poster={video.poster}
+            aria-label={video.title}
+          >
+            <source src={video.src} type="video/mp4" />
+            <track kind="captions" src={video.captions} srcLang="en" label="English" />
+            <a href={video.src}>Open the video</a>
+          </video>
+        </section>
+      )}
       <div className="project-brief-grid">
         <aside className="project-facts" aria-label="Project at a glance">
           <div>
@@ -174,6 +196,14 @@ export default function ProjectDetails({ project: p }: { project: LibraryProject
           <div className="related-project-grid">
             {related.map((r) => (
               <Link href={`/projects/${r.slug}`} key={r.slug} className="related-project">
+                <Image
+                  className={r.contain ? "related-image contain" : "related-image"}
+                  src={r.image}
+                  alt={r.imageAlt}
+                  width={440}
+                  height={255}
+                  sizes="(min-width: 750px) 30vw, 90vw"
+                />
                 <p className="eyebrow">{r.category}</p>
                 <h3>{r.title}</h3>
                 <p>{r.description}</p>

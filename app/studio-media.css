@@ -1,0 +1,278 @@
+/* A filmstrip keeps every featured project one tap from the homepage. */
+.spotlight {
+  min-width: 0;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #577076;
+  background: #203d47;
+  box-shadow: 0 24px 54px #071b2638;
+}
+.spotlight-bar,
+.spotlight-caption,
+.spotlight-filmstrip {
+  display: flex;
+  align-items: center;
+}
+.spotlight-bar {
+  justify-content: space-between;
+  padding: 0 3px 10px;
+  color: #d2e8e0;
+  letter-spacing: 0.14em;
+  font-size: 10px;
+  font-weight: 650;
+}
+.spotlight-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  border: 1px solid #527079;
+  border-radius: 18px;
+  padding: 0 12px;
+  color: #e8f5f0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: 0;
+}
+.spotlight-view {
+  display: block;
+  color: #fff;
+}
+.spotlight-stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1.75;
+  border-radius: 5px;
+  background-color: #b5ccb5;
+}
+.spotlight-coral .spotlight-stage {
+  background: linear-gradient(142deg, #e4c2ac, #cba48b 65%, #f2d7c5);
+}
+.spotlight-lilac .spotlight-stage,
+.spotlight-atlas .spotlight-stage {
+  background: linear-gradient(145deg, #cdcce8, #9c94c3 85%);
+}
+.spotlight-apricot .spotlight-stage {
+  background: linear-gradient(135deg, #edcfaa, #d8a66a);
+}
+.spotlight-phones {
+  background: linear-gradient(145deg, #d7eac8, #90ad97);
+}
+.spotlight-screen {
+  width: 90%;
+  height: 87%;
+  overflow: hidden;
+  border: 1px solid #ffffffac;
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: 0 12px 20px #24333c42;
+  transform: translateY(3%);
+}
+.spotlight-screen img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: top;
+}
+.spotlight-handset {
+  height: 93%;
+  width: auto;
+  max-width: 41%;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 16px #1e35473b;
+  transform: translate(-3%, 8%);
+}
+.spotlight-handset.second {
+  transform: translate(5%, -5%);
+}
+.spotlight-caption {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px 3px 16px;
+}
+.spotlight-caption p {
+  color: #c3d8d9;
+  font-size: 11px;
+  margin: 0 0 4px;
+}
+.studio .spotlight-caption h2 {
+  font-size: clamp(19px, 2vw, 27px);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+  color: white;
+  margin: 0;
+}
+.spotlight-caption svg {
+  flex-shrink: 0;
+  color: #c1e8d5;
+}
+.spotlight-filmstrip {
+  gap: 8px;
+  border-top: 1px solid #49616a;
+  padding-top: 12px;
+}
+.spotlight-filmstrip button {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #2e4652;
+  cursor: pointer;
+}
+.spotlight-filmstrip button img {
+  object-fit: cover;
+  object-position: 50% 18%;
+  opacity: 0.58;
+}
+.spotlight-filmstrip button[aria-pressed="true"] {
+  border-color: #c1e8cb;
+}
+.spotlight-filmstrip button[aria-pressed="true"] img,
+.spotlight-filmstrip button:hover img {
+  opacity: 1;
+}
+.spotlight button:focus-visible,
+.spotlight-view:focus-visible {
+  outline: 3px solid #f5d297;
+  outline-offset: 2px;
+}
+.library-art-fit img {
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
+}
+.library-art::before,
+.library-art::after {
+  display: none;
+}
+.library-detail-fit img {
+  height: min(65vh, 650px);
+  object-fit: contain;
+  padding: 15px;
+  background: #e7ece8;
+}
+.related-image {
+  display: block;
+  width: 100%;
+  height: 145px;
+  object-fit: cover;
+  object-position: top;
+  background: #e8ede8;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+.related-image.contain {
+  object-fit: contain;
+  object-position: center;
+}
+.project-film {
+  display: grid;
+  grid-template-columns: minmax(210px, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 35px;
+  margin: 45px 0;
+  padding: 32px;
+  background: #132c34;
+  border-radius: 8px;
+  color: #fafbf8;
+}
+.studio .project-film h2 {
+  color: inherit;
+  font-size: clamp(25px, 3vw, 40px);
+  line-height: 1.1;
+  margin: 0;
+}
+.project-film p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 18px 0 0;
+  color: #cfdfdf;
+}
+.project-film video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: contain;
+  border-radius: 4px;
+  background: #0d1c21;
+}
+.project-film video.portrait-film {
+  aspect-ratio: auto;
+  height: min(58vh, 455px);
+}
+@keyframes studio-settle {
+  from {
+    opacity: 0.65;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .spotlight-view {
+    animation: studio-settle 0.42s ease-out both;
+  }
+  .intro-copy {
+    animation: studio-settle 0.55s ease-out both;
+  }
+  .spotlight-filmstrip img,
+  .spotlight-caption svg,
+  .library-card .library-open {
+    transition:
+      transform 0.24s ease,
+      opacity 0.24s ease;
+  }
+  .spotlight-view:hover .spotlight-caption svg,
+  .library-card:hover .library-open {
+    transform: translate(2px, -2px);
+  }
+  @supports (animation-timeline: view()) {
+    .work-card,
+    .library-card {
+      animation: studio-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 75%;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .library-art img,
+  .project-image-link *,
+  .spotlight * {
+    animation: none !important;
+    transition: none !important;
+  }
+  .library-art:hover img {
+    transform: none;
+  }
+}
+@media (max-width: 750px) {
+  .project-film {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 20px;
+  }
+  .spotlight {
+    padding: 12px;
+  }
+  .spotlight-caption {
+    padding-block: 12px;
+  }
+  .spotlight-filmstrip {
+    gap: 6px;
+  }
+}

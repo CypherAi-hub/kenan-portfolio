@@ -62,7 +62,14 @@ export const projectDetails: Record<string, ProjectDetail> = {
         description: "View the public card and website QR code.",
       },
     ],
-    gallery: [],
+    gallery: [
+      {
+        src: "/media/showcase/maryville-card.webp",
+        alt: "Front of the Maryville General Services QR business card",
+        caption:
+          "Front of the department’s printable card. Its QR code opens the public request desk.",
+      },
+    ],
   },
   fofit: {
     audience:
@@ -244,7 +251,29 @@ export const projectDetails: Record<string, ProjectDetail> = {
         description: "Separate browser application; development and sample content remain visible.",
       },
     ],
-    gallery: [],
+    gallery: [
+      {
+        src: "/media/showcase/ultra-identification.webp",
+        alt: "Card identification review with selected printing",
+        caption: "Confirm the exact version after capture · iOS Simulator, sample data.",
+      },
+      {
+        src: "/media/showcase/ultra-market.webp",
+        alt: "Dated market reference and offer guides",
+        caption:
+          "Compare a dated reference with 70% and 80% buying guides · iOS Simulator, sample data.",
+      },
+      {
+        src: "/media/showcase/ultra-completed-sales.webp",
+        alt: "Interactive completed-sales chart with sample transactions",
+        caption: "Inspect individual sales on a grade-specific chart · iOS Simulator, sample data.",
+      },
+      {
+        src: "/media/showcase/ultra-buying-session.webp",
+        alt: "Buying group with four sample cards",
+        caption: "Calculate an offer across a group of cards · iOS Simulator, sample data.",
+      },
+    ],
   },
   "hirecrate-staffing": {
     audience: "Employers requesting workers and job seekers looking for their next opportunity.",
@@ -282,7 +311,18 @@ export const projectDetails: Record<string, ProjectDetail> = {
         description: "Explore the live employer and job-seeker website.",
       },
     ],
-    gallery: [],
+    gallery: [
+      {
+        src: "/media/projects/hirecrate-staffing/hirecrate-employer-request-workers.webp",
+        alt: "Employer inquiry photography from the HireCrate website",
+        caption: "Image from the employer request path.",
+      },
+      {
+        src: "/media/projects/hirecrate-staffing/hirecrate-job-seeker-find-work.webp",
+        alt: "Job seeker consultation photography from HireCrate",
+        caption: "Image from the job-seeker path.",
+      },
+    ],
   },
   meridian: {
     audience: "People exploring market-data interfaces and controlled paper-research workflows.",
