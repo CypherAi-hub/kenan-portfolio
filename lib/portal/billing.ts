@@ -13,7 +13,7 @@ export function paymentMode() {
 function stripe() {
   requireValue(
     paymentMode() !== "offline",
-    "Card payments are being connected. Contact Kenan about this request.",
+    "Online payments are being connected. Contact Kenan about this request.",
     503,
   );
   return new Stripe(process.env.STRIPE_SECRET_KEY!, { maxNetworkRetries: 2 });
@@ -51,7 +51,52 @@ export async function recordPaid(session: Stripe.Checkout.Session) {
     bill.sessionId = session.id;
     bill.paidAt = new Date().toISOString();
     bill.status = "paid";
+    delete bill.processing;
+    delete bill.failure;
     bill.test = !session.livemode;
+  });
+}
+// Delayed methods stay unpaid until Stripe confirms success. A definitive failure
+// unlocks a new idempotent attempt; retries of the same event do not advance it twice.
+export async function recordDelayed(session: Stripe.Checkout.Session, failed = false) {
+  const tags = session.metadata;
+  if (tags?.studio !== "kjl") return;
+  if (session.payment_status === "paid") return recordPaid(session);
+  requireValue(
+    session.mode === "payment" && session.livemode === (paymentMode() === "live"),
+    "Payment mode mismatch.",
+    409,
+  );
+  if (session.payment_status !== "unpaid" || session.status !== "complete") return;
+  await editWorkspace(tags.client, (w) => {
+    const bill = invoiceIn(w, tags.project, tags.bill).bill;
+    if (
+      bill.status === "paid" ||
+      bill.failedSessionId === session.id ||
+      Number(tags.attempt) < bill.attempt
+    )
+      return;
+    requireValue(
+      bill.cents === session.amount_total &&
+        session.currency === "usd" &&
+        session.client_reference_id === bill.id &&
+        String(bill.attempt) === tags.attempt &&
+        (!bill.sessionId || bill.sessionId === session.id),
+      "Payment details do not match the request.",
+      409,
+    );
+    if (failed) {
+      bill.failedSessionId = session.id;
+      delete bill.sessionId;
+      delete bill.startedAt;
+      delete bill.processing;
+      bill.failure = "The payment did not complete. Choose another method or try again.";
+      bill.attempt++;
+    } else {
+      bill.sessionId = session.id;
+      bill.processing = true;
+      delete bill.failure;
+    }
   });
 }
 export async function checkout(client: string, projectId: string, id: string, email: string) {
@@ -59,18 +104,39 @@ export async function checkout(client: string, projectId: string, id: string, em
   const { project, bill } = invoiceIn(await workspace(client), projectId, id);
   requireValue(bill.status === "open", "This request has already been paid.", 409);
   if (bill.sessionId) {
-    const prior = await api.checkout.sessions.retrieve(bill.sessionId);
+    let prior = await api.checkout.sessions.retrieve(bill.sessionId);
+    if (
+      prior.status === "open" &&
+      prior.allowed_payment_method_types?.length === 1 &&
+      prior.allowed_payment_method_types[0] === "card"
+    ) {
+      try {
+        prior = await api.checkout.sessions.expire(prior.id);
+      } catch {
+        prior = await api.checkout.sessions.retrieve(prior.id);
+      }
+      requireValue(
+        prior.status !== "open",
+        "Payment options could not refresh. Please try again.",
+        503,
+      );
+    }
     if (prior.payment_status === "paid") {
       await recordPaid(prior);
       return { paid: true };
     }
     if (prior.status === "open" && prior.url) return { url: prior.url };
+    if (prior.status === "complete") {
+      await recordDelayed(prior);
+      return { processing: true };
+    }
     requireValue(prior.status === "expired", "Payment is processing. Check back shortly.", 409);
     await editWorkspace(client, (w) => {
       const current = invoiceIn(w, projectId, id).bill;
       if (current.status === "open" && current.sessionId === prior.id) {
         delete current.sessionId;
         delete current.startedAt;
+        delete current.processing;
         current.attempt++;
       }
     });
@@ -93,7 +159,7 @@ export async function checkout(client: string, projectId: string, id: string, em
   const session = await api.checkout.sessions.create(
     {
       mode: "payment",
-      allowed_payment_method_types: ["card"],
+      // Stripe dynamically offers the eligible methods enabled on this account.
       client_reference_id: bill.id,
       customer_email: email,
       line_items: [
@@ -126,6 +192,7 @@ export async function checkout(client: string, projectId: string, id: string, em
       409,
     );
     current.sessionId = session.id;
+    delete current.failure;
   });
   requireValue(session.url, "Unable to open checkout. Refresh the project.", 503);
   return { url: session.url };

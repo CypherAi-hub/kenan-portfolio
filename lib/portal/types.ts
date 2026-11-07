@@ -27,6 +27,9 @@ export type Payment = {
   cents: number;
   status: "open" | "paid";
   sessionId?: string;
+  processing?: boolean;
+  failure?: string;
+  failedSessionId?: string;
   attempt: number;
   startedAt?: number;
   paidAt?: string;

@@ -159,11 +159,13 @@ export async function studioContext(me: Account) {
             brief,
             phase,
             updates: updates.slice(0, 5),
-            payments: payments.map(({ id, label, cents, status }) => ({
+            payments: payments.map(({ id, label, cents, status, processing, failure }) => ({
               id,
               label,
               cents,
               status,
+              processing: !!processing,
+              failure: failure || null,
             })),
           })),
       };

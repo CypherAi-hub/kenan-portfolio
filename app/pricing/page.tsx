@@ -118,6 +118,10 @@ export default function PricingPage() {
                 "Your proposal sets out the payment milestones, any deposit, and what is due before launch or handoff. No payment is collected by this estimator.",
               ],
               [
+                "Which payment methods can I use?",
+                "Your private client workspace opens secure checkout with eligible cards and digital wallets, including Apple Pay, Google Pay and Cash App Pay. The options shown depend on your device, location and payment amount. You’ll see the available methods before confirming payment.",
+              ],
+              [
                 "What do I need to provide?",
                 "Your goals, logo or existing brand assets, and the words and images you want to use. Content organization is available as an optional extra. You’ll also own the domain and service accounts for your project.",
               ],

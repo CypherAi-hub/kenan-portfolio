@@ -1,5 +1,5 @@
 import { readBody } from "@/lib/portal/request";
-import { recordPaid, verifiedEvent } from "@/lib/portal/billing";
+import { recordPaid, recordDelayed, verifiedEvent } from "@/lib/portal/billing";
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) return new Response("Signature required", { status: 400 });
@@ -14,7 +14,15 @@ export async function POST(request: Request) {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     try {
-      await recordPaid(event.data.object);
+      if (event.data.object.payment_status === "paid") await recordPaid(event.data.object);
+      else await recordDelayed(event.data.object);
+    } catch {
+      return new Response("Payment could not be reconciled", { status: 500 });
+    }
+  }
+  if (event.type === "checkout.session.async_payment_failed") {
+    try {
+      await recordDelayed(event.data.object, true);
     } catch {
       return new Response("Payment could not be reconciled", { status: 500 });
     }

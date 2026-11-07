@@ -57,8 +57,8 @@ async function post(as, body, source = origin) {
   });
   return { status: r.status, data: await r.json() };
 }
-async function webhook(session, badSignature = false) {
-  const body = JSON.stringify({ type: "checkout.session.completed", data: { object: session } });
+async function webhook(session, badSignature = false, type = "checkout.session.completed") {
+  const body = JSON.stringify({ type, data: { object: session } });
   const signature = stripe.webhooks.generateTestHeaderString({
     payload: body,
     secret: badSignature ? "wrong" : process.env.STRIPE_WEBHOOK_SECRET,
@@ -364,6 +364,28 @@ try {
   console.log(
     "Assistant owner authorization, appointment privacy and overlap prevention verified.",
   );
+  // Use an actual Stripe sandbox checkout, then simulate signed provider events
+  // against the deployed local route to verify delayed payment lifecycle handling.
+  const started = await post(client, { action: "checkout", client: cid, project, bill: bill.id });
+  assert.equal(started.status, 200, JSON.stringify(started.data));
+  const openedBill = (await view()).projects[0].payments[0];
+  const real = await stripe.checkout.sessions.retrieve(openedBill.sessionId);
+  assert.equal(real.allowed_payment_method_types, null);
+  assert(real.payment_method_types.includes("card"));
+  console.log(
+    "Actual Stripe sandbox checkout supports dynamic methods:",
+    real.payment_method_types.join(", "),
+  );
+  await stripe.checkout.sessions.expire(real.id);
+  const pending = { ...real, status: "complete", payment_status: "unpaid" };
+  assert.equal(await webhook(pending), 200);
+  assert.equal((await view()).projects[0].payments[0].processing, true);
+  assert.equal((await view()).projects[0].payments[0].status, "open");
+  assert.equal(await webhook(pending, false, "checkout.session.async_payment_failed"), 200);
+  assert.equal(await webhook(pending, false, "checkout.session.async_payment_failed"), 200);
+  assert.equal((await view()).projects[0].payments[0].attempt, 2);
+  assert.equal((await view()).projects[0].payments[0].sessionId, undefined);
+  console.log("Signed async failure clears processing and permits one new payment attempt.");
   const session = {
     id: "cs_test_fixture",
     mode: "payment",
@@ -372,7 +394,7 @@ try {
     amount_total: 350,
     currency: "usd",
     client_reference_id: bill.id,
-    metadata: { studio: "kjl", client: cid, project, bill: bill.id, attempt: "1" },
+    metadata: { studio: "kjl", client: cid, project, bill: bill.id, attempt: "2" },
   };
   assert.equal(await webhook(session, true), 400);
   assert.equal(await webhook({ ...session, amount_total: 349 }), 500);

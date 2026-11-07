@@ -313,17 +313,23 @@ function ProjectPanel({
           )}
           {mode === "offline" && (
             <p className="portal-note">
-              Card payments are being connected.{" "}
+              Online payments are being connected.{" "}
               {owner
                 ? "You can prepare requests now."
                 : "Contact Kenan if you have a billing question."}
             </p>
           )}
           {mode === "sandbox" && (
-            <p className="portal-note">Stripe test mode · use test cards only.</p>
+            <p className="portal-note">Stripe test mode · use test payment details only.</p>
           )}
           {project.payments.length === 0 && (
             <p className="portal-empty">No payment requests for this project yet.</p>
+          )}
+          {project.payments.length > 0 && mode !== "offline" && (
+            <p className="portal-note">
+              Secure checkout offers eligible cards and wallets, including Apple Pay, Google Pay and
+              Cash App Pay. Available options depend on your device, location and payment amount.
+            </p>
           )}
           {project.payments.map((b) => (
             <section className="portal-invoice" key={b.id}>
@@ -332,14 +338,27 @@ function ProjectPanel({
                 <small>
                   {b.status === "paid"
                     ? (b.test ? "Test payment" : "Paid") + " · " + date(b.paidAt!)
-                    : "Awaiting payment"}
+                    : b.processing
+                      ? "Payment processing"
+                      : "Awaiting payment"}
                 </small>
               </div>
               <b>{dollars(b.cents)}</b>
+              {b.processing && (
+                <p className="portal-note">
+                  Your payment is awaiting confirmation. This request updates automatically when it
+                  clears.
+                </p>
+              )}
+              {b.failure && (
+                <p className="portal-note" role="status">
+                  {b.failure}
+                </p>
+              )}
               {!owner && b.status === "open" && mode !== "offline" && (
                 <button
                   className="portal-btn"
-                  disabled={paying}
+                  disabled={paying || b.processing}
                   onClick={async () => {
                     setPaying(true);
                     try {
@@ -349,7 +368,8 @@ function ProjectPanel({
                     }
                   }}
                 >
-                  Pay with Stripe <ArrowUpRight size={15} />
+                  {b.processing ? "Payment processing" : "Choose payment method"}{" "}
+                  <ArrowUpRight size={15} />
                 </button>
               )}
             </section>

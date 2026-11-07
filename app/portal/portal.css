@@ -465,3 +465,11 @@
     width: 100%;
   }
 }
+.portal-invoice > .portal-note {
+  flex-basis: 100%;
+  order: 3;
+  margin: 0;
+}
+.portal-invoice > .portal-btn {
+  flex-shrink: 0;
+}
