@@ -1,3 +1,8 @@
+import { access } from "node:fs/promises";
+import path from "node:path";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { projectCovers, projectVideos } from "./data/project-media";
+import { projectDetails } from "./data/project-details";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -17,4 +22,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default async function config(phase: string): Promise<NextConfig> {
+  if (phase === PHASE_PRODUCTION_BUILD) {
+    const files = [
+      ...Object.values(projectCovers).map((cover) => cover.image),
+      ...Object.values(projectDetails).flatMap((detail) => detail.gallery.map((item) => item.src)),
+      ...Object.values(projectVideos).flatMap((video) =>
+        video ? [video.src, video.poster, video.captions] : [],
+      ),
+    ];
+    await Promise.all(files.map((file) => access(path.join(process.cwd(), "public", file))));
+  }
+  return nextConfig;
+}

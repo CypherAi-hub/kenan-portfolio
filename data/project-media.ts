@@ -4,7 +4,7 @@ export type ProjectCover = {
   imageNote: string;
   contain?: boolean;
 };
-const covers: Record<string, ProjectCover> = {
+export const projectCovers: Record<string, ProjectCover> = {
   fofit: {
     image: "/media/current/fofit-workout.webp",
     imageAlt: "FoFit workout screen",
@@ -173,7 +173,7 @@ const covers: Record<string, ProjectCover> = {
   },
 };
 export function projectCover(slug: string): ProjectCover {
-  const cover = covers[slug];
+  const cover = projectCovers[slug];
   if (!cover) throw new Error(`Missing portfolio media for ${slug}`);
   return cover;
 }

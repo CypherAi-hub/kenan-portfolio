@@ -1,5 +1,3 @@
-import { access } from "node:fs/promises";
-import path from "node:path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,8 +12,7 @@ import ProjectShare from "@/components/studio/ProjectShare";
 import { projectDetails } from "@/data/project-details";
 
 type Props = { params: Promise<{ slug: string }> };
-export async function generateStaticParams() {
-  await Promise.all(projectLibrary.map((p) => access(path.join(process.cwd(), "public", p.image))));
+export function generateStaticParams() {
   return projectLibrary.map((p) => ({ slug: p.slug }));
 }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
