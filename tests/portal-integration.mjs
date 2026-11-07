@@ -226,6 +226,7 @@ try {
     assert(reply.data.proposals.length === 1);
     const proposal = reply.data.proposals[0];
     assert.equal(proposal.input.action, "comment");
+    assert.equal(proposal.input.body, "The design is ready for your review.");
     const before = (await view()).projects[0].updates.length;
     const both = await Promise.all([
       assistant(owner, { action: "apply", id: proposal.id }),

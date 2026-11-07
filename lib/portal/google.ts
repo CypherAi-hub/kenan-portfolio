@@ -40,8 +40,8 @@ async function verified(me: Account) {
   requireValue(r.ok, "Google could not verify the connected account. Reconnect Google.", 503);
   const profile = await r.json();
   requireValue(
-    profile.email === "kenanlarry8@gmail.com" && profile.email_verified === true,
-    "Connect kenanlarry8@gmail.com to use studio email and Calendar.",
+    profile.email === "cypheros.ai@gmail.com" && profile.email_verified === true,
+    "Connect cypheros.ai@gmail.com to use studio email and Calendar.",
     403,
   );
   return profile.email as string;

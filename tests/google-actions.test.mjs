@@ -9,7 +9,7 @@ const source = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } },
 ).outputText;
 const owner = { id: "owner", role: "owner", email: "kenanlarry8@gmail.com" };
-async function harness({ email = owner.email, busy = false, fail = false } = {}) {
+async function harness({ email = "cypheros.ai@gmail.com", busy = false, fail = false } = {}) {
   const state = { proposals: [] },
     calls = [];
   const context = vm.createContext({
@@ -105,7 +105,7 @@ test("ambiguous email failure cannot resend on retry", async () => {
 test("wrong connected account and changed recipient fail before sending", async () => {
   const wrong = await harness({ email: "wrong@example.com" }),
     input = wrong.proposal("three");
-  await assert.rejects(wrong.api.applyGoogleAction(owner, "three", input), /Connect kenanlarry8/);
+  await assert.rejects(wrong.api.applyGoogleAction(owner, "three", input), /Connect cypheros/);
   assert.equal(wrong.calls.length, 0);
   const h = await harness(),
     changed = h.proposal("four");
