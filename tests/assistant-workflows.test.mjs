@@ -9,7 +9,7 @@ const source = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } },
 ).outputText;
 const owner = { id: "owner", role: "owner", email: "kenanlarry8@gmail.com" };
-async function harness(actions = []) {
+async function harness(actions = [], toolArgs = null) {
   const state = {
     appointments: [
       {
@@ -26,7 +26,9 @@ async function harness(actions = []) {
     usage: { day: "", count: 0 },
   };
   let modelInput,
-    deliveries = 0;
+    deliveries = 0,
+    modelCalls = 0,
+    projectReads = 0;
   class PortalError extends Error {}
   const requireValue = (condition, message) => {
     if (!condition) throw new PortalError(message);
@@ -39,6 +41,18 @@ async function harness(actions = []) {
     AbortSignal,
     fetch: async (_url, init) => {
       modelInput = JSON.parse(init.body);
+      modelCalls++;
+      if (toolArgs && modelCalls === 1)
+        return Response.json({
+          output: [
+            {
+              type: "function_call",
+              name: "inspect_projects",
+              call_id: "read-project",
+              arguments: JSON.stringify(toolArgs),
+            },
+          ],
+        });
       return Response.json({
         output: [
           {
@@ -54,6 +68,24 @@ async function harness(actions = []) {
     },
   });
   const mocks = {
+    "./project-access": {
+      projectCatalog: () => [{ slug: "fofit", title: "FoFit" }],
+      inspectProject: async () => {
+        projectReads++;
+        return {
+          project: {
+            title: "FoFit",
+            portfolioUrl: "https://kjl-designs.vercel.app/projects/fofit",
+            access: "Live private read-only connection",
+            screenshot: { url: "https://kjl-designs.vercel.app/test.png", note: "Saved fixture" },
+          },
+          privateData: {
+            checkedAt: new Date().toISOString(),
+            metrics: [{ label: "Sessions", count: 49 }],
+          },
+        };
+      },
+    },
     "./google": {
       googleStatus: async () => ({ connected: true }),
       applyGoogleAction: async () => {
@@ -98,6 +130,9 @@ async function harness(actions = []) {
   await sandboxModule.evaluate();
   return {
     api: sandboxModule.namespace,
+    get projectReads() {
+      return projectReads;
+    },
     state,
     get modelInput() {
       return modelInput;
@@ -149,4 +184,49 @@ test("manual meeting preparation shares the saved approval workflow and requires
   await assert.rejects(h.api.prepareAppointment(owner, "missing"), /unavailable/);
   await h.api.applyProposal(owner, p.id);
   assert.equal(h.deliveries, 1);
+});
+
+test("project assessment reads evidence and sends labeled screenshot to model", async () => {
+  const h = await harness([], { slugs: ["fofit"], view: "overview", page: 1 });
+  const r = await h.api.askAssistant(owner, { message: "Assess FoFit" });
+  assert.equal(h.projectReads, 1);
+  assert.equal(h.modelInput.tool_choice, "none");
+  assert(
+    h.modelInput.input.some(
+      (x) => x.type === "function_call_output" && x.output.includes("Sessions"),
+    ),
+  );
+  assert(
+    h.modelInput.input.some(
+      (x) => Array.isArray(x.content) && x.content.some((c) => c.type === "input_image"),
+    ),
+  );
+  assert.equal(r.evidence.length, 1);
+  assert.equal(h.state.messages.at(-1).evidence.length, 1);
+});
+test("generic project assessment cannot trigger a private customer directory read", async () => {
+  const h = await harness([], { slugs: ["fofit"], view: "customers", page: 1 });
+  await h.api.askAssistant(owner, { message: "Assess FoFit" });
+  assert.equal(h.projectReads, 0);
+  assert(
+    h.modelInput.input.some(
+      (x) => x.type === "function_call_output" && x.output.includes("explicitly request"),
+    ),
+  );
+});
+test("explicit customer question permits a bounded read but sends no saved screenshot", async () => {
+  const h = await harness([], { slugs: ["fofit"], view: "customers", page: 1 });
+  await h.api.askAssistant(owner, { message: "Show my FoFit customer accounts" });
+  assert.equal(h.projectReads, 1);
+  assert(
+    !h.modelInput.input.some(
+      (x) => Array.isArray(x.content) && x.content.some((c) => c.type === "input_image"),
+    ),
+  );
+});
+
+test("customer experience review does not authorize directory access", async () => {
+  const h = await harness([], { slugs: ["fofit"], view: "customers", page: 1 });
+  await h.api.askAssistant(owner, { message: "Assess FoFit customer experience" });
+  assert.equal(h.projectReads, 0);
 });

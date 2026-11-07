@@ -82,6 +82,70 @@ async function assistant(as, body) {
 }
 await directoryChange((d) => d.accounts.push(...fixtures.map((f) => f.record)));
 try {
+  const projectRequest = async (as, body, source = origin) => {
+    const r = await fetch(origin + "/api/portal/projects", {
+      method: body ? "POST" : "GET",
+      headers: {
+        cookie: "kjl-session=" + as.secret,
+        origin: source,
+        "content-type": "application/json",
+      },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    return { status: r.status, data: await r.json() };
+  };
+  assert.equal((await projectRequest(client)).status, 403);
+  assert.equal((await projectRequest(other, { action: "inspect", slug: "fofit" })).status, 403);
+  assert.equal(
+    (await projectRequest(owner, { action: "inspect", slug: "fofit" }, "https://example.org"))
+      .status,
+    403,
+  );
+  assert.equal(
+    (await projectRequest(owner, { action: "inspect", slug: "https://example.org" })).status,
+    404,
+  );
+  const catalog = await projectRequest(owner);
+  assert.equal(catalog.status, 200);
+  assert(catalog.data.projects.length > 20);
+  console.log(
+    "Owner project catalog:",
+    catalog.data.projects.length,
+    "projects; client access denied.",
+  );
+  for (const slug of ["fofit", "ultraflips", "general-services"]) {
+    const r = await projectRequest(owner, { action: "inspect", slug, view: "customers" });
+    assert.equal(r.status, 200);
+    assert.equal(r.data.privateData.access, "read-only");
+    assert(r.data.privateData.records.length <= 10);
+    console.log(
+      "Private project read verified:",
+      slug,
+      r.data.privateData.records.length,
+      "bounded directory records",
+    );
+  }
+  if (process.env.TEST_ASSISTANT_MODEL === "1") {
+    for (const message of [
+      "List my portfolio project names including Meridian Atlas, FoFit, UltraFlips, HireCrate and Maryville. Do not list client workspaces.",
+      "Assess FoFit using its current connected evidence and saved screenshot. Give three practical improvements and clearly distinguish observations from suggestions.",
+    ]) {
+      const r = await assistant(owner, { action: "ask", message });
+      assert.equal(r.status, 200, JSON.stringify(r.data));
+      assert(r.data.reply.length > 10);
+      if (message.startsWith("Assess"))
+        assert(
+          r.data.evidence?.some((e) => e.title.includes("FoFit")),
+          "No real project tool evidence",
+        );
+      console.log(
+        "Real model verified:",
+        message.startsWith("Assess")
+          ? "project assessment with actual tool evidence"
+          : "full portfolio catalog",
+      );
+    }
+  }
   const cid = client.record.id;
   const p = await post(owner, {
     action: "project",
@@ -232,7 +296,7 @@ try {
         ". The exact comment text should be: The design is ready for your review. Propose the comment action.",
     });
     assert.equal(reply.status, 200, JSON.stringify(reply.data));
-    assert(reply.data.proposals.length === 1);
+    assert(reply.data.proposals.length === 1, JSON.stringify(reply.data));
     const proposal = reply.data.proposals[0];
     assert.equal(proposal.input.action, "comment");
     assert.equal(proposal.input.body, "The design is ready for your review.");

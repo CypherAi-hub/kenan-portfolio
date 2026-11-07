@@ -37,6 +37,21 @@ export default function Privacy() {
           status, rather than card numbers. The public booking page uses Google Calendar’s booking
           service.
         </p>
+        <h2>Private project connections</h2>
+        <p>
+          The owner’s project review tools can read limited project counts and basic account
+          directory records from connected FoFit, UltraFlips and General Services sources. Account
+          records include names, email addresses and account dates where available. Separate
+          read-only connections exclude passwords, tokens, health details, payment details, private
+          files and request attachments. Clients cannot access these tools.
+        </p>
+        <p>
+          Meridian Atlas uses a dated local count snapshot. HireCrate uses an owner-imported backup
+          snapshot. Imported contact fields are limited to identity, email and status; private notes
+          and detailed job records are excluded. These snapshots do not update automatically. The
+          assistant may send requested project evidence and saved screenshots to OpenAI for
+          assessment. Private account records are requested separately by the owner.
+        </p>
         <h2>Google email and Calendar connection</h2>
         <p>
           The owner can connect their Google account through Vercel Connect. The connection requests

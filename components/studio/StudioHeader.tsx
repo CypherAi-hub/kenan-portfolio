@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import BrandLogo from "./BrandLogo";
 import { useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 export default function StudioHeader() {
@@ -8,12 +9,7 @@ export default function StudioHeader() {
     <header className="studio-header">
       <div className="studio-shell nav-row">
         <Link href="/" className="studio-brand" aria-label="KJL Designs home">
-          <span className="brand-symbol" aria-hidden="true">
-            KJ<span>L</span>
-          </span>
-          <span>
-            KJL Designs<span className="brand-caption">DESIGN & DEVELOPMENT</span>
-          </span>
+          <BrandLogo />
         </Link>
         <nav aria-label="Main navigation" className="desktop-nav">
           <Link href="/#work">Selected work</Link>

@@ -2,7 +2,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Bot, X, Send, Check, CalendarDays, Bell } from "lucide-react";
 import type { Appointment, Proposal } from "@/lib/portal/desk";
-type Message = { role: "user" | "assistant"; content: string; proposals?: Proposal[] };
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  proposals?: Proposal[];
+  evidence?: { title: string; url: string; checkedAt: string; note: string }[];
+};
 async function api(input: Record<string, unknown>) {
   const r = await fetch("/api/portal/assistant", {
     method: "POST",
@@ -268,6 +273,17 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
     [connectionNotice, setConnectionNotice] = useState(""),
     [loading, setLoading] = useState(false),
     [applied, setApplied] = useState<string[]>([]);
+  useEffect(() => {
+    const prepare = (event: Event) => {
+      const prompt = (event as CustomEvent<unknown>).detail;
+      if (typeof prompt === "string" && prompt.length <= 4000) {
+        setText(prompt);
+        setOpen(true);
+      }
+    };
+    window.addEventListener("kjl-assistant-prompt", prepare);
+    return () => window.removeEventListener("kjl-assistant-prompt", prepare);
+  }, []);
   const inFlight = useRef(false);
   async function refreshConversation() {
     const r = await fetch("/api/portal/assistant", { cache: "no-store" });
@@ -312,7 +328,12 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
       const data = await api({ action: "ask", message });
       setMessages((m) => [
         ...m,
-        { role: "assistant", content: data.reply, proposals: data.proposals },
+        {
+          role: "assistant",
+          content: data.reply,
+          proposals: data.proposals,
+          evidence: data.evidence,
+        },
       ]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Please try again.");
@@ -428,6 +449,7 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
                   "Who needs a follow-up?",
                   "Summarize my active projects",
                   "Which appointments need approval?",
+                  "List all my portfolio projects",
                 ].map((q) => (
                   <button key={q} onClick={() => send(q)}>
                     {q}
@@ -439,6 +461,19 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
               <section className={"assistant-message " + m.role} key={i}>
                 <small>{m.role === "user" ? "You" : "Assistant"}</small>
                 <p>{m.content}</p>
+                {m.evidence && m.evidence.length > 0 && (
+                  <div className="assistant-evidence">
+                    <small>Sources checked</small>
+                    {m.evidence.map((source) => (
+                      <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
+                        {source.title}
+                        <small>
+                          {source.note} · {new Date(source.checkedAt).toLocaleString()}
+                        </small>
+                      </a>
+                    ))}
+                  </div>
+                )}
                 {m.proposals?.map((p) => (
                   <ProposalCard
                     key={p.id}

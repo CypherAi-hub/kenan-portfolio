@@ -36,6 +36,7 @@ type StoredMessage = {
   role: "user" | "assistant";
   content: string;
   proposalIds?: string[];
+  evidence?: { title: string; url: string; checkedAt: string; note: string }[];
 };
 const empty = (): Desk => ({ appointments: [], proposals: [], usage: { day: "", count: 0 } });
 export const desk = () => readPrivate("owner-desk", empty);

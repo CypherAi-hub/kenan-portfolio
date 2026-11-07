@@ -287,3 +287,140 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.project-connections > p,
+.project-import {
+  margin-block: 18px;
+  max-width: 780px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.project-connection-search {
+  display: grid;
+  gap: 8px;
+  max-width: 440px;
+  margin: 18px 0;
+  font-size: 13px;
+}
+.project-connection-search input {
+  background: white;
+  color: #173b36;
+  border: 1px solid #bed2c7;
+  border-radius: 6px;
+  padding: 11px;
+}
+.project-connection-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.project-connection-card {
+  display: flex;
+  gap: 14px;
+  border: 1px solid #d7e3dc;
+  border-radius: 8px;
+  padding: 14px;
+  min-width: 0;
+  background: white;
+}
+.project-connection-card > img {
+  width: 104px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+  background: #edf3ef;
+  border-radius: 4px;
+}
+.project-connection-card h3 {
+  font-size: 15px;
+  margin: 0 0 5px;
+}
+.project-connection-card p {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.project-connection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+.project-connection-actions :is(a, button) {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: #17664f;
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.project-inspection {
+  padding: 22px;
+  border: 1px solid #aac6b6;
+  border-radius: 8px;
+  background: #f7fbf8;
+  margin-block: 20px;
+  overflow-wrap: anywhere;
+}
+.project-inspection h2 {
+  font-size: 21px;
+  margin-bottom: 12px;
+}
+.project-inspection p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-block: 7px;
+}
+.project-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin: 20px 0;
+}
+.project-metrics dt {
+  font-size: 12px;
+}
+.project-metrics dd {
+  font-size: 24px;
+  font-weight: 700;
+}
+.project-customer {
+  border-top: 1px solid #d1dfd5;
+  padding: 12px 0;
+}
+@media (max-width: 1000px) {
+  .project-connection-list {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 500px) {
+  .project-connection-card {
+    flex-direction: column;
+  }
+  .project-inspection {
+    padding: 15px;
+  }
+}
+.assistant-evidence {
+  display: grid;
+  gap: 8px;
+  margin: 15px 0;
+  padding: 12px;
+  border-top: 1px solid #cadcd0;
+}
+.assistant-evidence a {
+  display: grid;
+  gap: 3px;
+  font-size: 13px;
+  color: #17664f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.assistant-evidence a small {
+  font-size: 10px;
+  color: #566c61;
+  text-decoration: none;
+}

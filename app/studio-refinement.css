@@ -830,3 +830,46 @@
 .studio .package-card h2 {
   font-size: 28px;
 }
+
+/* Published black-and-gold KJL identity. */
+.brand-lockup {
+  display: block;
+  position: relative;
+  width: 252px;
+  height: 62px;
+  overflow: hidden;
+  background: #0c0d0e;
+  border: 1px solid #d4af3740;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.brand-lockup-image {
+  display: block;
+  position: absolute;
+  top: -11px;
+  left: 0;
+  width: 252px;
+  height: 84px;
+  max-width: none;
+  object-fit: contain;
+}
+.brand-lockup-footer {
+  width: 312px;
+  height: 78px;
+}
+.brand-lockup-footer .brand-lockup-image {
+  width: 312px;
+  height: 104px;
+  top: -13px;
+}
+@media (max-width: 700px) {
+  .brand-lockup {
+    width: 210px;
+    height: 52px;
+  }
+  .brand-lockup-image {
+    width: 210px;
+    height: 70px;
+    top: -9px;
+  }
+}

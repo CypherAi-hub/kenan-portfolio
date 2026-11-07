@@ -1,12 +1,13 @@
 import Link from "next/link";
+import BrandLogo from "./BrandLogo";
 import { ArrowUpRight } from "lucide-react";
 import { profile } from "@/lib/data";
 export default function StudioFooter() {
   return (
     <footer className="studio-footer studio-shell">
       <div className="footer-top">
-        <Link href="/" className="footer-name">
-          KJL Designs
+        <Link href="/" className="footer-name" aria-label="KJL Designs home">
+          <BrandLogo footer />
         </Link>
         <p>
           Thoughtful design.
