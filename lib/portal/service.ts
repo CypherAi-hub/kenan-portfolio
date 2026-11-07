@@ -83,7 +83,7 @@ export async function mutate(me: Account, input: Input, operationId?: string) {
       d.accounts.push(account);
       return publicMember(account);
     });
-    return { client: account.id, invitation: origin() + "/portal#invite=" + invitation.raw };
+    return { client: account.id, invitation: origin() + "/portal/login#invite=" + invitation.raw };
   }
   const id = clientId(me, input.client);
   if (me.role === "owner")

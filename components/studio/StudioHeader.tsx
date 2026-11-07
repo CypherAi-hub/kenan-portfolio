@@ -17,7 +17,7 @@ export default function StudioHeader() {
           <Link href="/#services">Services</Link>
           <Link href="/pricing">Pricing</Link>
           <Link href="/#about">About</Link>
-          <Link href="/portal">Client login</Link>
+          <Link href="/portal/login">Client login</Link>
         </nav>
         <Link className="studio-button button-small" href="/#book">
           Book with me <ArrowUpRight size={17} aria-hidden="true" />
@@ -44,7 +44,7 @@ export default function StudioHeader() {
             ["Services", "/#services"],
             ["Pricing", "/pricing"],
             ["About", "/#about"],
-            ["Client login", "/portal"],
+            ["Client login", "/portal/login"],
             ["Book with me", "/#book"],
           ].map(([name, href]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>

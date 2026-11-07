@@ -9,6 +9,7 @@ import {
 import type { AuthenticationResponseJSON, RegistrationResponseJSON } from "@simplewebauthn/server";
 import { directory, editDirectory, requireValue } from "./store";
 import type { Account, Member } from "./types";
+import { matchesAudience, type Audience } from "./access";
 
 export const hash = (value: string) => createHash("sha256").update(value).digest("base64url");
 export const token = () => randomBytes(32).toString("base64url");
@@ -65,7 +66,13 @@ export function findInvite(accounts: Account[], raw: string) {
   requireValue(entry, "This invitation has expired or was replaced.", 403);
   return entry;
 }
-type Challenge = { mode: "register" | "login"; value: string; expires: number; invite?: string };
+type Challenge = {
+  mode: "register" | "login";
+  value: string;
+  expires: number;
+  invite?: string;
+  audience: Audience;
+};
 function sign(body: string) {
   const key = process.env.PORTAL_SIGNING_KEY;
   requireValue(key && key.length >= 32, "Sign-in is temporarily unavailable.", 503);
@@ -95,10 +102,12 @@ async function consume() {
   requireValue(c.expires > Date.now(), "Sign-in expired. Start again.", 403);
   return c;
 }
-export async function begin(raw?: string) {
+export async function begin(raw?: string, audience: Audience = "client") {
+  requireValue(audience === "owner" || audience === "client", "Choose the correct sign-in page.");
   if (raw) {
     requireValue(typeof raw === "string" && raw.length === 43, "Invalid invitation.", 403);
     const a = findInvite((await directory()).accounts, raw);
+    requireValue(matchesAudience(a, audience), "Open the sign-in page for this invitation.", 403);
     const options = await generateRegistrationOptions({
       rpName: "KJL Designs",
       rpID: rp(),
@@ -110,14 +119,31 @@ export async function begin(raw?: string) {
     });
     await issue({
       mode: "register",
+      audience,
       value: options.challenge,
       expires: Date.now() + 300000,
       invite: hash(raw),
     });
     return { mode: "register", options };
   }
-  const options = await generateAuthenticationOptions({ rpID: rp(), userVerification: "required" });
-  await issue({ mode: "login", value: options.challenge, expires: Date.now() + 300000 });
+  const eligible =
+    audience === "owner"
+      ? (await directory()).accounts.filter((a) => a.credential && matchesAudience(a, audience))
+      : [];
+  if (audience === "owner")
+    requireValue(
+      eligible.length > 0,
+      "Use your private invitation to activate a passkey before signing in.",
+      403,
+    );
+  const options = await generateAuthenticationOptions({
+    rpID: rp(),
+    userVerification: "required",
+    ...(audience === "owner"
+      ? { allowCredentials: eligible.map((a) => ({ id: a.credential!.id })) }
+      : {}),
+  });
+  await issue({ mode: "login", audience, value: options.challenge, expires: Date.now() + 300000 });
   return { mode: "login", options };
 }
 export async function finish(
@@ -137,6 +163,12 @@ export async function finish(
       ? findInvite(accounts, raw || "")
       : accounts.find((u) => u.credential?.id === response?.id);
   requireValue(a, "Passkey could not be verified.", 403);
+  requireValue(
+    (challenge.audience === "owner" || challenge.audience === "client") &&
+      matchesAudience(a, challenge.audience),
+    "This passkey belongs to a different sign-in page. Use the matching client or studio login.",
+    403,
+  );
   let credential = a.credential;
   if (challenge.mode === "register") {
     requireValue(challenge.invite === hash(raw || ""), "Use your current invitation.", 403);
@@ -170,6 +202,11 @@ export async function finish(
   await editDirectory((d) => {
     const current = d.accounts.find((u) => u.id === a.id);
     requireValue(current, "Access has been removed.", 403);
+    requireValue(
+      matchesAudience(current, challenge.audience),
+      "Access has changed. Use the matching sign-in page.",
+      403,
+    );
     current.recentChallenges = current.recentChallenges.filter((c) => c.expires > Date.now());
     requireValue(
       !current.recentChallenges.some((c) => c.value === challenge.value),

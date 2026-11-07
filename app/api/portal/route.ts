@@ -43,7 +43,8 @@ export async function POST(request: Request) {
       input && typeof input === "object" && !Array.isArray(input),
       "Unreadable request.",
     );
-    if (input.action === "begin") return json(await begin(input.invite));
+    if (input.action === "begin")
+      return json(await begin(input.invite, input.audience ?? "client"));
     if (input.action === "finish") {
       try {
         await finish(input.response, input.invite);

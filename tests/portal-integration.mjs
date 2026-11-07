@@ -82,6 +82,39 @@ async function assistant(as, body) {
 }
 await directoryChange((d) => d.accounts.push(...fixtures.map((f) => f.record)));
 try {
+  const page = async (path, as) =>
+    fetch(origin + path, {
+      redirect: "manual",
+      headers: as ? { cookie: "kjl-session=" + as.secret } : {},
+    });
+  for (const [path, as, destination] of [
+    ["/studio", null, "/studio/login"],
+    ["/portal", null, "/portal/login"],
+    ["/studio", client, "/portal"],
+    ["/portal", owner, "/studio"],
+    ["/portal?checkout=returned", null, "/portal/login?checkout=returned"],
+  ]) {
+    const r = await page(path, as);
+    assert.equal(r.status, 307);
+    assert.equal(r.headers.get("location"), destination);
+  }
+  for (const [path, as] of [
+    ["/studio", owner],
+    ["/portal", client],
+    ["/studio/login", null],
+    ["/portal/login", null],
+  ]) {
+    const r = await page(path, as);
+    assert.equal(r.status, 200, path);
+    assert(r.headers.get("x-robots-tag").includes("noindex"));
+    const html = await r.text();
+    if (path === "/studio/login") assert(html.includes("Welcome back, Kenan."));
+    if (path === "/portal/login") assert(html.includes("Sign in to my project"));
+  }
+  assert.equal((await post(owner, { action: "begin", audience: "admin" })).status, 400);
+  console.log(
+    "Separate studio/client pages, role redirects, checkout return and private page headers verified.",
+  );
   const projectRequest = async (as, body, source = origin) => {
     const r = await fetch(origin + "/api/portal/projects", {
       method: body ? "POST" : "GET",

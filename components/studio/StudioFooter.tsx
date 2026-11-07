@@ -21,7 +21,8 @@ export default function StudioFooter() {
           <Link href="/projects">All projects</Link>
           <Link href="/pricing">Pricing</Link>
           <Link href="/privacy">Privacy</Link>
-          <Link href="/portal">Client workspace</Link>
+          <Link href="/portal/login">Client workspace</Link>
+          <Link href="/studio/login">Studio login</Link>
           <Link href="/world">Kenan World</Link>
           <a href={profile.linkedin}>
             LinkedIn <ArrowUpRight size={13} aria-hidden="true" />

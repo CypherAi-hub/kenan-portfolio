@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState, useRef, useCallback, type FormEvent } from "react";
-import { startRegistration, startAuthentication } from "@simplewebauthn/browser";
+import { matchesAudience, workspacePath, loginPath, type Audience } from "@/lib/portal/access";
 import {
   ArrowUpRight,
-  Fingerprint,
-  LockKeyhole,
   LogOut,
   CircleCheck,
   Copy,
@@ -14,7 +12,6 @@ import {
 } from "lucide-react";
 import type { PortalView, Project } from "@/lib/portal/types";
 import { phases } from "@/lib/portal/types";
-import { profile } from "@/lib/data";
 import StudioAssistant, { Appointments } from "./StudioAssistant";
 import NotificationCenter from "./NotificationCenter";
 import ProjectConnections from "./ProjectConnections";
@@ -362,46 +359,21 @@ function ProjectPanel({
     </article>
   );
 }
-export default function Portal() {
+export default function Portal({ audience }: { audience: Audience }) {
   const { view, ready, notice, setNotice, load } = useWorkspace();
-  const [invite, setInvite] = useState(""),
-    [share, setShare] = useState(""),
-    [busy, setBusy] = useState(false),
+  const [share, setShare] = useState(""),
     [selected, setSelected] = useState("");
   useEffect(() => {
-    const current = new URL(location.href),
-      raw = new URLSearchParams(current.hash.slice(1)).get("invite");
-    if (raw) {
-      setInvite(raw);
-      history.replaceState(null, "", current.pathname);
-    }
+    const current = new URL(location.href);
     if (current.searchParams.get("checkout") === "returned")
       setNotice("You’re back from Stripe. Your payment status updates after confirmation.");
     if (current.searchParams.get("checkout") === "cancelled")
       setNotice("Checkout closed. Your payment request is still available.");
   }, [setNotice]);
-  async function login() {
-    setBusy(true);
-    setNotice("");
-    try {
-      const data = await post({ action: "begin", invite: invite || undefined });
-      const response =
-        data.mode === "register"
-          ? await startRegistration({ optionsJSON: data.options })
-          : await startAuthentication({ optionsJSON: data.options });
-      await post({ action: "finish", response, invite: invite || undefined });
-      setInvite("");
-      await load();
-    } catch (err) {
-      setNotice(
-        err instanceof Error && err.name === "NotAllowedError"
-          ? "Passkey sign-in wasn’t completed. Try again when you’re ready."
-          : message(err),
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
+  useEffect(() => {
+    if (ready && !view) location.replace(loginPath(audience));
+    else if (view && !matchesAudience(view.me, audience)) location.replace(workspacePath(view.me));
+  }, [ready, view, audience]);
   const active = view?.activeClient,
     owner = view?.me.role === "owner";
   const run: Run = async (body, success) => {
@@ -429,40 +401,10 @@ export default function Portal() {
         Opening workspace…
       </div>
     );
-  if (!view)
+  if (!view || !matchesAudience(view.me, audience))
     return (
-      <div className="portal-shell portal-welcome">
-        <div>
-          <p className="portal-kicker">KJL DESIGNS / CLIENT WORKSPACE</p>
-          <h1>
-            Your project,
-            <br />
-            <em>in progress.</em>
-          </h1>
-          <p>See the latest work, review designs, and manage project payments with Kenan.</p>
-        </div>
-        <section className="portal-access">
-          <Fingerprint size={40} strokeWidth={1.35} />
-          <h2>{invite ? "Activate your workspace" : "Welcome back"}</h2>
-          <p>
-            {invite
-              ? "Create a passkey on this device to accept your private invitation."
-              : "Sign in with the passkey you set up when you accepted your invitation."}
-          </p>
-          <button className="portal-btn" disabled={busy} onClick={login}>
-            {busy
-              ? "Waiting for your device…"
-              : invite
-                ? "Create my passkey"
-                : "Sign in with a passkey"}
-            <ArrowRight size={17} />
-          </button>
-          {notice && <p role="status">{notice}</p>}
-          <small>
-            <LockKeyhole size={14} /> Invitation-only access
-          </small>
-          <a href={"mailto:" + profile.email}>Need an invitation or a new passkey?</a>
-        </section>
+      <div className="portal-shell portal-loading" aria-live="polite">
+        Opening your workspace…
       </div>
     );
   const unpaid = view.projects.reduce(

@@ -89,7 +89,7 @@ export async function verifyGoogleConnection(me: Account) {
 export async function connectGoogle(me: Account) {
   assertOwner(me);
   const { url } = await startAuthorization(connector, params(me), {
-    callbackUrl: "https://kjl-designs.vercel.app/portal",
+    callbackUrl: "https://kjl-designs.vercel.app/studio",
     prompt: "consent",
   });
   requireValue(new URL(url).protocol === "https:", "Invalid Google authorization URL.", 503);

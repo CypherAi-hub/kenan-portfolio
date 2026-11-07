@@ -27,7 +27,7 @@ account.invitation = {
 };
 account.sessions = [];
 delete account.credential;
-const url = new URL("/portal", process.env.PORTAL_ORIGIN || "https://kjl-designs.vercel.app");
+const url = new URL("/studio/login", process.env.PORTAL_ORIGIN || "https://kjl-designs.vercel.app");
 url.hash = "invite=" + raw;
 // Write the private handoff first so a disk error cannot orphan the invitation.
 await writeFile(
