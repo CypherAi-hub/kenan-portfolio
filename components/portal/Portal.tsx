@@ -16,7 +16,7 @@ import type { PortalView, Project } from "@/lib/portal/types";
 import { phases } from "@/lib/portal/types";
 import { profile } from "@/lib/data";
 import StudioAssistant, { Appointments } from "./StudioAssistant";
-import ClientNotifications from "./ClientNotifications";
+import NotificationCenter from "./NotificationCenter";
 const dollars = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 const date = (value: string) =>
@@ -503,7 +503,7 @@ export default function Portal() {
           Sign out
         </button>
       </div>
-      {!owner && <ClientNotifications me={view.me} projects={view.projects} />}
+      <NotificationCenter key={view.me.id} />
       <Appointments
         owner={owner}
         onChange={() => {

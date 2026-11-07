@@ -11,6 +11,9 @@ export type Appointment = {
   status: "requested" | "approved" | "declined";
   note: string;
   created: string;
+  reviewedAt?: string;
+  googleEvent?: string;
+  bookingProposal?: string;
 };
 export type Proposal = {
   id: string;
@@ -25,10 +28,29 @@ type Desk = {
   appointments: Appointment[];
   proposals: Proposal[];
   usage: { day: string; count: number };
+  messages?: StoredMessage[];
+};
+type StoredMessage = {
+  id: string;
+  at: string;
+  role: "user" | "assistant";
+  content: string;
+  proposalIds?: string[];
 };
 const empty = (): Desk => ({ appointments: [], proposals: [], usage: { day: "", count: 0 } });
 export const desk = () => readPrivate("owner-desk", empty);
 export const editDesk = <T>(fn: (d: Desk) => T) => editPrivate("owner-desk", empty, fn);
+export async function conversation(me: Account) {
+  assertOwner(me);
+  const data = await desk();
+  return (data.messages || []).slice(-40).map((m) => ({
+    ...m,
+    proposals: (m.proposalIds || []).flatMap((id) => {
+      const p = data.proposals.find((p) => p.id === id && p.owner === me.id);
+      return p ? [p] : [];
+    }),
+  }));
+}
 export function assertOwner(me: Account) {
   requireValue(
     me.role === "owner" && me.email.toLowerCase() === "kenanlarry8@gmail.com",
@@ -94,6 +116,11 @@ export async function reviewAppointment(me: Account, input: Record<string, unkno
     requireValue(a, "Appointment not found.", 404);
     if (a.status === input.decision) return { ok: true };
     requireValue(a.status === "requested", "This request has already been reviewed.", 409);
+    requireValue(
+      !a.bookingProposal,
+      "A Calendar invitation is being processed. Check its delivery in the assistant before changing this request.",
+      409,
+    );
     requireValue(new Date(a.start).getTime() > Date.now(), "This meeting time has passed.", 409);
     if (input.decision === "approved")
       requireValue(
@@ -108,6 +135,7 @@ export async function reviewAppointment(me: Account, input: Record<string, unkno
         409,
       );
     a.status = input.decision as "approved" | "declined";
+    a.reviewedAt = new Date().toISOString();
     return { ok: true };
   });
 }
@@ -144,5 +172,17 @@ export async function studioContext(me: Account) {
     clients: records,
     appointments: await appointmentView(me),
     now: new Date().toISOString(),
+    recentDeliveries: (await desk()).proposals
+      .filter((p) => p.owner === me.id && p.delivery)
+      .slice(-30)
+      .map((p) => ({
+        action: p.input.action,
+        client: p.input.client,
+        title: p.input.title,
+        to: p.input.to,
+        start: p.input.start,
+        status: p.delivery!.status,
+        at: p.delivery!.at,
+      })),
   };
 }

@@ -269,3 +269,21 @@
   background: #f0f7f3;
   margin: 0;
 }
+
+.portal-notifications strong {
+  display: block;
+  margin-top: 5px;
+}
+.portal-notifications > p {
+  padding: 12px 0;
+}
+.portal-meetings > .assistant-proposal {
+  margin-block: 18px;
+  max-width: 640px;
+}
+
+.assistant-proposal dd,
+.portal-notifications p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

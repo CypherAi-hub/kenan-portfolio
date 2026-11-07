@@ -13,13 +13,98 @@ async function api(input: Record<string, unknown>) {
   if (!r.ok) throw new Error(data.error || "Please try again.");
   return data;
 }
+function ProposalCard({
+  proposal: p,
+  busy,
+  applied,
+  onAction,
+}: {
+  proposal: Proposal;
+  busy: boolean;
+  applied?: boolean;
+  onAction: (action: "apply" | "reconcile-calendar", id: string) => Promise<void>;
+}) {
+  const done = applied || p.status === "applied",
+    expired = Date.now() - p.created > 3600000;
+  return (
+    <div className="assistant-proposal">
+      <strong>{p.label}</strong>
+      <dl>
+        {Object.entries(p.input)
+          .filter(
+            ([key, value]) =>
+              value &&
+              ["to", "body", "phase", "title", "brief", "amount", "decision", "start"].includes(
+                key,
+              ),
+          )
+          .map(([key, value]) => (
+            <div key={key}>
+              <dt>{key === "to" ? "Recipient" : key}</dt>
+              <dd>
+                {key === "start"
+                  ? new Date(String(value)).toLocaleString(undefined, {
+                      dateStyle: "full",
+                      timeStyle: "long",
+                    }) +
+                    " (" +
+                    String(value) +
+                    ")"
+                  : String(value)}
+              </dd>
+            </div>
+          ))}
+      </dl>
+      {p.delivery && (
+        <p role="status">
+          Delivery:{" "}
+          {p.delivery.status === "sent"
+            ? "Confirmed by Google"
+            : p.delivery.status === "failed"
+              ? "Not confirmed. Review the delivery before preparing another."
+              : "Awaiting confirmation. Check delivery before preparing another."}
+        </p>
+      )}
+      <button
+        disabled={busy || done || expired || !!p.delivery}
+        onClick={() => void onAction("apply", p.id)}
+      >
+        {done ? (
+          <>
+            <Check size={14} />
+            Applied
+          </>
+        ) : expired ? (
+          "Expired · prepare again"
+        ) : p.input.action === "email" ? (
+          "Approve and send email"
+        ) : p.input.action === "calendar" ? (
+          "Approve meeting and send invitation"
+        ) : (
+          "Apply this change"
+        )}
+      </button>
+      {!done && p.delivery && p.input.action === "calendar" && (
+        <button disabled={busy} onClick={() => void onAction("reconcile-calendar", p.id)}>
+          Check Calendar delivery
+        </button>
+      )}
+    </div>
+  );
+}
 export function Appointments({ owner, onChange }: { owner: boolean; onChange: () => void }) {
   const [items, setItems] = useState<Appointment[]>([]),
     [notice, setNotice] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [googleConnected, setGoogleConnected] = useState(false),
+    [proposal, setProposal] = useState<Proposal | null>(null);
   async function load() {
-    const r = await fetch("/api/portal/assistant", { cache: "no-store" });
-    if (r.ok) setItems((await r.json()).appointments);
+    const r = await fetch("/api/portal/assistant?section=appointments", { cache: "no-store" });
+    if (r.ok) {
+      const data = await r.json();
+      setItems(data.appointments);
+      setGoogleConnected(!!data.google?.connected);
+    }
   }
   useEffect(() => {
     void load();
@@ -38,6 +123,8 @@ export function Appointments({ owner, onChange }: { owner: boolean; onChange: ()
       await api(input);
       await load();
       onChange();
+      setProposal(null);
+      window.dispatchEvent(new Event("kjl-workspace-update"));
       setNotice("Appointment updated.");
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Try again.");
@@ -53,10 +140,20 @@ export function Appointments({ owner, onChange }: { owner: boolean; onChange: ()
         <span>{upcoming.filter((a) => a.status === "requested").length} awaiting review</span>
       </summary>
       <p className="portal-note">
-        Times below display in your device’s timezone. Portal appointments reserve time here. Google
-        Calendar bookings remain on the booking page.
+        Times below display in your device’s timezone. When Google is connected, review the
+        invitation before approving a meeting. Approval checks your calendar, sends the invitation,
+        and updates the client workspace.
       </p>
       {notice && <p role="status">{notice}</p>}
+      {proposal && (
+        <ProposalCard
+          proposal={proposal}
+          busy={busy}
+          onAction={async (action, id) => {
+            await act({ action, id });
+          }}
+        />
+      )}
       {upcoming.length === 0 && <p>No upcoming portal appointments.</p>}
       {upcoming.map((a) => (
         <div className="portal-meeting" key={a.id}>
@@ -70,18 +167,45 @@ export function Appointments({ owner, onChange }: { owner: boolean; onChange: ()
               })}{" "}
               · {a.minutes} minutes
             </p>
-            <span>{a.status}</span>
+            <span>
+              {a.status}
+              {a.googleEvent ? " · Google Calendar invitation confirmed" : ""}
+            </span>
+            {a.bookingProposal && (
+              <p>
+                Calendar delivery is awaiting confirmation. Check its delivery in the studio
+                assistant.
+              </p>
+            )}
             {a.note && <p>{a.note}</p>}
           </div>
-          {owner && a.status === "requested" && (
+          {owner && a.status === "requested" && !a.bookingProposal && (
             <div>
               <button
                 disabled={busy}
-                onClick={() =>
-                  act({ action: "review-appointment", appointment: a.id, decision: "approved" })
-                }
+                onClick={async () => {
+                  if (!googleConnected) {
+                    await act({
+                      action: "review-appointment",
+                      appointment: a.id,
+                      decision: "approved",
+                    });
+                    return;
+                  }
+                  setBusy(true);
+                  setNotice("");
+                  try {
+                    const data = await api({ action: "prepare-appointment", appointment: a.id });
+                    setProposal(data.proposals[0]);
+                    window.dispatchEvent(new Event("kjl-workspace-update"));
+                  } catch (e) {
+                    setNotice(e instanceof Error ? e.message : "Could not prepare the invitation.");
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
               >
-                Approve
+                {googleConnected ? "Review approval & invitation" : "Approve in portal"}
               </button>
               <button
                 disabled={busy}
@@ -142,13 +266,27 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
       null,
     ),
     [connectionNotice, setConnectionNotice] = useState(""),
+    [loading, setLoading] = useState(false),
     [applied, setApplied] = useState<string[]>([]);
+  const inFlight = useRef(false);
+  async function refreshConversation() {
+    const r = await fetch("/api/portal/assistant", { cache: "no-store" });
+    if (!r.ok) throw new Error("Could not load your saved conversation.");
+    const d = await r.json();
+    setGoogle(d.google || null);
+    setMessages(d.conversation || []);
+  }
   useEffect(() => {
-    if (open)
-      fetch("/api/portal/assistant", { cache: "no-store" })
-        .then((r) => r.json())
-        .then((d) => setGoogle(d.google || null))
-        .catch(() => setGoogle(null));
+    if (!open) return;
+    setLoading(true);
+    void refreshConversation()
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+    const refresh = () => {
+      if (!inFlight.current) void refreshConversation().catch(() => {});
+    };
+    window.addEventListener("kjl-workspace-update", refresh);
+    return () => window.removeEventListener("kjl-workspace-update", refresh);
   }, [open]);
   const input = useRef<HTMLTextAreaElement>(null),
     launch = useRef<HTMLButtonElement>(null),
@@ -164,14 +302,14 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
     launch.current?.focus();
   }
   async function send(message: string) {
-    if (busy || !message.trim()) return;
+    if (busy || loading || !message.trim()) return;
+    inFlight.current = true;
     setBusy(true);
     setError("");
     setText("");
-    const history = messages.map(({ role, content }) => ({ role, content }));
     setMessages((m) => [...m, { role: "user", content: message }]);
     try {
-      const data = await api({ action: "ask", message, history });
+      const data = await api({ action: "ask", message });
       setMessages((m) => [
         ...m,
         { role: "assistant", content: data.reply, proposals: data.proposals },
@@ -179,7 +317,9 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
     } catch (e) {
       setError(e instanceof Error ? e.message : "Please try again.");
       setText(message);
+      await refreshConversation().catch(() => {});
     } finally {
+      inFlight.current = false;
       setBusy(false);
     }
   }
@@ -298,75 +438,35 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
                 <small>{m.role === "user" ? "You" : "Assistant"}</small>
                 <p>{m.content}</p>
                 {m.proposals?.map((p) => (
-                  <div className="assistant-proposal" key={p.id}>
-                    <strong>{p.label}</strong>
-                    <dl>
-                      {Object.entries(p.input)
-                        .filter(
-                          ([key, value]) =>
-                            value &&
-                            [
-                              "to",
-                              "body",
-                              "phase",
-                              "title",
-                              "brief",
-                              "amount",
-                              "decision",
-                              "start",
-                            ].includes(key),
-                        )
-                        .map(([key, value]) => (
-                          <div key={key}>
-                            <dt>{key}</dt>
-                            <dd>
-                              {key === "start"
-                                ? new Date(String(value)).toLocaleString(undefined, {
-                                    dateStyle: "full",
-                                    timeStyle: "long",
-                                  }) +
-                                  " (" +
-                                  String(value) +
-                                  ")"
-                                : String(value)}
-                            </dd>
-                          </div>
-                        ))}
-                    </dl>
-                    <button
-                      disabled={busy || applied.includes(p.id)}
-                      onClick={async () => {
-                        setBusy(true);
-                        setError("");
-                        try {
-                          await api({ action: "apply", id: p.id });
-                          setApplied((a) => [...a, p.id]);
-                          onChange();
-                        } catch (e) {
-                          setError(e instanceof Error ? e.message : "Could not apply.");
-                        } finally {
-                          setBusy(false);
-                        }
-                      }}
-                    >
-                      {applied.includes(p.id) ? (
-                        <>
-                          <Check size={14} />
-                          Applied
-                        </>
-                      ) : p.input.action === "email" ? (
-                        "Approve and send email"
-                      ) : p.input.action === "calendar" ? (
-                        "Approve event and send invitation"
-                      ) : (
-                        "Apply this change"
-                      )}
-                    </button>
-                  </div>
+                  <ProposalCard
+                    key={p.id}
+                    proposal={p}
+                    busy={busy || loading}
+                    applied={applied.includes(p.id)}
+                    onAction={async (action, id) => {
+                      inFlight.current = true;
+                      setBusy(true);
+                      setError("");
+                      try {
+                        await api({ action, id });
+                        setApplied((a) => [...a, id]);
+                        await refreshConversation();
+                        onChange();
+                      } catch (e) {
+                        setError(e instanceof Error ? e.message : "Could not apply.");
+                        await refreshConversation().catch(() => {});
+                      } finally {
+                        inFlight.current = false;
+                        setBusy(false);
+                      }
+                    }}
+                  />
                 ))}
               </section>
             ))}
-            {busy && <p role="status">Working…</p>}
+            {(busy || loading) && (
+              <p role="status">{loading ? "Loading saved conversation…" : "Working…"}</p>
+            )}
             <div ref={end} />
           </div>
           {error && (
@@ -392,7 +492,10 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
               placeholder="Ask about clients, projects, or meetings…"
               rows={2}
             />
-            <button disabled={busy || !text.trim()} aria-label="Send message to assistant">
+            <button
+              disabled={busy || loading || !text.trim()}
+              aria-label="Send message to assistant"
+            >
               <Send size={18} />
             </button>
           </form>

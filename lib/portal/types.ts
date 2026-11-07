@@ -13,6 +13,7 @@ export type Update = {
   id: string;
   at: string;
   author: string;
+  authorId?: string;
   body: string;
   phase: Phase;
   url?: string;

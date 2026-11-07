@@ -44,8 +44,9 @@ export default function Privacy() {
           check Calendar availability. The studio currently uses the primary calendar for
           availability and event creation. It does not request permission to read Gmail inbox
           messages. The owner reviews each proposed recipient, message, or calendar invitation
-          before approving an external action. Approval of a portal appointment by itself does not
-          create a Google Calendar event.
+          before approving an external action. When Google is connected, combined meeting approval
+          prepares a Calendar invitation for owner review before approving the portal request. A
+          separately labeled portal-only approval reserves time only in the workspace.
         </p>
         <p>
           Google tokens are managed by Vercel Connect and used by server code. They are not returned
@@ -66,11 +67,12 @@ export default function Privacy() {
         </p>
         <h2>Private studio assistant</h2>
         <p>
-          The owner assistant sends the owner’s request and relevant client project records to
-          OpenAI to generate replies and proposed actions. Requests use the API’s store:false
-          setting. Do not include passwords, payment credentials, or unnecessary sensitive
-          information in project notes. The assistant prepares changes for owner review. It cannot
-          grant account access or directly charge a saved card.
+          Recent assistant conversations and action reviews are saved in private studio storage. The
+          owner assistant sends the owner’s request, recent conversation, and relevant client
+          project and delivery records to OpenAI to generate replies and proposed actions. Requests
+          use the API’s store:false setting. Do not include passwords, payment credentials, or
+          unnecessary sensitive information in project notes. The assistant prepares changes for
+          owner review. It cannot grant account access or directly charge a saved card.
         </p>
         <h2>Service providers and website metrics</h2>
         <p>

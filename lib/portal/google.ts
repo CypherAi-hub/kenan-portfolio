@@ -5,7 +5,7 @@ import {
   UserAuthorizationRequiredError,
   NoValidTokenError,
 } from "@vercel/connect";
-import { assertOwner, editDesk } from "./desk";
+import { assertOwner, editDesk, desk } from "./desk";
 import { directory, requireValue } from "./store";
 import type { Account } from "./types";
 const connector = "google/kjl-studio-google";
@@ -169,6 +169,41 @@ export async function applyGoogleAction(me: Account, id: string, input: Record<s
     );
     if (isCalendar)
       requireValue(
+        !d.appointments.some(
+          (a) =>
+            a.id !== input.appointment &&
+            a.status === "approved" &&
+            Math.abs(Date.parse(a.start) - start.getTime()) < 30 * 60000,
+        ),
+        "This time overlaps an approved portal appointment.",
+        409,
+      );
+    if (isCalendar && input.appointment) {
+      const a = d.appointments.find((a) => a.id === input.appointment);
+      requireValue(
+        a &&
+          a.client === client.id &&
+          a.start === start.toISOString() &&
+          a.title === title &&
+          a.status === "requested" &&
+          !a.bookingProposal,
+        "This appointment changed or is already being processed. Review it again.",
+        409,
+      );
+      requireValue(
+        !d.appointments.some(
+          (other) =>
+            other.id !== a.id &&
+            other.status === "approved" &&
+            Math.abs(Date.parse(other.start) - start.getTime()) < 30 * 60000,
+        ),
+        "This time overlaps an approved portal appointment.",
+        409,
+      );
+      a.bookingProposal = id;
+    }
+    if (isCalendar)
+      requireValue(
         !d.proposals.some(
           (other) =>
             other.id !== id &&
@@ -226,6 +261,10 @@ export async function applyGoogleAction(me: Account, id: string, input: Record<s
             status: r.status >= 500 ? "unknown" : "failed",
             at: new Date().toISOString(),
           };
+        if (r.status < 500) {
+          const a = d.appointments.find((a) => a.bookingProposal === id);
+          if (a) delete a.bookingProposal;
+        }
       });
       requireValue(
         false,
@@ -244,6 +283,13 @@ export async function applyGoogleAction(me: Account, id: string, input: Record<s
         at: new Date().toISOString(),
         reference: String(result.id || ""),
       };
+      const appointment = d.appointments.find((a) => a.bookingProposal === id);
+      if (appointment) {
+        appointment.status = "approved";
+        appointment.googleEvent = String(result.id);
+        appointment.reviewedAt = new Date().toISOString();
+        delete appointment.bookingProposal;
+      }
     });
     return { ok: true };
   } catch (e) {
@@ -255,4 +301,49 @@ export async function applyGoogleAction(me: Account, id: string, input: Record<s
       });
     throw e;
   }
+}
+
+export async function reconcileCalendar(me: Account, id: unknown) {
+  assertOwner(me);
+  const p = (await desk()).proposals.find((p) => p.id === id && p.owner === me.id);
+  requireValue(
+    p && p.input.action === "calendar" && p.delivery,
+    "Choose a Calendar delivery to check.",
+    404,
+  );
+  if (p.status === "applied") return { ok: true };
+  await verified(me);
+  const eventId = createHash("sha256").update(p.id).digest("hex");
+  const r = await google(
+    me,
+    "https://www.googleapis.com/calendar/v3/calendars/primary/events/" + eventId,
+  );
+  requireValue(
+    r.ok,
+    "Google has not confirmed this event. Check your Calendar before preparing another invitation.",
+    409,
+  );
+  const event = await r.json();
+  requireValue(
+    event.status !== "cancelled" &&
+      event.start?.dateTime &&
+      Date.parse(event.start.dateTime) === Date.parse(String(p.input.start)) &&
+      event.attendees?.some((a: { email: string }) => a.email === p.input.to),
+    "The Calendar event differs from this proposal. Review it directly in Google Calendar.",
+    409,
+  );
+  await editDesk((d) => {
+    const current = d.proposals.find((x) => x.id === p.id && x.owner === me.id);
+    requireValue(current, "Proposal not found.", 404);
+    current.status = "applied";
+    current.delivery = { status: "sent", at: new Date().toISOString(), reference: eventId };
+    const a = d.appointments.find((a) => a.bookingProposal === p.id);
+    if (a) {
+      a.status = "approved";
+      a.googleEvent = eventId;
+      a.reviewedAt = new Date().toISOString();
+      delete a.bookingProposal;
+    }
+  });
+  return { ok: true };
 }

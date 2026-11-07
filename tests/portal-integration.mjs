@@ -158,6 +158,14 @@ try {
   assert.equal((await assistant(other, { action: "apply", id: "forged" })).status, 403);
   assert.equal((await assistant(client, { action: "connect-google" })).status, 403);
   assert.equal((await assistant(client, { action: "verify-google" })).status, 403);
+  assert.equal(
+    (await assistant(client, { action: "prepare-appointment", appointment: "forged" })).status,
+    403,
+  );
+  assert.equal(
+    (await assistant(client, { action: "reconcile-calendar", id: "forged" })).status,
+    403,
+  );
   assert.equal((await assistant(other, { action: "connect-google" })).status, 403);
   const start = new Date(Date.now() + 3 * 86400000).toISOString();
   assert.equal(
@@ -238,6 +246,22 @@ try {
       JSON.stringify(both),
     );
     assert.equal((await view()).projects[0].updates.length, before + 1);
+    const saved = await (
+      await fetch(origin + "/api/portal/assistant", {
+        headers: { cookie: "kjl-session=" + owner.secret },
+      })
+    ).json();
+    assert(
+      saved.conversation.some((m) =>
+        m.proposals?.some((p) => p.id === proposal.id && p.status === "applied"),
+      ),
+    );
+    const clientDesk = await (
+      await fetch(origin + "/api/portal/assistant", {
+        headers: { cookie: "kjl-session=" + client.secret },
+      })
+    ).json();
+    assert.equal(clientDesk.conversation, undefined);
     console.log("Live model proposal generated and applied once under concurrent replay.");
   }
   console.log(
@@ -262,6 +286,31 @@ try {
   assert.equal(paid.test, true);
   assert.equal(await webhook(session), 200);
   assert.equal((await view()).projects[0].payments[0].paidAt, paid.paidAt);
+  async function notices(as) {
+    return (
+      await (
+        await fetch(origin + "/api/portal/assistant?section=notifications", {
+          headers: { cookie: "kjl-session=" + as.secret },
+        })
+      ).json()
+    ).notifications;
+  }
+  const mine = await notices(client),
+    unrelated = await notices(other),
+    ownerNotices = await notices(owner);
+  assert(mine.items.some((n) => n.kind === "project"));
+  assert(mine.items.some((n) => n.kind === "payment"));
+  assert(!unrelated.items.some((n) => n.kind === "project" || n.kind === "payment"));
+  assert(ownerNotices.items.some((n) => n.title.includes("reviewed")));
+  assert.equal(
+    (await assistant(client, { action: "read-notifications", client: other.record.id })).status,
+    200,
+  );
+  assert.equal((await notices(client)).unread, 0);
+  assert((await notices(owner)).unread > 0);
+  console.log(
+    "Saved assistant proposals, client notification privacy and account-scoped read state verified.",
+  );
   console.log(
     "Passed cross-client isolation, owner-only writes, origin checks, concurrent updates, one-time review, signature and amount checks, and webhook replay.",
   );
@@ -278,6 +327,7 @@ try {
       (a) => ![client.record.id, other.record.id].includes(a.client),
     );
     data.proposals = data.proposals.filter((p) => p.owner !== owner.record.id);
+    data.messages = [];
     await put(deskPath, JSON.stringify(data), {
       access: "private",
       allowOverwrite: true,
@@ -285,5 +335,9 @@ try {
       ifMatch: deskItem.blob.etag.replace(/^W\//, ""),
       contentType: "application/json",
     });
+  }
+  for (const f of fixtures) {
+    const key = ns + "/notification-read-" + f.record.id + ".json";
+    if (await get(key, { access: "private", useCache: false })) await del(key);
   }
 }

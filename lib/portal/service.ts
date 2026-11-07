@@ -154,6 +154,7 @@ export async function mutate(me: Account, input: Input, operationId?: string) {
         id: randomUUID(),
         at: new Date().toISOString(),
         author: me.name,
+        authorId: me.id,
         body,
         phase: project.phase,
         url,

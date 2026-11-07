@@ -14,8 +14,10 @@ async function harness({
   busy = false,
   fail = false,
   missingScope = false,
+  failCalendarAfterAccept = false,
 } = {}) {
-  const state = { proposals: [] },
+  const state = { proposals: [], appointments: [] },
+    events = new Map(),
     calls = [];
   const context = vm.createContext({
     Buffer,
@@ -34,6 +36,16 @@ async function harness({
       if (url.includes("freeBusy"))
         return Response.json({ calendars: { primary: { busy: busy ? [{ start: "busy" }] : [] } } });
       calls.push({ url, init });
+      if (url.includes("/events/") && !init.method)
+        return events.has(url.split("/").at(-1))
+          ? Response.json(events.get(url.split("/").at(-1)))
+          : Response.json({ error: "Not found" }, { status: 404 });
+      if (url.includes("/events?") && init.method === "POST") {
+        const event = JSON.parse(init.body);
+        events.set(event.id, event);
+        if (failCalendarAfterAccept) throw new Error("Calendar response lost");
+        return Response.json({ id: event.id });
+      }
       if (fail) throw new Error("network failed");
       return Response.json({ id: "provider-receipt" });
     },
@@ -57,6 +69,7 @@ async function harness({
       assertOwner: (me) =>
         requireValue(me.role === "owner" && me.email === owner.email, "Owner required", 403),
       editDesk: async (fn) => fn(state),
+      desk: async () => state,
     },
     "./store": {
       requireValue,
@@ -163,4 +176,40 @@ test("connection check requires all permissions and working Calendar access", as
     h.api.verifyGoogleConnection({ ...owner, role: "client" }),
     /Owner required/,
   );
+});
+
+function linkedMeeting(h, id) {
+  const input = h.proposal(id, "calendar");
+  input.appointment = "meeting-" + id;
+  h.state.appointments.push({
+    id: input.appointment,
+    client: input.client,
+    start: input.start,
+    title: input.title,
+    minutes: 30,
+    status: "requested",
+  });
+  return input;
+}
+test("one approval sends one Calendar invitation and approves the portal request", async () => {
+  const h = await harness(),
+    input = linkedMeeting(h, "linked");
+  await Promise.allSettled([
+    h.api.applyGoogleAction(owner, "linked", input),
+    h.api.applyGoogleAction(owner, "linked", input),
+  ]);
+  assert.equal(h.calls.length, 1);
+  assert.equal(h.state.appointments[0].status, "approved");
+  assert.ok(h.state.appointments[0].googleEvent);
+  assert.equal(h.state.appointments[0].bookingProposal, undefined);
+});
+test("a lost Calendar response can be reconciled without sending another invitation", async () => {
+  const h = await harness({ failCalendarAfterAccept: true }),
+    input = linkedMeeting(h, "lost");
+  await assert.rejects(h.api.applyGoogleAction(owner, "lost", input), /Calendar response lost/);
+  assert.equal(h.state.appointments[0].status, "requested");
+  assert.equal(h.state.proposals[0].delivery.status, "unknown");
+  await h.api.reconcileCalendar(owner, "lost");
+  assert.equal(h.state.appointments[0].status, "approved");
+  assert.equal(h.calls.filter((c) => c.init.method === "POST").length, 1);
 });
