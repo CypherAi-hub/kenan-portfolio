@@ -9,7 +9,11 @@ Verified on the KJL Designs live account on November 7, 2026:
 - Other existing enabled methods include Link, Amazon Pay, Klarna and regional payment methods. Eligibility is decided by Stripe per checkout.
 - Stablecoins and Crypto activation was requested and approved during this update. Stripe now shows Enabled. It can be offered dynamically to eligible customers. The account details show a USD 0.01–10,000 transaction range and USD presentment.
 
-Stripe documents USDC on Solana, Ethereum, Polygon, Base and Tempo among supported crypto options. Native BTC, ETH or SOL availability varies by merchant; it has not been confirmed for this account. No direct wallet address, seed phrase, custodial crypto account or unverified payment button was added.
+Live unpaid checkout verification confirmed the crypto redirect and wallet choices: Coinbase Wallet, Phantom, MetaMask, Crypto.com Pay and Trust. Direct-deposit token choices include USDC on Ethereum, Polygon, Solana, Base and Tempo; USDG on Solana; OUSD on Tempo, Base, Solana and Ethereum; and CASH on Solana. These are observed provider choices as of November 7, not hardcoded token/network support in the application.
+
+Crypto.com Pay is offered in this account’s crypto checkout. Its current provider documentation lists BTC as a supported payment currency. This is a provider-mediated Bitcoin payment route; no BTC transaction was performed in QA. Native SOL was not confirmed; Solana-network stablecoin payments were confirmed. No merchant wallet address, seed phrase or custodial account was created.
+
+The temporary live verification link was for an unpaid USD 1 item, with no real payment submitted. It is deactivated and its verification product archived after review.
 
 Old open sessions with an explicit card-only filter are expired and replaced with a new idempotent invoice attempt. If a customer completes payment during that refresh, the server reconciles the payment instead of creating another checkout.
 
@@ -29,3 +33,5 @@ References:
 - https://docs.stripe.com/apple-pay?platform=web
 - https://docs.stripe.com/payments/accept-stablecoin-payments?payment-ui=checkout
 - https://support.stripe.com/user/topics/stablecoin-and-crypto-payments?locale=en-GB
+
+- https://help.crypto.com/en/articles/6075352-what-are-the-supported-payment-currencies
