@@ -38,6 +38,10 @@ try {
     throw new Error("A live key for the new KJL Designs account is required.");
   const stripe = new Stripe(key);
   const account = await stripe.accounts.retrieve();
+  if (account.id !== "acct_1UZDdQDGtocwlzwU")
+    throw new Error(
+      "Use the live key from the KJL Designs account. Switch to KJL Designs in Stripe and try again.",
+    );
   if (!account.charges_enabled)
     throw new Error(
       "Finish the activation steps Stripe shows under Payments, then run this again.",
