@@ -19,6 +19,7 @@ export default function StudioFooter() {
         <nav aria-label="Footer navigation">
           <Link href="/projects">All projects</Link>
           <Link href="/pricing">Pricing</Link>
+          <Link href="/portal">Client workspace</Link>
           <Link href="/world">Kenan World</Link>
           <a href={profile.linkedin}>
             LinkedIn <ArrowUpRight size={13} aria-hidden="true" />

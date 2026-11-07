@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import SiteMetrics from "@/components/portal/SiteMetrics";
 import SmoothScroll from "@/components/effects/SmoothScroll";
 import "./globals.css";
 import "./studio.css";
@@ -39,8 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="bg-bg text-fg antialiased">
         <SmoothScroll>{children}</SmoothScroll>
-        <Analytics />
-        <SpeedInsights />
+        <SiteMetrics />
       </body>
     </html>
   );
