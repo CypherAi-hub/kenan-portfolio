@@ -157,6 +157,7 @@ try {
   );
   assert.equal((await assistant(other, { action: "apply", id: "forged" })).status, 403);
   assert.equal((await assistant(client, { action: "connect-google" })).status, 403);
+  assert.equal((await assistant(client, { action: "verify-google" })).status, 403);
   assert.equal((await assistant(other, { action: "connect-google" })).status, 403);
   const start = new Date(Date.now() + 3 * 86400000).toISOString();
   assert.equal(

@@ -59,6 +59,33 @@ export async function googleStatus(me: Account) {
     };
   }
 }
+export async function verifyGoogleConnection(me: Account) {
+  assertOwner(me);
+  const email = await verified(me),
+    key = await token(me);
+  const response = await fetch(
+    "https://oauth2.googleapis.com/tokeninfo?access_token=" + encodeURIComponent(key),
+    { cache: "no-store", signal: AbortSignal.timeout(15000), redirect: "error" },
+  );
+  requireValue(
+    response.ok,
+    "Google could not confirm the connection permissions. Reconnect Google.",
+    503,
+  );
+  const info = await response.json();
+  const granted = new Set(String(info.scope || "").split(" "));
+  requireValue(
+    scopes.slice(2).every((scope) => granted.has(scope)),
+    "Google is missing email or Calendar permissions. Reconnect and review the requested permissions.",
+    409,
+  );
+  await freeBusy(me, new Date(Date.now() + 86400000).toISOString());
+  return {
+    ok: true,
+    email,
+    message: "Email sending permission and primary Calendar access verified.",
+  };
+}
 export async function connectGoogle(me: Account) {
   assertOwner(me);
   const { url } = await startAuthorization(connector, params(me), {

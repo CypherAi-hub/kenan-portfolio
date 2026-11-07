@@ -242,3 +242,30 @@
     gap: 6px;
   }
 }
+
+.assistant-google {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  padding: 10px 18px;
+  background: #f0f7f3;
+  border-bottom: 1px solid #d4e4da;
+  font-size: 12px;
+}
+.assistant-google button {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: #17664f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.assistant-connection-notice {
+  padding: 10px 18px;
+  font-size: 12px;
+  background: #f0f7f3;
+  margin: 0;
+}

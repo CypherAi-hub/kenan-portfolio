@@ -141,6 +141,7 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
     [google, setGoogle] = useState<{ connected: boolean; email?: string; error?: string } | null>(
       null,
     ),
+    [connectionNotice, setConnectionNotice] = useState(""),
     [applied, setApplied] = useState<string[]>([]);
   useEffect(() => {
     if (open)
@@ -219,7 +220,27 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
           </header>
           <div className="assistant-google">
             {google?.connected ? (
-              <small>Google connected · {google.email}</small>
+              <>
+                <small>Google connected · {google.email}</small>
+                <button
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    setError("");
+                    setConnectionNotice("");
+                    try {
+                      const data = await api({ action: "verify-google" });
+                      setConnectionNotice(data.message);
+                    } catch (e) {
+                      setError(e instanceof Error ? e.message : "Could not verify Google.");
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                >
+                  Check Google connection
+                </button>
+              </>
             ) : (
               <button
                 disabled={busy}
@@ -242,6 +263,11 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
               </button>
             )}
           </div>
+          {connectionNotice && (
+            <p className="assistant-connection-notice" role="status">
+              {connectionNotice}
+            </p>
+          )}
           <div
             className="assistant-conversation"
             data-lenis-prevent

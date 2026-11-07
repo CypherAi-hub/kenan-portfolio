@@ -9,7 +9,12 @@ const source = ts.transpileModule(
   { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } },
 ).outputText;
 const owner = { id: "owner", role: "owner", email: "kenanlarry8@gmail.com" };
-async function harness({ email = "cypheros.ai@gmail.com", busy = false, fail = false } = {}) {
+async function harness({
+  email = "cypheros.ai@gmail.com",
+  busy = false,
+  fail = false,
+  missingScope = false,
+} = {}) {
   const state = { proposals: [] },
     calls = [];
   const context = vm.createContext({
@@ -19,6 +24,12 @@ async function harness({ email = "cypheros.ai@gmail.com", busy = false, fail = f
     AbortSignal,
     process: { env: {} },
     fetch: async (url, init) => {
+      if (url.includes("tokeninfo"))
+        return Response.json({
+          scope: missingScope
+            ? "openid email"
+            : "openid email https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/calendar.events.owned https://www.googleapis.com/auth/calendar.freebusy",
+        });
       if (url.includes("userinfo")) return Response.json({ email, email_verified: true });
       if (url.includes("freeBusy"))
         return Response.json({ calendars: { primary: { busy: busy ? [{ start: "busy" }] : [] } } });
@@ -138,4 +149,18 @@ test("clients cannot access external tools", async () => {
   await assert.rejects(h.api.applyGoogleAction(client, "eight", input), /Owner required/);
   await assert.rejects(h.api.connectGoogle(client), /Owner required/);
   assert.equal(h.calls.length, 0);
+});
+
+test("connection check requires all permissions and working Calendar access", async () => {
+  const h = await harness();
+  const result = await h.api.verifyGoogleConnection(owner);
+  assert.equal(result.email, "cypheros.ai@gmail.com");
+  assert.equal(result.ok, true);
+  assert.equal(h.calls.length, 0);
+  const missing = await harness({ missingScope: true });
+  await assert.rejects(missing.api.verifyGoogleConnection(owner), /missing email or Calendar/);
+  await assert.rejects(
+    h.api.verifyGoogleConnection({ ...owner, role: "client" }),
+    /Owner required/,
+  );
 });

@@ -1,4 +1,4 @@
-import { googleStatus, connectGoogle } from "@/lib/portal/google";
+import { googleStatus, connectGoogle, verifyGoogleConnection } from "@/lib/portal/google";
 import { identity, origin } from "@/lib/portal/auth";
 import {
   assertOwner,
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
     requireValue(input && typeof input === "object" && !Array.isArray(input), "Invalid request.");
     if (input.action === "request-appointment") return json(await requestAppointment(me, input));
     assertOwner(me);
+    if (input.action === "verify-google") return json(await verifyGoogleConnection(me));
     if (input.action === "connect-google") return json(await connectGoogle(me));
     if (input.action === "review-appointment") return json(await reviewAppointment(me, input));
     if (input.action === "apply") return json(await applyProposal(me, input.id));
