@@ -328,7 +328,9 @@ function ProjectPanel({
           {project.payments.length > 0 && mode !== "offline" && (
             <p className="portal-note">
               Secure checkout offers eligible cards and wallets, including Apple Pay, Google Pay and
-              Cash App Pay. Available options depend on your device, location and payment amount.
+              Cash App Pay, plus supported crypto wallets. Checkout shows the eligible tokens and
+              networks for crypto. Available options depend on your device, location and payment
+              amount.
             </p>
           )}
           {project.payments.map((b) => (

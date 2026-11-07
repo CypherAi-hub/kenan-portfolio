@@ -119,7 +119,7 @@ export default function PricingPage() {
               ],
               [
                 "Which payment methods can I use?",
-                "Your private client workspace opens secure checkout with eligible cards and digital wallets, including Apple Pay, Google Pay and Cash App Pay. The options shown depend on your device, location and payment amount. You’ll see the available methods before confirming payment.",
+                "Your private client workspace opens secure checkout with eligible cards and digital wallets, including Apple Pay, Google Pay and Cash App Pay, plus supported crypto wallets. For crypto, use the token and network choices shown at checkout. Available methods depend on your device, location and payment amount. You’ll see the available methods before confirming payment.",
               ],
               [
                 "What do I need to provide?",
