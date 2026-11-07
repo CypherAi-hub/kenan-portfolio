@@ -359,7 +359,9 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
             </button>
           </header>
           <div className="assistant-google">
-            {google?.connected ? (
+            {loading && google === null ? (
+              <small>Checking Google connection…</small>
+            ) : google?.connected ? (
               <>
                 <small>Google connected · {google.email}</small>
                 <button
@@ -500,8 +502,8 @@ export default function StudioAssistant({ onChange }: { onChange: () => void }) 
             </button>
           </form>
           <footer>
-            Review every recipient, message and time before approving. Google events check your
-            primary Calendar; portal appointment approvals are separate.
+            Review every recipient, message and time before approving. Your recent chat is saved
+            privately. Meeting approval can include a Google Calendar invitation.
           </footer>
         </aside>
       )}

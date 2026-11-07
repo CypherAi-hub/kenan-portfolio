@@ -172,6 +172,15 @@ export async function studioContext(me: Account) {
     clients: records,
     appointments: await appointmentView(me),
     now: new Date().toISOString(),
+    recentProposals: (await desk()).proposals
+      .filter((p) => p.owner === me.id)
+      .slice(-8)
+      .map((p) => ({
+        label: p.label,
+        status: p.status,
+        input: p.input,
+        delivery: p.delivery?.status,
+      })),
     recentDeliveries: (await desk()).proposals
       .filter((p) => p.owner === me.id && p.delivery)
       .slice(-30)
