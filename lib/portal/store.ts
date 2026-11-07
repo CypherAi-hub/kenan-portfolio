@@ -60,3 +60,8 @@ function workspaceKey(id: string) {
 export const workspace = async (id: string) => (await load(workspaceKey(id), emptyWorkspace)).value;
 export const editWorkspace = <R>(id: string, apply: (value: Workspace) => R) =>
   change(workspaceKey(id), emptyWorkspace, apply);
+
+export const readPrivate = async <T>(key: string, initial: () => T) =>
+  (await load(key, initial)).value;
+export const editPrivate = <T, R>(key: string, initial: () => T, apply: (value: T) => R) =>
+  change(key, initial, apply);

@@ -22,3 +22,12 @@ The portal uses a dedicated private Vercel Blob store. Access is enforced by the
 Use the linked production Blob token through a protected environment file to run `node --env-file=/private/path/env scripts/portal-owner.mjs /private/path/setup.html`. The script refuses to replace an existing owner unless you explicitly add `--recover-owner`. Keep the resulting file private. If storage or authentication configuration is unavailable, access fails closed.
 
 For local testing set a separate `PORTAL_NAMESPACE`, a localhost `PORTAL_ORIGIN`, and a fresh `PORTAL_SIGNING_KEY`. Use sandbox credentials and the signing secret from `stripe listen --forward-to localhost:3189/api/stripe/webhook`. Production and test records must use distinct namespaces or stores. To run the authorization, concurrency and payment regression tests against an isolated local workspace see [the test script](../tests/portal-integration.mjs).
+
+
+## Studio assistant and appointments
+
+Only Kenan's owner account can ask the assistant for workspace summaries or generate and apply proposed changes. The assistant can prepare project comments, status updates, project scopes and titles, payment requests, and portal appointment decisions. Each change has an explicit Apply control with its actual client and project. Applying a proposal more than once does not repeat the mutation. Proposals expire after one hour. Responses use the approved OpenAI project with storage disabled on the API request and a limit of 100 requests per UTC day.
+
+Clients can request a 30-minute portal meeting at least 24 hours ahead. The owner can approve or decline. Approving overlapping portal requests is blocked. Clients see only their own requests. Portal approvals currently check portal appointments. Google Calendar synchronization and external email delivery still require their own authenticated connections. A portal project comment appears in that client's project timeline, and open workspaces refresh periodically.
+
+The production Vercel firewall limits the client workspace API to 120 requests per minute per IP. The Stripe webhook is outside that rule. Passkeys, server authorization, origin checks, bounded bodies, private storage, and no-store responses protect the application behind the firewall.

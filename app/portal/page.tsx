@@ -1,6 +1,7 @@
 import StudioHeader from "@/components/studio/StudioHeader";
 import Portal from "@/components/portal/Portal";
 import "./portal.css";
+import "./assistant.css";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Client workspace",

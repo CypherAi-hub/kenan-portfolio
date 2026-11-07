@@ -71,6 +71,15 @@ async function webhook(session, badSignature = false) {
     })
   ).status;
 }
+owner.record.email = "kenanlarry8@gmail.com";
+async function assistant(as, body) {
+  const r = await fetch(origin + "/api/portal/assistant", {
+    method: "POST",
+    headers: { "content-type": "application/json", origin, cookie: "kjl-session=" + as.secret },
+    body: JSON.stringify(body),
+  });
+  return { status: r.status, data: await r.json() };
+}
 await directoryChange((d) => d.accounts.push(...fixtures.map((f) => f.record)));
 try {
   const cid = client.record.id;
@@ -142,6 +151,94 @@ try {
     (await post(other, { action: "checkout", client: cid, project, bill: bill.id })).status,
     404,
   );
+  assert.equal(
+    (await assistant(client, { action: "ask", message: "List every client" })).status,
+    403,
+  );
+  assert.equal((await assistant(other, { action: "apply", id: "forged" })).status, 403);
+  const start = new Date(Date.now() + 3 * 86400000).toISOString();
+  assert.equal(
+    (
+      await assistant(client, {
+        action: "request-appointment",
+        start,
+        title: "Integration meeting",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await assistant(other, { action: "request-appointment", start, title: "Overlapping meeting" }))
+      .status,
+    200,
+  );
+  const appointments = (
+    await (
+      await fetch(origin + "/api/portal/assistant", {
+        headers: { cookie: "kjl-session=" + owner.secret },
+      })
+    ).json()
+  ).appointments;
+  const own = appointments.find((a) => a.client === cid),
+    conflict = appointments.find((a) => a.client === other.record.id);
+  assert.equal(
+    (
+      await assistant(owner, {
+        action: "review-appointment",
+        appointment: own.id,
+        decision: "approved",
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await assistant(owner, {
+        action: "review-appointment",
+        appointment: conflict.id,
+        decision: "approved",
+      })
+    ).status,
+    409,
+  );
+  const clientAppointments = (
+    await (
+      await fetch(origin + "/api/portal/assistant", {
+        headers: { cookie: "kjl-session=" + client.secret },
+      })
+    ).json()
+  ).appointments;
+  assert(clientAppointments.every((a) => a.client === cid));
+  assert.equal((await assistant(owner, { action: "apply", id: "forged" })).status, 409);
+  if (process.env.TEST_ASSISTANT_MODEL === "1") {
+    const reply = await assistant(owner, {
+      action: "ask",
+      message:
+        "Prepare one portal comment for client id " +
+        cid +
+        " and project id " +
+        project +
+        ". The exact comment text should be: The design is ready for your review. Propose the comment action.",
+    });
+    assert.equal(reply.status, 200, JSON.stringify(reply.data));
+    assert(reply.data.proposals.length === 1);
+    const proposal = reply.data.proposals[0];
+    assert.equal(proposal.input.action, "comment");
+    const before = (await view()).projects[0].updates.length;
+    const both = await Promise.all([
+      assistant(owner, { action: "apply", id: proposal.id }),
+      assistant(owner, { action: "apply", id: proposal.id }),
+    ]);
+    assert(
+      both.every((r) => r.status === 200),
+      JSON.stringify(both),
+    );
+    assert.equal((await view()).projects[0].updates.length, before + 1);
+    console.log("Live model proposal generated and applied once under concurrent replay.");
+  }
+  console.log(
+    "Assistant owner authorization, appointment privacy and overlap prevention verified.",
+  );
   const session = {
     id: "cs_test_fixture",
     mode: "payment",
@@ -169,4 +266,20 @@ try {
     d.accounts = d.accounts.filter((a) => !fixtures.some((f) => f.record.id === a.id));
   });
   await del(ns + "/clients/" + client.record.id + ".json");
+  const deskPath = ns + "/owner-desk.json";
+  const deskItem = await get(deskPath, { access: "private", useCache: false });
+  if (deskItem) {
+    const data = await new Response(deskItem.stream).json();
+    data.appointments = data.appointments.filter(
+      (a) => ![client.record.id, other.record.id].includes(a.client),
+    );
+    data.proposals = data.proposals.filter((p) => p.owner !== owner.record.id);
+    await put(deskPath, JSON.stringify(data), {
+      access: "private",
+      allowOverwrite: true,
+      addRandomSuffix: false,
+      ifMatch: deskItem.blob.etag.replace(/^W\//, ""),
+      contentType: "application/json",
+    });
+  }
 }

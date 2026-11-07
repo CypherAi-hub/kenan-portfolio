@@ -49,7 +49,7 @@ export async function view(me: Account, target: string | null): Promise<PortalVi
     paymentMode: paymentMode(),
   };
 }
-export async function mutate(me: Account, input: Input) {
+export async function mutate(me: Account, input: Input, operationId?: string) {
   const action = input.action;
   if (action === "invite" || action === "renew") {
     owner(me);
@@ -102,6 +102,10 @@ export async function mutate(me: Account, input: Input) {
     );
   }
   return editWorkspace(id, (w) => {
+    if (operationId) {
+      if (w.operations?.includes(operationId)) return { ok: true };
+      w.operations = [...(w.operations || []).slice(-999), operationId];
+    }
     if (action === "project") {
       owner(me);
       const project = {
@@ -118,6 +122,13 @@ export async function mutate(me: Account, input: Input) {
     }
     const project = w.projects.find((p) => p.id === input.project);
     requireValue(project, "Project not found.", 404);
+    if (action === "edit") {
+      owner(me);
+      requireValue(input.title != null || input.brief != null, "Provide a title or scope to edit.");
+      if (input.title != null) project.title = field(input.title, "Project name", 120);
+      if (input.brief != null) project.brief = field(input.brief, "Scope", 2400);
+      return { ok: true };
+    }
     if (action === "update" || action === "comment") {
       const body = field(input.body, "Message", 4000);
       let url: string | undefined;

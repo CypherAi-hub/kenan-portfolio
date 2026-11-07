@@ -15,6 +15,8 @@ import {
 import type { PortalView, Project } from "@/lib/portal/types";
 import { phases } from "@/lib/portal/types";
 import { profile } from "@/lib/data";
+import StudioAssistant, { Appointments } from "./StudioAssistant";
+import ClientNotifications from "./ClientNotifications";
 const dollars = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 const date = (value: string) =>
@@ -472,6 +474,14 @@ export default function Portal() {
   );
   return (
     <div className="portal-shell portal-dash">
+      {owner && (
+        <StudioAssistant
+          onChange={() => {
+            void load(active?.id);
+            window.dispatchEvent(new Event("kjl-workspace-update"));
+          }}
+        />
+      )}
       <div className="portal-top">
         <div>
           <p className="portal-kicker">{owner ? "STUDIO DASHBOARD" : "CLIENT WORKSPACE"}</p>
@@ -493,6 +503,13 @@ export default function Portal() {
           Sign out
         </button>
       </div>
+      {!owner && <ClientNotifications me={view.me} projects={view.projects} />}
+      <Appointments
+        owner={owner}
+        onChange={() => {
+          void load(active?.id);
+        }}
+      />
       {notice && (
         <p role="status" className="portal-notice">
           {notice}

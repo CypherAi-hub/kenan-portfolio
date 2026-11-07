@@ -1,0 +1,244 @@
+.assistant-launch {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid #7cac98;
+  border-radius: 100px;
+  background: #173b36;
+  color: #e8f6ec;
+  padding: 14px 20px;
+  box-shadow: 0 5px 22px #102e3328;
+  font-weight: 750;
+}
+.assistant-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 88px;
+  z-index: 71;
+  width: min(440px, calc(100vw - 32px));
+  height: min(690px, calc(100dvh - 120px));
+  background: #fff;
+  border: 1px solid #c3d8ce;
+  border-radius: 14px;
+  box-shadow: 0 18px 80px #12352f38;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #173b36;
+}
+.assistant-panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #173b36;
+  color: white;
+  padding: 17px 20px;
+}
+.assistant-panel header small {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #c0d9cd;
+  font-size: 11px;
+  margin-top: 4px;
+}
+.assistant-panel header button {
+  background: transparent;
+  border: 0;
+  color: white;
+  padding: 8px;
+}
+.assistant-conversation {
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  flex: 1;
+  min-height: 0;
+}
+.assistant-intro h2 {
+  font-size: 24px;
+  margin: 15px 0;
+}
+.assistant-intro p {
+  font-size: 14px;
+  color: #50685e;
+  margin: 10px 0 18px;
+}
+.assistant-intro button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #c6d8cd;
+  background: #f2f7f1;
+  color: #173b36;
+  border-radius: 7px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.assistant-message {
+  padding: 13px;
+  border-radius: 9px;
+  margin: 10px 0;
+  background: #f1f5ee;
+  overflow-wrap: anywhere;
+}
+.assistant-message.user {
+  background: #dcece4;
+  margin-left: 25px;
+}
+.assistant-message small {
+  font-size: 11px;
+  font-weight: 750;
+}
+.assistant-message p {
+  white-space: pre-wrap;
+  font-size: 14px;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.assistant-proposal {
+  background: #fff;
+  border: 1px solid #bed6c8;
+  border-radius: 7px;
+  padding: 12px;
+  margin-top: 12px;
+}
+.assistant-proposal strong {
+  font-size: 13px;
+}
+.assistant-proposal dl {
+  margin: 8px 0;
+}
+.assistant-proposal dt {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.assistant-proposal dd {
+  margin: 2px 0 8px;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+.assistant-proposal button,
+.portal-meeting button {
+  border: 1px solid #397960;
+  color: #173b36;
+  background: #e3f0e7;
+  border-radius: 5px;
+  padding: 9px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  gap: 5px;
+}
+.assistant-panel > form {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid #d6e3da;
+  padding: 12px;
+}
+.assistant-panel textarea {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  border: 1px solid #aabfb3;
+  border-radius: 7px;
+  padding: 10px;
+  font-size: 14px;
+  color: #173b36;
+  background: #fff;
+}
+.assistant-panel > form button {
+  border: 0;
+  color: white;
+  background: #173b36;
+  border-radius: 6px;
+  padding: 12px;
+}
+.assistant-panel footer {
+  font-size: 10px;
+  padding: 0 14px 12px;
+  color: #566e62;
+  line-height: 1.4;
+}
+.assistant-error {
+  padding: 8px 15px;
+  background: #fff0e6;
+  color: #754224;
+  font-size: 13px !important;
+}
+.portal-meetings {
+  background: white;
+  border: 1px solid #d6e2de;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.portal-meetings summary {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-weight: 700;
+}
+.portal-meetings summary span {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 500;
+}
+.portal-meeting {
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  border-bottom: 1px solid #d6e2de;
+  padding: 14px 0;
+}
+.portal-meeting p {
+  font-size: 13px;
+  margin: 5px 0;
+  white-space: pre-wrap;
+}
+.portal-meeting span {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #39644e;
+}
+.portal-meeting > div:last-child button {
+  margin: 4px;
+}
+.assistant-panel button:disabled {
+  opacity: 0.6;
+}
+.assistant-panel button,
+.assistant-panel textarea {
+  font-family: inherit;
+}
+.assistant-panel :focus-visible {
+  outline: 3px solid #4277bc;
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .assistant-launch {
+    right: 16px;
+    bottom: 16px;
+  }
+  .assistant-panel {
+    right: 16px;
+    bottom: 78px;
+    height: min(620px, calc(100dvh - 98px));
+  }
+  .portal-meetings summary {
+    flex-wrap: wrap;
+  }
+  .portal-meetings summary span {
+    margin-left: 0;
+  }
+  .portal-meeting {
+    flex-direction: column;
+    gap: 6px;
+  }
+}

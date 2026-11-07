@@ -40,7 +40,7 @@ export type Project = {
   updates: Update[];
   payments: Payment[];
 };
-export type Workspace = { projects: Project[] };
+export type Workspace = { projects: Project[]; operations?: string[] };
 export type PortalView = {
   me: Member;
   clients: Member[];
