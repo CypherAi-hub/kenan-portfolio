@@ -470,6 +470,9 @@ export default function Portal({ audience }: { audience: Audience }) {
         </button>
       </div>
       <NotificationCenter key={view.me.id} />
+      <Link className="portal-quiet" href={owner ? "/studio/delivery" : "/portal/delivery"}>
+        <FolderOpen size={17} /> Onboarding & project delivery <ArrowRight size={16} />
+      </Link>
       {owner && (
         <Link className="portal-quiet" href="/studio/inquiries">
           <FolderOpen size={17} /> Project inquiries & briefs <ArrowRight size={16} />
