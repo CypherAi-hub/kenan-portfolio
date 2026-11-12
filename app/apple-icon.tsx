@@ -9,17 +9,17 @@ export default function AppleIcon() {
       style={{
         width: 180,
         height: 180,
-        background: "#101010",
-        color: "#d4af37",
+        background: "#172b35",
+        color: "#ffffff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 64,
         fontWeight: 700,
-        fontFamily: "monospace",
+        fontFamily: "sans-serif",
       }}
     >
-      KJL
+      kjl.
     </div>,
     size,
   );

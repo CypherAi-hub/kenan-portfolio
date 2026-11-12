@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CaseWalkthrough from "./CaseWalkthrough";
 import Link from "next/link";
 import { ArrowUpRight, ArrowRight } from "lucide-react";
 import { projectLibrary, type LibraryProject } from "@/data/project-library";
@@ -15,6 +16,7 @@ export default function ProjectDetails({ project: p }: { project: LibraryProject
     .filter((x): x is LibraryProject => Boolean(x));
   return (
     <>
+      <CaseWalkthrough slug={p.slug} />
       {video && (
         <section className="project-film" aria-labelledby="project-film-title">
           <div>
@@ -94,7 +96,7 @@ export default function ProjectDetails({ project: p }: { project: LibraryProject
           </section>
         </div>
       </div>
-      {d.gallery.length > 0 && (
+      {d.gallery.length > 0 && !["ultraflips-mobile", "hirecrate-staffing"].includes(p.slug) && (
         <section className="project-gallery-section" aria-label="More project views">
           <div className="section-heading">
             <div>

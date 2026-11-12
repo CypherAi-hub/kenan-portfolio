@@ -9,8 +9,8 @@ export default function OpenGraph() {
       style={{
         width: "100%",
         height: "100%",
-        background: "#142e38",
-        color: "#f7faf8",
+        background: "#f7f8f5",
+        color: "#172b35",
         display: "flex",
         padding: "65px 75px",
         flexDirection: "column",
@@ -19,11 +19,11 @@ export default function OpenGraph() {
     >
       <div style={{ display: "flex", fontSize: 24, justifyContent: "space-between" }}>
         <span style={{ fontWeight: 700 }}>KJL Designs</span>
-        <span style={{ fontSize: 17, color: "#bdd1d6" }}>DESIGN & DEVELOPMENT</span>
+        <span style={{ fontSize: 17, color: "#586571" }}>DESIGN & DEVELOPMENT</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <span style={{ fontSize: 80, fontWeight: 700, lineHeight: 1.1, letterSpacing: -4 }}>
-          Designed to impress.
+          Useful software.
         </span>
         <span
           style={{
@@ -31,10 +31,10 @@ export default function OpenGraph() {
             fontWeight: 700,
             lineHeight: 1.1,
             letterSpacing: -4,
-            color: "#b9dfcb",
+            color: "#2455cd",
           }}
         >
-          Built to work.
+          Thoughtfully built.
         </span>
       </div>
       <div
@@ -47,9 +47,9 @@ export default function OpenGraph() {
       >
         <span>Websites · Apps · Digital tools</span>
         <span
-          style={{ background: "#b9dfcb", color: "#16342a", padding: "18px 26px", borderRadius: 9 }}
+          style={{ background: "#2455cd", color: "#ffffff", padding: "18px 26px", borderRadius: 9 }}
         >
-          Book with me ↗
+          KJL Designs ↗
         </span>
       </div>
     </div>,

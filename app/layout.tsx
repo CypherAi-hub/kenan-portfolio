@@ -8,6 +8,7 @@ import "./studio.css";
 import "./studio-refinement.css";
 import "./project-details.css";
 import "./studio-media.css";
+import "./showcase-refresh.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://kjl-designs.vercel.app"),

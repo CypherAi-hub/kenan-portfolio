@@ -50,16 +50,14 @@ export default function ProjectVisual({
               />
             </div>
           ) : (
-            <div className="collector-note" aria-hidden="true">
-              <span>
-                ULTRA<span>FLIPS</span>
-              </span>
-              <div>
-                Know the card.
-                <br />
-                Keep the context.
-              </div>
-              <p>SEARCH / RESEARCH / COLLECT</p>
+            <div className="phone-frame second-phone">
+              <Image
+                src="/media/showcase/ultra-identification.webp"
+                alt="UltraFlips exact-card review in a Simulator with sample data"
+                width={720}
+                height={1565}
+                sizes="(min-width: 900px) 250px, 180px"
+              />
             </div>
           )}
         </div>

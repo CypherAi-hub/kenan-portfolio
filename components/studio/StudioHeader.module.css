@@ -2,14 +2,3 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
-@media (max-width: 540px) {
-  .header :global(.brand-lockup) {
-    width: clamp(110px, calc(100vw - 220px), 210px);
-    height: clamp(28px, calc((100vw - 220px) * 0.248), 52px);
-  }
-  .header :global(.brand-lockup-image) {
-    width: 100%;
-    height: auto;
-    top: -17%;
-  }
-}

@@ -1,5 +1,5 @@
 export const siteUrl = "https://kjl-designs.vercel.app";
-export const selectedWork = [
+const work = [
   {
     slug: "general-services",
     number: "01",
@@ -65,11 +65,11 @@ export const selectedWork = [
     category: "Mobile app + research tools",
     status: "iOS internal beta",
     theme: "lilac",
-    headline: "A clearer view of a collector’s next move.",
+    headline: "From a card in hand to a considered offer.",
     summary:
       "A card-show companion for scanning cards, confirming exact versions, inspecting price evidence, and calculating buying offers.",
-    image: "/media/current/ultraflips-watchlist.webp",
-    alt: "UltraFlips development screen showing a saved card, dated price references, and watchlist controls",
+    image: "/media/showcase/ultra-market.webp",
+    alt: "UltraFlips Simulator showing exact card context, a dated reference, and buying guides with sample data",
     url: "",
     urlLabel: "",
     role: "Product lead and developer, using AI-assisted engineering",
@@ -83,7 +83,7 @@ export const selectedWork = [
       "Collection and inventory workflows",
       "Photo review and buying research tools",
     ],
-    note: "Development preview, with an October 2026 Simulator screenshot. Data availability varies by source; a displayed reference is not a guaranteed sale price.",
+    note: "November 2026 Simulator previews with labeled sample data. Mobile access is private; displayed prices illustrate the workflow.",
     stack: ["React Native", "Expo", "Supabase", "Product research"],
   },
   {
@@ -121,10 +121,10 @@ export const selectedWork = [
     category: "Business website + inquiry flows",
     status: "Live website",
     theme: "apricot",
-    headline: "Two audiences. One clear next step.",
+    headline: "A better first conversation, on both sides of the hire.",
     summary:
-      "A staffing website that helps employers request workers and gives job seekers a straightforward place to start.",
-    image: "/media/current/hirecrate.webp",
+      "A staffing website with distinct employer and job-seeker journeys, guided inquiry forms, and a browser-local operations workspace.",
+    image: "/media/showcase/hirecrate-home.png",
     alt: "HireCrate Staffing website with employer and job seeker calls to action",
     url: "https://www.hirecratestaffing.net",
     urlLabel: "Visit the website",
@@ -136,10 +136,18 @@ export const selectedWork = [
     features: [
       "Separate employer and job-seeker paths",
       "Service and industry information",
-      "Clear inquiry calls to action",
+      "Validated email-draft inquiries",
+      "Local companies, candidates, matches, and follow-ups",
       "Responsive business website",
     ],
-    note: "Website screenshot from the project archive. The public website is available to explore.",
+    note: "Local website preview, November 2026. Public forms prepare an email draft; the sender completes delivery in their email app.",
     stack: ["React", "TypeScript", "Responsive design", "Vercel"],
   },
 ];
+
+// Lead with the two product stories; keep the rest of the selected work accessible.
+const order = ["ultraflips", "hirecrate-staffing", "general-services", "fofit", "meridian-atlas"];
+export const selectedWork = order.map((slug, index) => ({
+  ...work.find((project) => project.slug === slug)!,
+  number: String(index + 1).padStart(2, "0"),
+}));

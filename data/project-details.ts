@@ -233,11 +233,11 @@ export const projectDetails: Record<string, ProjectDetail> = {
       {
         title: "Deal Scout preview",
         description:
-          "A targeted listing-search interface explores delivered costs and estimated margins. Live eBay retrieval remains unconfigured; review examples use labeled synthetic data.",
+          "A targeted listing-search interface explores delivered costs and estimated margins. Live listing retrieval requires a connected provider and separate acceptance; it is not presented here as an operating deal-discovery service.",
       },
     ],
     availability:
-      "An internal iOS TestFlight beta, with a separate web app in development. Explore the public website and browser experience below. Mobile beta access is private; a public download is not offered on this page.",
+      "A private iOS beta, with a separate web app in development. Explore the public website and browser experience below. Mobile beta access is private; a public download is not offered on this page.",
     related: ["ultraflips", "ultraflips-website"],
     links: [
       {
@@ -285,15 +285,18 @@ export const projectDetails: Record<string, ProjectDetail> = {
     features: [
       {
         title: "Employer journey",
-        description: "A clear route for businesses to learn about staffing and request workers.",
+        description:
+          "A guided request captures the role, worker count, location, schedule, and contact details before preparing an email.",
       },
       {
         title: "Job-seeker journey",
-        description: "A separate path for people exploring work opportunities.",
+        description:
+          "A separate inquiry collects experience, availability, and location. Visitors review and send the resulting email themselves.",
       },
       {
-        title: "Service presentation",
-        description: "Industry and service information explains what the staffing business offers.",
+        title: "Operations workspace",
+        description:
+          "A browser-local dashboard organizes companies, candidates, jobs, matches, and follow-ups, with JSON backup export and import.",
       },
       {
         title: "Responsive layout",
@@ -302,7 +305,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
       },
     ],
     availability:
-      "The public business website is live. Its inquiry forms belong to the staffing business; the portfolio links visitors to that existing site.",
+      "The public business website is live. Its inquiry forms prepare email drafts for visitors to review and send. The operations dashboard uses browser-local storage, with export/import backups and no cross-device sync.",
     related: ["general-services", "launch-relay"],
     links: [
       {
@@ -313,12 +316,12 @@ export const projectDetails: Record<string, ProjectDetail> = {
     ],
     gallery: [
       {
-        src: "/media/projects/hirecrate-staffing/hirecrate-employer-request-workers.webp",
+        src: "/media/showcase/hirecrate-employer.png",
         alt: "Employer inquiry photography from the HireCrate website",
         caption: "Image from the employer request path.",
       },
       {
-        src: "/media/projects/hirecrate-staffing/hirecrate-job-seeker-find-work.webp",
+        src: "/media/showcase/hirecrate-candidate.png",
         alt: "Job seeker consultation photography from HireCrate",
         caption: "Image from the job-seeker path.",
       },

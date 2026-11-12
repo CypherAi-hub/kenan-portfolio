@@ -19,7 +19,9 @@ export default function ProjectSpotlight() {
 
   useEffect(() => {
     const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setPlaying(!query.matches);
+    const sync = () => {
+      if (query.matches) setPlaying(false);
+    };
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
@@ -68,7 +70,7 @@ export default function ProjectSpotlight() {
       }}
     >
       <header className="spotlight-bar">
-        <span>PROJECT SPOTLIGHT</span>
+        <span>A CLOSER LOOK</span>
         <button
           type="button"
           className="spotlight-play"
@@ -102,7 +104,7 @@ export default function ProjectSpotlight() {
                 />
                 <Image
                   className="spotlight-handset second"
-                  src={project.secondImage || "/media/showcase/ultra-market.webp"}
+                  src={project.secondImage || "/media/showcase/ultra-identification.webp"}
                   alt={
                     project.secondImage
                       ? "FoFit recipe discovery"
@@ -128,7 +130,9 @@ export default function ProjectSpotlight() {
           </div>
           <div className="spotlight-caption">
             <div>
-              <p>{project.category}</p>
+              <p>
+                {project.category} · {project.status}
+              </p>
               <h2>{project.name}</h2>
             </div>
             <ArrowUpRight size={26} aria-hidden="true" />

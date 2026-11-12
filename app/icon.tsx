@@ -9,17 +9,17 @@ export default function Icon() {
       style={{
         width: 32,
         height: 32,
-        background: "#101010",
-        color: "#d4af37",
+        background: "#172b35",
+        color: "#ffffff",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 12,
         fontWeight: 700,
-        fontFamily: "monospace",
+        fontFamily: "sans-serif",
       }}
     >
-      KJL
+      kjl.
     </div>,
     size,
   );

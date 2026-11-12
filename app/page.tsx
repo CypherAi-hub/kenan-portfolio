@@ -6,7 +6,6 @@ import StudioFooter from "@/components/studio/StudioFooter";
 import PricingOverview from "@/components/studio/PricingOverview";
 import BookingSection from "@/components/studio/BookingSection";
 import ProjectVisual from "@/components/studio/ProjectVisual";
-import { projectLibrary } from "@/data/project-library";
 import { selectedWork } from "@/data/selected-work";
 export const metadata = { alternates: { canonical: "https://kjl-designs.vercel.app" } };
 
@@ -25,22 +24,24 @@ export default function Home() {
                 <span /> ST. LOUIS DESIGN & DEVELOPMENT
               </p>
               <h1>
-                Designed to
+                Useful software.
                 <br />
-                impress.
-                <br />
-                <span>Built to work.</span>
+                <span>
+                  Thoughtfully
+                  <br />
+                  built.
+                </span>
               </h1>
               <p className="intro-description">
-                Custom websites, apps, and digital tools for businesses ready for their next
-                chapter. Thoughtfully designed. Personally built by Kenan Larry.
+                I turn complex ideas into clear, useful digital experiences. Websites, mobile apps,
+                and the workflows behind them — designed and built by Kenan Larry.
               </p>
               <div className="intro-actions">
-                <Link className="studio-button" href="/book">
-                  Let’s talk about your project <ArrowUpRight size={18} aria-hidden="true" />
+                <Link className="studio-button" href="/start-project">
+                  Start a project <ArrowUpRight size={18} aria-hidden="true" />
                 </Link>
-                <Link className="intro-pricing" href="/pricing">
-                  Explore pricing <ArrowRight size={16} aria-hidden="true" />
+                <Link className="intro-pricing" href="#work">
+                  See the work <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </div>
@@ -78,19 +79,22 @@ export default function Home() {
             <div>
               <p className="eyebrow">01 / SELECTED WORK</p>
               <h2>
-                Real projects.
+                The work,
                 <br />
-                Thoughtful solutions.
+                in practice.
               </h2>
             </div>
             <p>
-              Websites, products, and tools built around real needs. Explore the work, the thinking
-              behind it, and where each project stands.
+              From card research to staffing inquiries: explore the interface, the decisions behind
+              it, and what each product does today.
             </p>
           </div>
           <div className="selected-grid">
             {selectedWork.map((p, i) => (
-              <article className={`work-card ${i === 0 ? "work-wide" : ""}`} key={p.slug}>
+              <article
+                className={`work-card ${i < 2 ? "work-lead" : "work-supporting"}`}
+                key={p.slug}
+              >
                 <Link
                   href={`/work/${p.slug}`}
                   className="project-image-link"
@@ -103,8 +107,10 @@ export default function Home() {
                 </Link>
                 <div className="project-info">
                   <div>
-                    {i === 0 && (
-                      <p className="featured-label">FEATURED PROJECT / MARYVILLE UNIVERSITY</p>
+                    {i < 2 && (
+                      <p className="featured-label">
+                        FEATURED CASE STUDY / {i === 0 ? "MOBILE PRODUCT" : "BUSINESS EXPERIENCE"}
+                      </p>
                     )}
                     <p className="project-category">
                       {p.category} <span> / {p.status}</span>
@@ -119,7 +125,7 @@ export default function Home() {
                       ))}
                     </div>
                     <Link className="text-link project-story-link" href={`/work/${p.slug}`}>
-                      Explore the project <ArrowUpRight size={16} aria-hidden="true" />
+                      Read the case study <ArrowUpRight size={16} aria-hidden="true" />
                     </Link>
                   </div>
                   <span className="project-number">/{p.number}</span>
@@ -130,8 +136,7 @@ export default function Home() {
           <div className="work-end">
             <span>There’s more behind the work.</span>
             <Link className="text-link" href="/projects">
-              Explore all {projectLibrary.length} projects{" "}
-              <ArrowUpRight size={18} aria-hidden="true" />
+              Browse the project archive <ArrowUpRight size={18} aria-hidden="true" />
             </Link>
           </div>
         </section>

@@ -22,14 +22,14 @@ export const projectCovers: Record<string, ProjectCover> = {
     imageNote: "Local demonstration with simulated network data.",
   },
   "hirecrate-staffing": {
-    image: "/media/current/hirecrate.webp",
+    image: "/media/showcase/hirecrate-home.png",
     imageAlt: "HireCrate staffing website with employer and job-seeker paths",
-    imageNote: "Website screenshot from the project archive.",
+    imageNote: "November 2026 local website preview.",
   },
   "ultraflips-mobile": {
-    image: "/media/current/ultraflips-watchlist.webp",
-    imageAlt: "UltraFlips mobile watchlist",
-    imageNote: "October 2026 Simulator development preview.",
+    image: "/media/showcase/ultra-market.webp",
+    imageAlt: "UltraFlips exact-card research and dated price evidence",
+    imageNote: "November 2026 Simulator preview with sample data.",
     contain: true,
   },
   "general-services": {

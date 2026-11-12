@@ -1,15 +1,15 @@
-import Image from "next/image";
 export default function BrandLogo({ footer = false }: { footer?: boolean }) {
   return (
-    <span className={"brand-lockup" + (footer ? " brand-lockup-footer" : "")}>
-      <Image
-        src="/brand/kjl-designs-single-monogram.png"
-        alt="KJL Designs"
-        width={2172}
-        height={724}
-        priority={!footer}
-        className="brand-lockup-image"
-      />
+    <span
+      className={"kjl-wordmark" + (footer ? " kjl-wordmark-footer" : "")}
+      aria-label="KJL Designs"
+    >
+      <span className="kjl-initials" aria-hidden="true">
+        kjl<span>.</span>
+      </span>
+      <span className="kjl-wordmark-name" aria-hidden="true">
+        Designs<span>Independent digital studio</span>
+      </span>
     </span>
   );
 }
