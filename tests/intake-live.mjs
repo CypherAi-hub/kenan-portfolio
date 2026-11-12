@@ -7,7 +7,7 @@ import { spawn } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { parseEnv } from "node:util";
 import { list, put, del } from "@vercel/blob";
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 
 assert.equal(
   process.env.RUN_INTAKE_LIVE,
@@ -20,7 +20,8 @@ const origin = "http://localhost:3217",
 const evidence = process.env.INTAKE_EVIDENCE_DIR;
 if (evidence) await mkdir(evidence, { recursive: true });
 const ownerSecret = randomBytes(32).toString("base64url"),
-  clientSecret = randomBytes(32).toString("base64url");
+  clientSecret = randomBytes(32).toString("base64url"),
+  otherSecret = randomBytes(32).toString("base64url");
 const account = (secret, role) => ({
   id: randomUUID(),
   name: "QA " + role,
@@ -34,6 +35,13 @@ const account = (secret, role) => ({
   ],
   recentChallenges: [],
 });
+const ownerAccount = account(ownerSecret, "owner"),
+  clientAccount = account(clientSecret, "client"),
+  otherAccount = {
+    ...account(otherSecret, "client"),
+    name: "QA other client",
+    email: "qa-other@example.com",
+  };
 let openaiKey = process.env.OPENAI_API_KEY;
 if (!openaiKey && process.env.INTAKE_OPENAI_ENV_FILE)
   openaiKey = parseEnv(await readFile(process.env.INTAKE_OPENAI_ENV_FILE, "utf8")).OPENAI_API_KEY;
@@ -79,7 +87,7 @@ async function getInquiry(id, secret = ownerSecret) {
 try {
   await put(
     namespace + "/accounts.json",
-    JSON.stringify({ accounts: [account(ownerSecret, "owner"), account(clientSecret, "client")] }),
+    JSON.stringify({ accounts: [ownerAccount, clientAccount, otherAccount] }),
     { access: "private", addRandomSuffix: false, contentType: "application/json" },
   );
   server = spawn(
@@ -195,6 +203,152 @@ try {
   record(
     "Owner browser: edit, mark reviewed, versioned save, stale-write protection and Markdown export verified.",
   );
+  await page.getByLabel("Client account", { exact: true }).selectOption(clientAccount.id);
+  await page.getByLabel("Project title", { exact: true }).fill("QA service booking website");
+  await page
+    .getByLabel("Client-visible discovery summary", { exact: true })
+    .fill(
+      "A service website and appointment request flow. Scope and pricing will follow in a reviewed proposal.",
+    );
+  const connectButton = page.getByRole("button", { name: "Create & connect project", exact: true });
+  assert(await connectButton.isDisabled(), "Owner must confirm the sharing destination.");
+  await page.getByLabel("I’ve checked the client and the information being shared.").check();
+  await expect(connectButton).toBeEnabled({ timeout: 30000 });
+  const handoffPanel = page.locator(".inbox-handoff");
+  await page.setViewportSize({ width: 1440, height: 2000 });
+  await handoffPanel.scrollIntoViewIfNeeded();
+  if (evidence) await handoffPanel.screenshot({ path: evidence + "/handoff-desktop.png" });
+  for (const width of [390, 320, 768]) {
+    await page.setViewportSize({ width, height: 2000 });
+    assert(
+      await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      `Inbox handoff overflow at ${width}px`,
+    );
+    if (evidence && width === 390)
+      await handoffPanel.screenshot({ path: evidence + "/handoff-mobile.png" });
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await connectButton.click();
+  await page.getByText("Connected to client project", { exact: true }).waitFor({ timeout: 30000 });
+  const linked = (await getInquiry(browserId)).data.inquiry;
+  assert.equal(linked.handoff.clientId, clientAccount.id);
+  assert.equal(linked.handoff.sourceRevision, saved.revision);
+  if (evidence) await handoffPanel.screenshot({ path: evidence + "/handoff-receipt.png" });
+  const repeated = await post({ action: "handoff", id: browserId, resume: true }, true);
+  assert.equal(repeated.status, 200);
+  assert.equal(repeated.data.inquiry.handoff.projectId, linked.handoff.projectId);
+  const clientView = await fetch(origin + "/api/portal", {
+    headers: { cookie: "kjl-session=" + clientSecret },
+  });
+  assert.equal(clientView.status, 200);
+  const clientData = await clientView.json();
+  assert.equal(clientData.paymentMode, "offline", "Billing must remain disabled in this test.");
+  assert.equal(clientData.projects.length, 1);
+  assert.equal(clientData.projects[0].id, linked.handoff.projectId);
+  assert.equal(clientData.projects[0].phase, "Discovery");
+  assert.deepEqual(clientData.projects[0].payments, []);
+  assert(!JSON.stringify(clientData).includes("Reviewed QA brief"));
+  assert.equal(
+    (
+      await fetch(origin + "/api/portal?client=" + clientAccount.id, {
+        headers: { cookie: "kjl-session=" + otherSecret },
+      })
+    ).status,
+    404,
+  );
+  assert.equal(
+    (await post({ action: "handoff", id: browserId, resume: true }, true, clientSecret)).status,
+    403,
+  );
+  const clientContext = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    reducedMotion: "reduce",
+  });
+  await clientContext.addCookies([
+    { name: "kjl-session", value: clientSecret, url: origin, httpOnly: true, sameSite: "Lax" },
+  ]);
+  const clientPage = await clientContext.newPage();
+  clientPage.on("pageerror", (e) => consoleErrors.push(e.message));
+  await clientPage.goto(origin + "/portal");
+  await clientPage.getByText("QA service booking website", { exact: true }).first().waitFor();
+  await clientPage.getByText(clientData.projects[0].brief, { exact: true }).waitFor();
+  assert(!(await clientPage.getByText("Reviewed QA brief", { exact: false }).count()));
+  if (evidence)
+    await clientPage.screenshot({
+      path: evidence + "/client-discovery-project.png",
+      fullPage: true,
+    });
+  record(
+    "Real Blob + browser: reviewed inquiry connected to the selected client; 320/390/768/1440px layouts, replay without duplicate, private brief exclusion, Discovery phase and empty payments verified. Another client cannot read the project or perform handoff.",
+  );
+  async function createReviewedInquiry(name) {
+    const id = randomUUID();
+    const submitted = await post({
+      action: "submit",
+      id,
+      answers: { ...saved.answers, name },
+      allowAI: false,
+      consent: true,
+    });
+    assert.equal(submitted.status, 200);
+    const reviewed = await post(
+      {
+        action: "save",
+        id,
+        revision: 1,
+        status: "Reviewed",
+        markdown: "# Internal follow-up scope\nConfirm details in a commercial proposal.",
+      },
+      true,
+    );
+    assert.equal(reviewed.status, 200);
+    return reviewed.data.inquiry;
+  }
+  const existingInquiry = await createReviewedInquiry("Existing project QA");
+  await page.getByRole("button", { name: "Refresh inbox" }).click();
+  await page.getByRole("button", { name: /Existing project QA/ }).click();
+  await page.getByLabel("Client account", { exact: true }).selectOption(clientAccount.id);
+  await page.getByRole("radio", { name: "Link an existing project", exact: true }).check();
+  await page.getByLabel("Existing project", { exact: true }).selectOption(linked.handoff.projectId);
+  await page.getByLabel("I’ve checked the client and the information being shared.").check();
+  await page.getByRole("button", { name: "Connect existing project", exact: true }).click();
+  await page.getByText("Connected to client project", { exact: true }).waitFor({ timeout: 30000 });
+  assert.equal(
+    (await getInquiry(existingInquiry.id)).data.inquiry.handoff.projectId,
+    linked.handoff.projectId,
+  );
+  const afterExisting = await fetch(origin + "/api/portal", {
+    headers: { cookie: "kjl-session=" + clientSecret },
+  });
+  assert.deepEqual((await afterExisting.json()).projects, clientData.projects);
+  record(
+    "Owner browser: linking another reviewed inquiry to an existing project preserves its summary, progress and payments.",
+  );
+  const concurrent = await createReviewedInquiry("Concurrent handoff QA");
+  const concurrentInput = {
+    action: "handoff",
+    id: concurrent.id,
+    revision: concurrent.revision,
+    clientId: otherAccount.id,
+    mode: "new",
+    title: "Concurrent QA project",
+    summary: "Synthetic introduction only.",
+    confirmed: true,
+  };
+  const concurrentResults = await Promise.all(
+    Array.from({ length: 3 }, () => post(concurrentInput, true)),
+  );
+  assert(
+    concurrentResults.every((r) => r.status === 200),
+    "Concurrent handoffs must resolve against the same reserved project: " +
+      JSON.stringify(concurrentResults.map((r) => ({ status: r.status, error: r.data.error }))),
+  );
+  assert.equal(new Set(concurrentResults.map((r) => r.data.inquiry.handoff.projectId)).size, 1);
+  const concurrentWorkspace = await fetch(origin + "/api/portal", {
+    headers: { cookie: "kjl-session=" + otherSecret },
+  });
+  assert.equal((await concurrentWorkspace.json()).projects.length, 1);
+  record("Real Blob concurrency: three simultaneous handoff requests produce one client project.");
   const mobile = await browser.newContext({
     viewport: { width: 390, height: 844 },
     isMobile: true,
@@ -209,11 +363,15 @@ try {
     await phone.screenshot({ path: evidence + "/discovery-mobile.png", fullPage: true });
   record("Mobile browser: discovery loads at 390 px without horizontal overflow.");
   await phone.setViewportSize({ width: 320, height: 740 });
-  const menuBox = await phone.getByRole("button", { name: "Open menu" }).boundingBox();
-  assert(
-    menuBox && menuBox.x >= 0 && menuBox.x + menuBox.width <= 320,
-    "Mobile menu must fit at 320 px",
-  );
+  await expect
+    .poll(
+      async () => {
+        const menuBox = await phone.getByRole("button", { name: "Open menu" }).boundingBox();
+        return Boolean(menuBox && menuBox.x >= 0 && menuBox.x + menuBox.width <= 320);
+      },
+      { message: "Mobile menu must fit at 320 px after viewport layout settles." },
+    )
+    .toBe(true);
   await phone.getByRole("button", { name: "Open menu" }).click();
   assert(await phone.getByRole("navigation", { name: "Mobile navigation" }).isVisible());
   record("Small mobile browser: navigation remains visible and usable at 320 px.");

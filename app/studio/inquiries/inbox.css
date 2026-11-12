@@ -278,6 +278,102 @@
   opacity: 0.5;
   cursor: wait;
 }
+.inbox-handoff {
+  margin: 30px 0;
+  padding: 24px;
+  border: 1px solid #c4d3c9;
+  background: #f4f8f4;
+  font-size: 13px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.inbox-handoff h3 {
+  font-size: 23px;
+  margin: 10px 0 15px;
+}
+.inbox-handoff p {
+  margin: 12px 0;
+}
+.inbox-handoff fieldset {
+  border: 0;
+  padding: 0;
+  margin: 18px 0;
+}
+.inbox-handoff legend {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.inbox-handoff fieldset label,
+.inbox-handoff .inbox-handoff-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 12px 0;
+  cursor: pointer;
+}
+.inbox-handoff input[type="radio"],
+.inbox-handoff input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin: 2px 0 0;
+  accent-color: #37664b;
+}
+.inbox-handoff select,
+.inbox-handoff input,
+.inbox-handoff textarea {
+  max-width: 100%;
+  min-width: 0;
+}
+.inbox-handoff textarea {
+  width: 100%;
+  display: block;
+  margin-top: 7px;
+  padding: 12px;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--ink);
+  background: white;
+  border: 1px solid #bfcfc4;
+  border-radius: 4px;
+  resize: vertical;
+}
+.inbox-handoff .studio-button {
+  margin: 12px 0;
+  font-size: 12px;
+  padding: 13px 16px;
+}
+.inbox-handoff .intake-text-button {
+  display: block;
+}
+.inbox-handoff-status {
+  font-weight: 600;
+  color: #254e36;
+}
+.inbox-handoff-receipt > div {
+  padding: 10px 0;
+  border-bottom: 1px solid #d5dfd8;
+}
+.inbox-handoff details {
+  margin-top: 18px;
+}
+.inbox-handoff-summary,
+.inbox-handoff pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.inbox-handoff pre {
+  max-height: 300px;
+  overflow: auto;
+  font-size: 11px;
+}
+@media (max-width: 760px) {
+  .inbox-handoff {
+    padding: 16px;
+  }
+}
 @media (max-width: 1000px) {
   .inbox-layout {
     grid-template-columns: 250px minmax(0, 1fr);

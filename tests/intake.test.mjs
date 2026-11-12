@@ -25,6 +25,23 @@ async function harness({ failAI = false, invalidRefs = false } = {}) {
   let currentUser = owner,
     calls = 0,
     lastModel;
+  let failure;
+  const edit = async (key, initial, apply) => {
+    let fail;
+    if (failure?.key === key) {
+      if (failure.skip > 0) failure.skip--;
+      else {
+        fail = failure;
+        failure = undefined;
+      }
+    }
+    if (fail && !fail.afterCommit) throw new Error("Synthetic storage failure");
+    const value = structuredClone(storage.get(key) ?? initial());
+    const result = apply(value);
+    storage.set(key, structuredClone(value));
+    if (fail) throw new Error("Synthetic storage failure after commit");
+    return structuredClone(result);
+  };
   class PortalError extends Error {
     constructor(message, status = 400) {
       super(message);
@@ -84,12 +101,10 @@ async function harness({ failAI = false, invalidRefs = false } = {}) {
       PortalError,
       requireValue,
       readPrivate: async (key, initial) => structuredClone(storage.get(key) ?? initial()),
-      editPrivate: async (key, initial, apply) => {
-        const value = structuredClone(storage.get(key) ?? initial());
-        const result = apply(value);
-        storage.set(key, structuredClone(value));
-        return structuredClone(result);
-      },
+      editPrivate: edit,
+      directory: async () => structuredClone(storage.get("accounts") ?? { accounts: [] }),
+      workspace: async (id) => structuredClone(storage.get("clients/" + id) ?? { projects: [] }),
+      editWorkspace: async (id, apply) => edit("clients/" + id, () => ({ projects: [] }), apply),
     },
     "lib/portal/desk.ts": {
       assertOwner: (me) =>
@@ -149,6 +164,7 @@ async function harness({ failAI = false, invalidRefs = false } = {}) {
     ai = await api("lib/intake/ai.ts"),
     pub = await api("app/api/inquiries/route.ts"),
     admin = await api("app/api/portal/inquiries/route.ts");
+  const handoff = await api("lib/intake/handoff.ts");
   function input(allowAI = false) {
     return { action: "submit", id: crypto.randomUUID(), answers: base(), allowAI, consent: true };
   }
@@ -167,6 +183,10 @@ async function harness({ failAI = false, invalidRefs = false } = {}) {
     input,
     req,
     storage,
+    handoff,
+    failNextWrite: (key, skip = 0, afterCommit = false) => {
+      failure = { key, skip, afterCommit };
+    },
     setUser: (user) => {
       currentUser = user;
     },
@@ -334,4 +354,220 @@ test("public daily AI follow-up limits are durable across requests", async () =>
     429,
   );
   assert.equal(h.calls, 6);
+});
+
+async function reviewedFixture() {
+  const h = await harness(),
+    body = h.input();
+  await h.pub.POST(h.req(body));
+  const inquiry = await h.service.updateInquiry(owner, {
+    id: body.id,
+    revision: 1,
+    status: "Reviewed",
+    markdown:
+      "# Internal reviewed brief\nPrivate owner notes. Proposed scope requires commercial approval.",
+  });
+  const client = {
+    id: crypto.randomUUID(),
+    role: "client",
+    name: "Selected Client",
+    email: "client@example.com",
+    credential: { publicKey: "never-return" },
+    sessions: ["never-return"],
+  };
+  const other = {
+    ...client,
+    id: crypto.randomUUID(),
+    name: "Other Client",
+    email: "other@example.com",
+  };
+  h.storage.set("accounts", { accounts: [owner, client, other] });
+  const input = {
+    action: "handoff",
+    id: inquiry.id,
+    revision: inquiry.revision,
+    clientId: client.id,
+    mode: "new",
+    title: "Discovery project",
+    summary: "Client-visible introduction only.",
+    confirmed: true,
+  };
+  return { h, input, client, other, inquiry };
+}
+test("handoff reuses client identity, shares only explicit summary, and does not activate or bill", async () => {
+  const { h, input, client, inquiry } = await reviewedFixture();
+  const response = await h.admin.POST(h.req(input));
+  assert.equal(response.status, 200);
+  const saved = (await response.json()).inquiry;
+  assert.equal(saved.handoff.status, "linked");
+  assert.equal(saved.handoff.clientId, client.id);
+  assert.equal(saved.handoff.requestedBy, owner.id);
+  assert.equal(saved.handoff.sourceRevision, inquiry.revision);
+  assert.equal(saved.handoff.sourceMarkdown, inquiry.versions.at(-1).markdown);
+  assert(saved.handoff.linkedAt);
+  const w = h.storage.get("clients/" + client.id);
+  assert.equal(w.projects.length, 1);
+  assert.equal(w.projects[0].phase, "Discovery");
+  assert.equal(w.projects[0].brief, input.summary);
+  assert.deepEqual(w.projects[0].payments, []);
+  assert.deepEqual(w.projects[0].updates, []);
+  assert(!JSON.stringify(w).includes("Private owner notes"));
+  assert(!JSON.stringify(w).includes(inquiry.answers.email));
+  assert.equal(h.calls, 0);
+  assert.equal((await h.service.listInquiries(owner))[0].handoff, "linked");
+  const options = await h.handoff.handoffOptions(owner, client.id);
+  assert.equal(options.projects[0].id, saved.handoff.projectId);
+  assert(!JSON.stringify(options).includes("never-return"));
+});
+test("concurrent handoff retries create one project and reject a changed destination", async () => {
+  const { h, input, client, other } = await reviewedFixture();
+  const results = await Promise.all(Array.from({ length: 5 }, () => h.admin.POST(h.req(input))));
+  assert(results.every((r) => r.status === 200));
+  assert.equal(h.storage.get("clients/" + client.id).projects.length, 1);
+  const after = await h.service.getInquiry(owner, input.id);
+  assert.equal(after.revision, input.revision + 2);
+  const replay = await h.handoff.handoffInquiry(owner, input);
+  assert.equal(replay.revision, after.revision);
+  assert.equal(replay.handoff.projectId, after.handoff.projectId);
+  assert.equal((await h.admin.POST(h.req({ ...input, clientId: other.id }))).status, 409);
+  assert.equal((await h.admin.POST(h.req({ ...input, summary: "Different scope" }))).status, 409);
+  assert.equal(h.storage.get("clients/" + other.id), undefined);
+});
+test("handoff rejects anonymous, client, forged owner, cross-client project, bad origin and invalid input", async () => {
+  const { h, input, client, other } = await reviewedFixture();
+  const otherProject = {
+    id: crypto.randomUUID(),
+    title: "Other project",
+    brief: "private",
+    phase: "Build",
+    created: new Date().toISOString(),
+    updates: [],
+    payments: [],
+  };
+  h.storage.set("clients/" + other.id, { projects: [otherProject] });
+  for (const user of [null, client, { ...owner, email: "attacker@example.com" }]) {
+    h.setUser(user);
+    assert.equal((await h.admin.POST(h.req(input))).status, user ? 403 : 401);
+    assert.equal(
+      (await h.admin.GET(new Request("http://localhost:3217/api/portal/inquiries?handoff=options")))
+        .status,
+      user ? 403 : 401,
+    );
+  }
+  h.setUser(owner);
+  assert.equal(
+    (await h.admin.POST(h.req(input, { origin: "https://attacker.invalid" }))).status,
+    403,
+  );
+  for (const changed of [
+    { clientId: "../../accounts" },
+    { mode: "active" },
+    { confirmed: false },
+    { summary: " " },
+    { summary: "x".repeat(2401) },
+    { title: "x".repeat(121) },
+  ])
+    assert.equal((await h.admin.POST(h.req({ ...input, ...changed }))).status, 400);
+  assert.equal(
+    (await h.admin.POST(h.req({ ...input, clientId: crypto.randomUUID() }))).status,
+    404,
+  );
+  assert.equal(
+    (await h.admin.POST(h.req({ ...input, mode: "existing", projectId: otherProject.id }))).status,
+    404,
+  );
+  assert.equal(h.storage.get("clients/" + client.id), undefined);
+  assert.equal((await h.service.getInquiry(owner, input.id)).handoff, undefined);
+});
+test("handoff requires a saved reviewed brief and rejects stale review revisions", async () => {
+  const { h, input, client } = await reviewedFixture();
+  assert.equal((await h.admin.POST(h.req({ ...input, revision: 1 }))).status, 409);
+  const current = await h.service.updateInquiry(owner, {
+    id: input.id,
+    revision: input.revision,
+    status: "New",
+    markdown: "Changed draft",
+  });
+  assert.equal((await h.admin.POST(h.req({ ...input, revision: current.revision }))).status, 409);
+  assert.equal(h.storage.get("clients/" + client.id), undefined);
+  assert.equal((await h.service.getInquiry(owner, input.id)).handoff, undefined);
+});
+test("existing-project handoff preserves scope, progress, payment and prior operations", async () => {
+  const { h, input, client } = await reviewedFixture();
+  const project = {
+    id: crypto.randomUUID(),
+    title: "Current project",
+    brief: "Agreed scope",
+    phase: "Build",
+    created: "2026-11-01T00:00:00Z",
+    updates: [{ body: "Existing update" }],
+    payments: [{ id: "test-paid", status: "paid", cents: 5000, test: true }],
+  };
+  const before = { projects: [project], operations: ["existing-operation"] };
+  h.storage.set("clients/" + client.id, before);
+  const saved = await h.handoff.handoffInquiry(owner, {
+    ...input,
+    mode: "existing",
+    projectId: project.id,
+  });
+  assert.equal(saved.handoff.projectId, project.id);
+  assert.equal(saved.handoff.title, project.title);
+  assert.equal(saved.handoff.summary, "");
+  assert.deepEqual(h.storage.get("clients/" + client.id), before);
+});
+test("handoff recovers every write boundary, including a lost committed response", async () => {
+  for (const boundary of [
+    "claim",
+    "project-before",
+    "project-after",
+    "complete-before",
+    "complete-after",
+    "index",
+    "complete-index",
+  ]) {
+    const { h, input, client } = await reviewedFixture();
+    const inquiryKey = "inquiries/items/" + input.id;
+    if (boundary === "claim") h.failNextWrite(inquiryKey);
+    if (boundary.startsWith("project"))
+      h.failNextWrite("clients/" + client.id, 0, boundary.endsWith("after"));
+    if (boundary.startsWith("complete")) h.failNextWrite(inquiryKey, 1, boundary.endsWith("after"));
+    if (boundary === "index") h.failNextWrite("inquiries/index");
+    if (boundary === "complete-index") h.failNextWrite("inquiries/index", 1);
+    assert.equal((await h.admin.POST(h.req(input))).status, 503, boundary);
+    const partial = await h.service.getInquiry(owner, input.id);
+    if (partial.handoff?.status === "pending") {
+      await assert.rejects(
+        h.service.updateInquiry(owner, {
+          id: input.id,
+          revision: partial.revision,
+          status: "Reviewed",
+          markdown: "Edit during recovery",
+        }),
+        /pending/,
+      );
+    }
+    const resumed = await h.handoff.handoffInquiry(
+      owner,
+      partial.handoff ? { id: input.id, resume: true } : input,
+    );
+    assert.equal(resumed.handoff.status, "linked", boundary);
+    assert.equal(h.storage.get("clients/" + client.id).projects.length, 1, boundary);
+    assert.equal((await h.service.listInquiries(owner))[0].handoff, "linked", boundary);
+    if (partial.handoff) assert.equal(resumed.handoff.projectId, partial.handoff.projectId);
+  }
+});
+test("later brief edits keep the handed-off source snapshot and do not rewrite the client project", async () => {
+  const { h, input, client } = await reviewedFixture();
+  const linked = await h.handoff.handoffInquiry(owner, input);
+  const later = await h.service.updateInquiry(owner, {
+    id: input.id,
+    revision: linked.revision,
+    status: "Needs clarification",
+    markdown: "Later private notes and open questions",
+  });
+  assert.equal(later.handoff.sourceMarkdown, linked.handoff.sourceMarkdown);
+  assert.notEqual(later.versions.at(-1).markdown, later.handoff.sourceMarkdown);
+  assert.equal(h.storage.get("clients/" + client.id).projects[0].brief, input.summary);
+  const replay = await h.handoff.handoffInquiry(owner, { id: input.id, resume: true });
+  assert.equal(replay.revision, later.revision);
 });

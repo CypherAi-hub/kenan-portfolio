@@ -2,6 +2,7 @@ import { identity, origin } from "@/lib/portal/auth";
 import { readBody } from "@/lib/portal/request";
 import { PortalError, requireValue } from "@/lib/portal/store";
 import { assertOwner } from "@/lib/portal/desk";
+import { handoffInquiry, handoffOptions } from "@/lib/intake/handoff";
 import {
   listInquiries,
   getInquiry,
@@ -30,6 +31,8 @@ export async function GET(request: Request) {
     requireValue(me, "Sign in to continue.", 401);
     assertOwner(me);
     const query = new URL(request.url).searchParams;
+    if (query.get("handoff") === "options")
+      return json(await handoffOptions(me, query.get("client")));
     if (!query.has("id")) return json({ inquiries: await listInquiries(me) });
     const inquiry = await getInquiry(me, query.get("id"));
     if (query.get("download") === "1")
@@ -64,6 +67,7 @@ export async function POST(request: Request) {
       throw new PortalError("Invalid request.");
     }
     requireValue(input && typeof input === "object" && !Array.isArray(input), "Invalid request.");
+    if (input.action === "handoff") return json({ inquiry: await handoffInquiry(me, input) });
     if (input.action === "retry") return json({ inquiry: await retryBrief(me, input.id) });
     requireValue(input.action === "save", "Unknown inquiry action.");
     return json({ inquiry: await updateInquiry(me, input) });

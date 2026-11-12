@@ -26,6 +26,7 @@ const summary = (i: Inquiry): InquirySummary => ({
   idea: String(i.answers.idea).slice(0, 180),
   status: i.status,
   generation: i.generation.status,
+  handoff: i.handoff?.status,
 });
 async function index(inquiry: Inquiry) {
   await editPrivate("inquiries/index", empty, (d) => {
@@ -157,6 +158,11 @@ async function runGeneration(id: string, retry = false) {
     (d) => {
       const i = d.inquiry;
       requireValue(i && i.consent.ai, "AI review was not authorized for this inquiry.", 409);
+      requireValue(
+        !i.handoff,
+        "This brief has been handed off. Make any further changes manually.",
+        409,
+      );
       if (i.generation.status === "generating" && (i.generation.started || 0) > Date.now() - 90000)
         return false;
       if (!retry && ["ready", "failed"].includes(i.generation.status)) return false;
@@ -227,6 +233,11 @@ export async function updateInquiry(me: Account, input: Record<string, unknown>)
       const i = d.inquiry;
       requireValue(i, "Inquiry not found.", 404);
       requireValue(
+        i.handoff?.status !== "pending",
+        "Finish the pending project handoff before editing this brief.",
+        409,
+      );
+      requireValue(
         i.revision === input.revision && i.generation.status !== "generating",
         "This inquiry changed. Refresh before saving; your unsaved text is still here.",
         409,
@@ -249,3 +260,5 @@ export async function updateInquiry(me: Account, input: Record<string, unknown>)
 export function exportInquiry(inquiry: Inquiry) {
   return `# KJL Designs — inquiry ${inquiry.id}\n\nSubmitted: ${inquiry.created}\nReview status: ${inquiry.status}\nRevision: ${inquiry.revision}\n\n${inquiry.versions.at(-1)?.markdown || "# Source answers — no AI brief generated"}\n\n${sourceMarkdown(inquiry)}\n`;
 }
+// Handoff shares the same conditional-write record and derived inbox index.
+export { key as inquiryKey, index as indexInquiry };

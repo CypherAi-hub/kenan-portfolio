@@ -42,8 +42,18 @@ async function change<T, R>(path: string, initial: () => T, apply: (value: T) =>
     } catch (error) {
       const conflict =
         error instanceof BlobPreconditionFailedError ||
+        (error instanceof Error &&
+          /conditional request cannot succeed due to a conflicting operation against this resource/i.test(
+            error.message,
+          )) ||
         (!etag && error instanceof Error && /already exists|overwrite/i.test(error.message));
       if (!conflict) throw error;
+      // Blob can reject simultaneous conditional writes while a prior write is still settling.
+      // Reload and reapply against its current ETag after a short bounded backoff.
+      if (retry < 5)
+        await new Promise((resolve) =>
+          setTimeout(resolve, 30 * (retry + 1) + Math.floor(Math.random() * 40)),
+        );
     }
   }
   throw new PortalError("Someone else just updated this workspace. Please try again.", 409);

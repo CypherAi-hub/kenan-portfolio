@@ -9,6 +9,7 @@ import {
   type InquiryStatus,
 } from "@/lib/intake/types";
 import { answerText, sections } from "@/lib/intake/questions";
+import InquiryHandoff from "./InquiryHandoff";
 const date = (value: string) =>
   new Date(value).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 async function request(path = "", body?: unknown) {
@@ -48,6 +49,8 @@ export default function InquiryInbox() {
     [notice, setNotice] = useState("");
   const requestId = useRef(0),
     detailHeading = useRef<HTMLHeadingElement>(null);
+  const [handoffDirty, setHandoffDirty] = useState(false);
+  const [openGeneration, setOpenGeneration] = useState(0);
   const dirty =
     !!selected &&
     (markdown !== (selected.versions.at(-1)?.markdown || manualBrief(selected)) ||
@@ -61,20 +64,20 @@ export default function InquiryInbox() {
       .finally(() => setLoading(false));
   }, [load]);
   useEffect(() => {
-    if (!dirty) return;
+    if (!dirty && !handoffDirty) return;
     const warn = (e: BeforeUnloadEvent) => {
       e.preventDefault();
     };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
+  }, [dirty, handoffDirty]);
   function populate(inquiry: Inquiry) {
     setSelected(inquiry);
     setMarkdown(inquiry.versions.at(-1)?.markdown || manualBrief(inquiry));
     setStatus(inquiry.status);
   }
   async function open(id: string) {
-    if (dirty && !window.confirm("Discard your unsaved brief changes?")) return;
+    if ((dirty || handoffDirty) && !window.confirm("Discard your unsaved inquiry changes?")) return;
     const current = ++requestId.current;
     setBusy(true);
     setError("");
@@ -83,6 +86,8 @@ export default function InquiryInbox() {
       const result = await request("?id=" + encodeURIComponent(id));
       if (current === requestId.current) {
         populate(result.inquiry);
+        setHandoffDirty(false);
+        setOpenGeneration((value) => value + 1);
         requestAnimationFrame(() => detailHeading.current?.focus());
       }
     } catch (e) {
@@ -216,13 +221,17 @@ export default function InquiryInbox() {
                 <span>{i.kind}</span>
                 <p>{i.idea}</p>
                 <small>
-                  {i.generation === "ready"
-                    ? "Draft ready"
-                    : i.generation === "not-requested"
-                      ? "Manual review"
-                      : i.generation === "failed"
-                        ? "AI needs attention"
-                        : "Brief pending"}
+                  {i.handoff === "linked"
+                    ? "Connected to project"
+                    : i.handoff === "pending"
+                      ? "Handoff needs completion"
+                      : i.generation === "ready"
+                        ? "Draft ready"
+                        : i.generation === "not-requested"
+                          ? "Manual review"
+                          : i.generation === "failed"
+                            ? "AI needs attention"
+                            : "Brief pending"}
                 </small>
               </button>
             ))
@@ -262,7 +271,7 @@ export default function InquiryInbox() {
                   Review status
                   <select
                     value={status}
-                    disabled={busy}
+                    disabled={busy || selected.handoff?.status === "pending"}
                     onChange={(e) => setStatus(e.target.value as InquiryStatus)}
                   >
                     {inquiryStatuses.map((s) => (
@@ -334,20 +343,30 @@ export default function InquiryInbox() {
                 value={markdown}
                 maxLength={80000}
                 onChange={(e) => setMarkdown(e.target.value)}
-                disabled={busy}
+                disabled={busy || selected.handoff?.status === "pending"}
                 spellCheck={false}
               />
               <div className="inbox-actions">
                 <button
                   className="studio-button"
-                  disabled={busy || !markdown.trim() || selected.generation.status === "generating"}
+                  disabled={
+                    busy ||
+                    !markdown.trim() ||
+                    selected.generation.status === "generating" ||
+                    selected.handoff?.status === "pending"
+                  }
                   onClick={() => void act("save")}
                 >
                   <Save size={16} /> Save brief
                 </button>
                 <button
                   className="inbox-secondary"
-                  disabled={busy || !markdown.trim() || selected.generation.status === "generating"}
+                  disabled={
+                    busy ||
+                    !markdown.trim() ||
+                    selected.generation.status === "generating" ||
+                    selected.handoff?.status === "pending"
+                  }
                   onClick={() => void act("save", "Reviewed")}
                 >
                   Save & mark reviewed
@@ -362,15 +381,30 @@ export default function InquiryInbox() {
               <p className="intake-hint">
                 Exports contain the last saved version. Save your changes first.
               </p>
-              {selected.consent.ai && !selected.versions.some((v) => v.author === "Owner") && (
-                <button
-                  className="intake-text-button"
-                  disabled={busy}
-                  onClick={() => void act("retry")}
-                >
-                  {busy ? "Working…" : "Retry AI brief generation"}
-                </button>
-              )}
+              {selected.consent.ai &&
+                !selected.handoff &&
+                !selected.versions.some((v) => v.author === "Owner") && (
+                  <button
+                    className="intake-text-button"
+                    disabled={busy}
+                    onClick={() => void act("retry")}
+                  >
+                    {busy ? "Working…" : "Retry AI brief generation"}
+                  </button>
+                )}
+              <InquiryHandoff
+                key={selected.id + ":" + openGeneration}
+                inquiry={selected}
+                busy={busy}
+                unsavedBrief={dirty}
+                setBusy={setBusy}
+                onDirty={setHandoffDirty}
+                onChange={async (inquiry) => {
+                  populate(inquiry);
+                  await load();
+                  window.dispatchEvent(new Event("kjl-workspace-update"));
+                }}
+              />
               <details className="inbox-history">
                 <summary>Saved versions ({selected.versions.length})</summary>
                 {selected.versions.map((v, i) => (

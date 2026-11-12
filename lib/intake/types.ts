@@ -10,6 +10,26 @@ export const inquiryStatuses = [
 ] as const;
 export type InquiryStatus = (typeof inquiryStatuses)[number];
 export type BriefVersion = { at: string; author: "AI draft" | "Owner"; markdown: string };
+export type InquiryHandoff = {
+  status: "pending" | "linked";
+  clientId: string;
+  clientName: string;
+  clientEmail: string;
+  projectId: string;
+  mode: "new" | "existing";
+  title: string;
+  summary: string;
+  requestedAt: string;
+  requestedBy: string;
+  linkedAt?: string;
+  sourceRevision: number;
+  sourceMarkdown: string;
+  requestHash: string;
+};
+export type HandoffOptions = {
+  clients: { id: string; name: string; email: string }[];
+  projects: { id: string; title: string; phase: string }[];
+};
 export type Inquiry = {
   id: string;
   created: string;
@@ -26,6 +46,7 @@ export type Inquiry = {
     error?: string;
   };
   versions: BriefVersion[];
+  handoff?: InquiryHandoff;
 };
 export type InquirySummary = Pick<Inquiry, "id" | "created" | "status" | "revision"> & {
   name: string;
@@ -33,4 +54,5 @@ export type InquirySummary = Pick<Inquiry, "id" | "created" | "status" | "revisi
   kind: string;
   idea: string;
   generation: Inquiry["generation"]["status"];
+  handoff?: InquiryHandoff["status"];
 };
