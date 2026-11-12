@@ -1,12 +1,13 @@
 import { directory, workspace, readPrivate, editPrivate } from "./store";
 import { appointmentView, assertOwner, desk } from "./desk";
+import { listInquiries } from "../intake/service";
 import type { Account } from "./types";
 export type StudioNotification = {
   id: string;
   at: string;
   title: string;
   body: string;
-  kind: "project" | "payment" | "appointment" | "delivery";
+  kind: "project" | "payment" | "appointment" | "delivery" | "inquiry";
   client?: string;
 };
 const empty = () => ({ readAt: "" });
@@ -87,6 +88,14 @@ export async function notifications(me: Account) {
       });
   }
   if (me.role === "owner") {
+    for (const inquiry of await listInquiries(me))
+      items.push({
+        id: "inquiry-" + inquiry.id,
+        at: inquiry.created,
+        title: "New project inquiry",
+        body: inquiry.name + " · " + inquiry.kind + " — open Project inquiries & briefs to review.",
+        kind: "inquiry",
+      });
     for (const p of (await desk()).proposals.filter((p) => p.owner === me.id && p.delivery))
       items.push({
         id: "delivery-" + p.id + "-" + p.delivery!.status,

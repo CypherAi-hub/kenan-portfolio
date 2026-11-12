@@ -4,7 +4,7 @@ Personal portfolio for website, app, and digital product work. The public site i
 
 ## Develop and verify
 
-Run `npm ci`, then `npm run dev`. Run `npm run lint`, `npm run test:pricing`, and `npm run build` before deploying. `npm run start` serves the production build. Uses Next.js 15, React 19, TypeScript, and Tailwind CSS 4.
+Run `npm ci`, then `npm run dev`. Run `npm run lint`, `npm run test:unit`, and `npm run build` before deploying. `npm run start` serves the production build. Uses Next.js 15, React 19, TypeScript, and Tailwind CSS 4.
 
 ## Content
 
@@ -12,7 +12,10 @@ Run `npm ci`, then `npm run dev`. Run `npm run lint`, `npm run test:pricing`, an
 - `data/selected-work.ts`: current project descriptions, screenshots, and verified public links.
 - `components/studio` and `app/studio.css`: shared visual design.
 - `data/pricing.ts`: package budgets, optional extras, and the estimate calculation.
-- `/pricing`: package comparison, ongoing support, and interactive project brief builder. Email opens the visitor’s email app; the website does not submit messages or collect payments.
+- `/pricing`: package comparison, ongoing support, and planning estimates. The email option opens the visitor’s email app. Detailed discovery submits directly through `/start-project`.
+- `/start-project`: adaptive questionnaire, opt-in browser drafts, AI clarification, review and durable inquiry submission.
+- `/studio/inquiries`: owner-only original answers, brief editing, review status, version history and Markdown export.
+- `/studio` and `/portal`: separate owner/client workspaces with passkeys, projects, updates, appointments and Stripe-hosted checkout.
 - `lib/booking.ts`: Google Calendar appointment URL.
 - `/book`: shareable entry to booking. The provider handles availability, invitations, cancellations, and video links.
 - `data/project-library.ts`: 30 project entries with status, categories, and public links.
@@ -24,4 +27,8 @@ Only use real project screenshots, distinguish development previews from release
 
 ## Deploy
 
-Reuse the linked Vercel project `kenan-portfolio`. Do not create a duplicate project or alias. The site has no new server secrets or form backend; appointment booking is provided by Google Calendar. `vercel deploy --prod` publishes the current reviewed source.
+Reuse the linked Vercel project `kenan-portfolio`. Do not create a duplicate project or alias. The client studio uses private Vercel Blob storage, passkey authentication, Stripe, and the existing OpenAI configuration. Project discovery reuses those services and adds no required secret. Appointment booking is provided by Google Calendar. `vercel deploy --prod` publishes the current reviewed source.
+
+## Project discovery
+
+See `docs/PROJECT_DISCOVERY.md` for routes, storage, limits, consent, failure recovery and isolated provider/browser verification.

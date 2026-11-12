@@ -14,13 +14,32 @@ export default function Privacy() {
         className="studio-shell"
         style={{ maxWidth: 850, paddingTop: 150, paddingBottom: 100, lineHeight: 1.8 }}
       >
-        <p>Updated November 7, 2026</p>
+        <p>Updated November 12, 2026</p>
         <h1 style={{ fontSize: "clamp(2.6rem, 7vw, 4.5rem)", lineHeight: 1.1, marginBottom: 32 }}>
           Privacy at KJL Designs
         </h1>
         <p>
           KJL Designs is Kenan Larry’s design and development studio. This notice explains data used
           by this portfolio and its invitation-only client workspace.
+        </p>
+        <h2>Project discovery</h2>
+        <p>
+          The project discovery form collects the contact details and project answers you choose to
+          provide. Submitted inquiries, original answers, follow-ups and brief versions are stored
+          privately with Vercel Blob and are accessible to the studio owner. An optional draft is
+          saved only in your browser for up to 30 days and can be cleared from the form. Discovery
+          pages do not load the portfolio analytics components.
+        </p>
+        <p>
+          If you enable AI review, your project answers are sent to OpenAI to suggest follow-up
+          questions and prepare a draft brief. Name and email fields are excluded from those
+          requests; avoid placing contact information, credentials or confidential records in
+          free-text answers. Requests use store:false. You can submit without AI. Briefs require
+          owner review and do not confirm a price, booking, or project start. We retain submitted
+          inquiries for project discussions and delivery; contact Kenan below to request access,
+          correction or deletion. Daily abuse controls store a keyed digest of the connection
+          address, rather than the raw address. Share reference links only when you have permission
+          to do so.
         </p>
         <h2>Client workspace</h2>
         <p>

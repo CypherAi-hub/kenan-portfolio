@@ -3,10 +3,11 @@ import Link from "next/link";
 import BrandLogo from "./BrandLogo";
 import { useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
+import styles from "./StudioHeader.module.css";
 export default function StudioHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="studio-header">
+    <header className={`studio-header ${styles.header}`}>
       <div className="studio-shell nav-row">
         <Link href="/" className="studio-brand" aria-label="KJL Designs home">
           <BrandLogo />
@@ -19,8 +20,8 @@ export default function StudioHeader() {
           <Link href="/#about">About</Link>
           <Link href="/portal/login">Client login</Link>
         </nav>
-        <Link className="studio-button button-small" href="/#book">
-          Book with me <ArrowUpRight size={17} aria-hidden="true" />
+        <Link className="studio-button button-small" href="/start-project">
+          Start a project <ArrowUpRight size={17} aria-hidden="true" />
         </Link>
         <button
           className="menu-toggle"
@@ -45,6 +46,7 @@ export default function StudioHeader() {
             ["Pricing", "/pricing"],
             ["About", "/#about"],
             ["Client login", "/portal/login"],
+            ["Start a project", "/start-project"],
             ["Book with me", "/#book"],
           ].map(([name, href]) => (
             <Link key={href} href={href} onClick={() => setOpen(false)}>

@@ -1,6 +1,7 @@
 import { ArrowUpRight, Clock3, Video, CalendarDays, Check, Mail } from "lucide-react";
 import { profile } from "@/lib/data";
 import { bookingUrl } from "@/lib/booking";
+import Link from "next/link";
 export default function BookingSection({ standalone = false }: { standalone?: boolean }) {
   const Heading = standalone ? "h1" : "h2";
   const CardHeading = standalone ? "h2" : "h3";
@@ -74,12 +75,7 @@ export default function BookingSection({ standalone = false }: { standalone?: bo
           <div className="booking-alternative">
             <Mail size={16} aria-hidden="true" />
             <span>
-              Prefer to write it out?{" "}
-              <a
-                href={`mailto:${profile.email}?subject=${encodeURIComponent("Website / app project inquiry")}`}
-              >
-                Email me your idea.
-              </a>
+              Prefer to write it out? <Link href="/start-project">Tell me about your project.</Link>
             </span>
           </div>
         </div>

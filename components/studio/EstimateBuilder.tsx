@@ -187,6 +187,13 @@ export default function EstimateBuilder() {
             larger scope may fall outside this range. Hosting, domains, subscriptions, and provider
             usage are separate.
           </p>
+          <Link className="studio-button" href="/start-project">
+            Start detailed project discovery <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
+          <p className="estimate-mail-note">
+            Share requirements, answer relevant follow-ups, and send your inquiry directly to Kenan.
+            Your estimate remains a planning range.
+          </p>
           <a
             className="studio-button"
             href={`mailto:${profile.email}?subject=${encodeURIComponent(`KJL Designs — Project inquiry — ${estimate.base.name}`)}&body=${encodeURIComponent(brief)}`}

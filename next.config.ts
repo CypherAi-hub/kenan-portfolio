@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
       { key: "X-Content-Type-Options", value: "nosniff" },
     ];
     return [
+      { source: "/start-project", headers: privacy },
       { source: "/portal/:path*", headers: privacy },
       { source: "/studio/:path*", headers: privacy },
       { source: "/api/:path*", headers: privacy },

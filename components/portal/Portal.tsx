@@ -15,6 +15,7 @@ import { phases } from "@/lib/portal/types";
 import StudioAssistant, { Appointments } from "./StudioAssistant";
 import NotificationCenter from "./NotificationCenter";
 import ProjectConnections from "./ProjectConnections";
+import Link from "next/link";
 const dollars = (cents: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 const date = (value: string) =>
@@ -469,6 +470,11 @@ export default function Portal({ audience }: { audience: Audience }) {
         </button>
       </div>
       <NotificationCenter key={view.me.id} />
+      {owner && (
+        <Link className="portal-quiet" href="/studio/inquiries">
+          <FolderOpen size={17} /> Project inquiries & briefs <ArrowRight size={16} />
+        </Link>
+      )}
       {owner && <ProjectConnections />}
       <Appointments
         owner={owner}

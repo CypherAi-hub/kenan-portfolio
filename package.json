@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test:pricing": "node --experimental-strip-types --test tests/pricing.test.mjs"
+    "test:pricing": "node --experimental-strip-types --test tests/pricing.test.mjs",
+    "test:intake": "node --experimental-vm-modules --test tests/intake.test.mjs",
+    "test:unit": "node --experimental-vm-modules --experimental-strip-types --test tests/*.test.mjs",
+    "test:intake:live": "node tests/intake-live.mjs"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^14.0.0",
@@ -30,6 +33,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.9.0",
     "@types/react": "^19.0.0",
