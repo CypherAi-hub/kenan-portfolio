@@ -8,6 +8,7 @@ import path from "node:path";
 import { put, list, del } from "@vercel/blob";
 import { chromium, expect } from "@playwright/test";
 import { commercialFixture } from "./helpers/delivery-harness.mjs";
+import { milestoneWalkthrough } from "./helpers/milestone-walkthrough.mjs";
 
 assert.equal(process.env.RUN_DELIVERY_LIVE, "1", "Explicitly enable isolated delivery QA.");
 assert(process.env.BLOB_READ_WRITE_TOKEN, "Private test storage access is required.");
@@ -73,7 +74,8 @@ gate.ready = false;
 gate.reasons = ["Provider-confirmed initial payment"];
 const checks = [],
   issues = [],
-  consoleErrors = [];
+  consoleErrors = [],
+  serverDiagnostics = [];
 const check = (message) => {
   checks.push(message);
   console.log(message);
@@ -175,7 +177,10 @@ export async function GET(request: Request) {
     ["node_modules/next/dist/bin/next", "dev", "-p", "3218", "-H", "127.0.0.1"],
     { env, stdio: ["ignore", "ignore", "pipe"] },
   );
-  server.stderr.on("data", () => {});
+  server.stderr.on("data", (chunk) => {
+    for (const line of String(chunk).split("\n"))
+      if (line.includes("Delivery service unavailable:")) serverDiagnostics.push(line);
+  });
   for (let attempt = 0; attempt < 100; attempt++) {
     try {
       if ((await fetch(origin + "/portal/login")).ok) break;
@@ -319,6 +324,22 @@ export async function GET(request: Request) {
   check(
     "Owner browser: required reviews and access verification complete; approved start date and explicit start produce the same client status.",
   );
+  if (process.env.RUN_MILESTONE_LIVE === "1")
+    await milestoneWalkthrough({
+      ownerPage,
+      clientPage,
+      owner,
+      client,
+      other,
+      project,
+      origin,
+      view,
+      action,
+      cookie,
+      notice,
+      check,
+      evidence,
+    });
   gate.ready = false;
   gate.reasons = ["Provider-confirmed initial payment"];
   await writeFile(fixtureFile, JSON.stringify(commercial));
@@ -343,6 +364,7 @@ export async function GET(request: Request) {
     "No browser runtime errors; no Stripe, e-signature, OpenAI or outbound notification calls were configured.",
   );
 } catch (error) {
+  for (const line of serverDiagnostics) console.error(line);
   issues.push(error instanceof Error ? error.message : "Delivery QA failed.");
   process.exitCode = 1;
   if (browser && evidence)

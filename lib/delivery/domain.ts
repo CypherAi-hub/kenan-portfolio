@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { PortalError, requireValue } from "../portal/store";
 import type { Member, Project } from "../portal/types";
 import { checklist } from "./templates";
+import { milestoneAction, milestoneActions, mutateMilestone, type Artifact } from "./milestones";
 import {
   projectKinds,
   type CommercialProject,
@@ -59,7 +60,14 @@ export function status(
 ): ProjectStatus {
   const required = d?.tasks.filter((t) => t.required) || [],
     accepted = required.filter((t) => t.status === "accepted").length;
-  const base = { accepted, required: required.length, readyToSchedule: false };
+  const deliveryStage: ProjectStatus["deliveryStage"] = d?.started
+    ? "In progress"
+    : d?.schedule
+      ? "Scheduled"
+      : d?.source
+        ? "Onboarding"
+        : "Not started";
+  const base = { accepted, required: required.length, readyToSchedule: false, deliveryStage };
   if (!d)
     return {
       ...base,
@@ -185,7 +193,7 @@ export function status(
     ...base,
     readyToSchedule: true,
     stage: "In progress",
-    action: {
+    action: milestoneAction(d) || {
       title: "Development is underway",
       detail: "Kenan will share the next deliverable through your project workspace.",
       responsible: "owner",
@@ -209,6 +217,7 @@ export function command(
   project: Project,
   commercial: CommercialProject,
   input: Record<string, unknown>,
+  context: { clientId?: string; artifact?: Artifact } = {},
 ) {
   const admin = owner(me),
     operation = input.operation;
@@ -301,6 +310,20 @@ export function command(
     initialize();
   } else if (input.action === "refresh") {
     initialize();
+  } else if (input.action === "designate-approver") {
+    requireValue(admin && d, "Only Kenan can designate a project approver.", 403);
+    requireValue(
+      input.approver === "" || (context.clientId && input.approver === context.clientId),
+      "Select the existing client account; a contact name does not grant access.",
+    );
+    if (input.approver) d.approver = String(input.approver);
+    else delete d.approver;
+    d.revision++;
+    audit(
+      input.approver
+        ? "Client account designated as milestone approver"
+        : "Milestone approval authority revoked",
+    );
   } else {
     requireValue(d?.source, "The onboarding checklist is not open yet.", 409);
     requireValue(
@@ -329,7 +352,23 @@ export function command(
         "The accepted scope changed. Kenan must review it before continuing.",
         409,
       );
-      if (input.action === "save-task" || input.action === "submit-task") {
+      if (milestoneActions.includes(String(input.action))) {
+        mutateMilestone(d, me, input, { ...context, at, commercial, text: field, audit });
+        state.outbox ||= [];
+        requireValue(
+          state.outbox.length < 5000,
+          "Delivery event outbox needs archival review.",
+          409,
+        );
+        state.outbox.push({
+          id: operation,
+          project: project.id,
+          type: String(input.action),
+          actor: me.id,
+          at,
+          status: "held",
+        });
+      } else if (input.action === "save-task" || input.action === "submit-task") {
         const t = d.tasks.find((t) => t.id === input.task);
         requireValue(t, "Onboarding item not found.", 404);
         requireValue(

@@ -91,7 +91,8 @@ export async function deliveryHarness() {
     [client.id, commercialFixture(client.id, project.id)],
     [other.id, commercialFixture(other.id, otherProject.id)],
   ]);
-  const calls = [];
+  const calls = [],
+    blobs = new Map();
   let current = owner,
     sourceStatus = 200,
     lostResponse = false;
@@ -114,6 +115,10 @@ export async function deliveryHarness() {
     Response,
     AbortSignal,
     TextDecoder,
+    TextEncoder,
+    File,
+    FormData,
+    structuredClone,
     console,
     fetch: async (url, options) => {
       calls.push({ url: String(url), options });
@@ -124,9 +129,24 @@ export async function deliveryHarness() {
   });
   const mocks = {
     "node:crypto": { createHash: crypto.createHash },
+    "@vercel/blob": {
+      put: async (key, bytes, options) => {
+        assertPrivate(options);
+        if (blobs.has(key)) throw new Error("already exists");
+        blobs.set(key, Buffer.from(bytes));
+        return { pathname: key };
+      },
+      get: async (key, options) => {
+        assertPrivate(options);
+        return blobs.has(key)
+          ? { statusCode: 200, stream: new Response(blobs.get(key)).body }
+          : null;
+      },
+    },
     "lib/portal/store.ts": {
       PortalError,
       requireValue,
+      namespace: () => "test-namespace",
       directory: async () => structuredClone(storage.get("accounts")),
       workspace: async (id) => structuredClone(storage.get("clients/" + id) || { projects: [] }),
       readPrivate: async (key, initial) => structuredClone(storage.get(key) || initial()),
@@ -178,7 +198,7 @@ export async function deliveryHarness() {
       cache.set(file, loaded);
       await loaded.link((specifier) =>
         load(
-          specifier.startsWith("node:")
+          specifier.startsWith("node:") || mocks[specifier]
             ? specifier
             : (specifier.startsWith("@/")
                 ? specifier.slice(2)
@@ -234,6 +254,8 @@ export async function deliveryHarness() {
     sources,
     calls,
     routes,
+    api,
+    blobs,
     domain,
     commercial,
     action,
@@ -256,4 +278,8 @@ export async function deliveryHarness() {
       return storage.get(key);
     },
   };
+}
+function assertPrivate(options) {
+  if (options.access !== "private" || options.allowOverwrite === true)
+    throw new Error("Artifact must be private and immutable");
 }

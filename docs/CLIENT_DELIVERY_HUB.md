@@ -1,5 +1,7 @@
 # Client Delivery Hub
 
+This document describes the first onboarding increment. See [Deliverable reviews](DELIVERABLE_REVIEWS.md) for the subsequent versioned-file and approval extension.
+
 First increment, 2026-11-12. Built on discovery handoff commit `e7326192393a005846b6007e1c9fb4a230f12eae`. This branch is not deployed and does not include the separately owned contracts or software-care branches.
 
 ## Working flow

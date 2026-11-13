@@ -55,7 +55,24 @@ export async function deliveryView(me: Account, cookie: string | null): Promise<
                 ? { latestUpdate: { at: latest.at, body: latest.body, author: latest.author } }
                 : {}),
             },
-            delivery,
+            delivery:
+              me.role === "client" && delivery
+                ? {
+                    ...delivery,
+                    milestones: delivery.milestones?.map((m) => ({
+                      ...m,
+                      versions: m.versions.map((v) => ({
+                        ...v,
+                        artifact: { ...v.artifact, key: "" },
+                      })),
+                      revisions: m.revisions.map((r) => {
+                        const visible = { ...r };
+                        delete visible.changeDraft;
+                        return visible;
+                      }),
+                    })),
+                  }
+                : delivery,
             commercial,
             status: status(delivery, commercial, me.role),
             events: state.events
@@ -75,18 +92,21 @@ export async function deliveryAction(
   cookie: string | null,
   input: Record<string, unknown>,
 ) {
-  const roster = await clients(me);
-  const client = roster.find((c) => c.id === input.client);
-  requireValue(client, "Client not found.", 404);
-  const project = (await workspace(client.id)).projects.find((p) => p.id === input.project);
-  requireValue(project, "Project not found.", 404);
+  const { client, project } = await authorizeProject(me, input);
   const commercial = commercialProject(
     await readCommercial(client.id, cookie),
     client.id,
     project.id,
   );
   await editPrivate(key(client.id), emptyDelivery, (state) =>
-    command(state, publicMember(me), project, commercial, input),
+    command(state, publicMember(me), project, commercial, input, { clientId: client.id }),
   );
   return { ok: true };
+}
+export async function authorizeProject(me: Account, input: Record<string, unknown>) {
+  const client = (await clients(me)).find((c) => c.id === input.client);
+  requireValue(client, "Client not found.", 404);
+  const project = (await workspace(client.id)).projects.find((p) => p.id === input.project);
+  requireValue(project, "Project not found.", 404);
+  return { client, project, key: key(client.id) };
 }

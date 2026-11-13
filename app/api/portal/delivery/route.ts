@@ -10,8 +10,13 @@ const json = (value: unknown, status = 200) =>
     status,
     headers: { "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" },
   });
-const failure = (error: unknown) =>
-  json(
+const failure = (error: unknown) => {
+  if (!(error instanceof PortalError))
+    console.error(
+      "Delivery service unavailable:",
+      error instanceof Error ? error.constructor.name : "Unknown failure",
+    );
+  return json(
     {
       error:
         error instanceof PortalError
@@ -20,6 +25,7 @@ const failure = (error: unknown) =>
     },
     error instanceof PortalError ? error.status : 503,
   );
+};
 export async function GET(request: Request) {
   try {
     const me = await identity();

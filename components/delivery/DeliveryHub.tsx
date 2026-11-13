@@ -18,22 +18,51 @@ import {
   type OnboardingTask,
 } from "@/lib/delivery/types";
 import styles from "./delivery.module.css";
+import Milestones from "./Milestones";
 
-type Run = (input: Record<string, unknown>, success: string) => Promise<boolean>;
-async function api(body?: unknown): Promise<DeliveryView> {
-  const response = await fetch(
-    "/api/portal/delivery",
-    body
-      ? {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify(body),
-        }
-      : { cache: "no-store" },
+export type Run = (
+  input: Record<string, unknown>,
+  success: string,
+  file?: File,
+) => Promise<boolean>;
+async function api(body?: unknown, file?: File): Promise<DeliveryView> {
+  const form = file ? new FormData() : undefined;
+  if (form && file) {
+    form.set("input", JSON.stringify(body));
+    form.set("file", file);
+  }
+  // Retry the same operation identifier and bytes after temporary network/service failures.
+  // The server's receipt makes this safe even if the first response was lost after commit.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let response: Response;
+    try {
+      response = await fetch(
+        file ? "/api/portal/delivery/artifact" : "/api/portal/delivery",
+        body
+          ? {
+              method: "POST",
+              ...(form ? {} : { headers: { "content-type": "application/json" } }),
+              body: form || JSON.stringify(body),
+            }
+          : { cache: "no-store" },
+      );
+    } catch (error) {
+      if (attempt === 2) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+      continue;
+    }
+    if ([502, 503, 504].includes(response.status) && attempt < 2) {
+      await response.body?.cancel();
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
+      continue;
+    }
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || "Unable to open the delivery workspace.");
+    return result;
+  }
+  throw new Error(
+    "The delivery service is temporarily unavailable. Keep your unsaved work and retry.",
   );
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.error || "Unable to open the delivery workspace.");
-  return result;
 }
 const date = (value: string) =>
   new Date(value).toLocaleString("en-US", {
@@ -242,10 +271,11 @@ function ProjectPane({
   const mine = item.status.action.responsible === (admin ? "owner" : "client");
   const enabled =
     commercial.ready && d?.source?.fingerprint === commercial.fingerprint && !d?.started;
-  const scoped: Run = (input, message) =>
+  const scoped: Run = (input, message, file) =>
     run(
       { client: item.client.id, project: item.project.id, revision: d?.revision || 0, ...input },
       message,
+      file,
     );
   return (
     <article className={styles.project} aria-busy={busy}>
@@ -254,7 +284,11 @@ function ProjectPane({
           <p className={styles.eyebrow}>{item.client.name}</p>
           <h2>{item.project.title}</h2>
         </div>
-        <span className={styles.stage}>{item.status.stage}</span>
+        <span className={styles.stage}>
+          {["Commercial review", "Scope review"].includes(item.status.stage)
+            ? `${item.status.deliveryStage} · ${item.status.stage}`
+            : item.status.stage}
+        </span>
       </div>
       {commercial.available && commercial.sandbox && (
         <p className={styles.sandbox}>Sandbox commercial records · test project workflow</p>
@@ -267,6 +301,12 @@ function ProjectPane({
         </p>
         <h3>{item.status.action.title}</h3>
         <p>{item.status.action.detail}</p>
+        {item.status.action.milestone && (
+          <a className={styles.textLink} href="#milestones">
+            Open milestone review <ArrowRight size={15} />
+          </a>
+        )}
+        {item.status.action.due && <p>Milestone due {item.status.action.due}</p>}
         <div className={styles.actionFooter}>
           <span>
             <Clock3 size={15} />
@@ -408,6 +448,16 @@ function ProjectPane({
             </button>
           </section>
         )}
+      {d?.started && (
+        <Milestones
+          item={item}
+          admin={admin}
+          busy={busy}
+          run={scoped}
+          dirty={dirty}
+          canLeave={canLeave}
+        />
+      )}
       {!!d?.tasks.length && (
         <section className={styles.checklist}>
           <div className={styles.sectionHeading}>
@@ -505,6 +555,16 @@ function ProjectPane({
           Development started {date(d.started.at)} Central.
         </p>
       )}
+      {!d?.started && (
+        <Milestones
+          item={item}
+          admin={admin}
+          busy={busy}
+          run={scoped}
+          dirty={dirty}
+          canLeave={canLeave}
+        />
+      )}
       <div className={styles.links}>
         <Link className={styles.textLink} href={admin ? "/studio" : "/portal"}>
           Project messages, reviews & payments
@@ -572,12 +632,12 @@ export default function DeliveryHub() {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
   const canLeave = () => !dirty || window.confirm("Discard your unsaved onboarding changes?");
-  const run: Run = async (input, message) => {
+  const run: Run = async (input, message, file) => {
     setBusy(true);
     setError("");
     setNotice("");
     try {
-      await api({ ...input, operation: crypto.randomUUID() });
+      await api({ ...input, operation: crypto.randomUUID() }, file);
       setDirty(false);
       await load(false);
       setNotice(message);
@@ -688,7 +748,7 @@ export default function DeliveryHub() {
                   {
                     sorted.filter(
                       (p) =>
-                        p.status.action.responsible === "owner" && p.status.stage !== "In progress",
+                        p.status.action.responsible === "owner" && p.status.action.priority < 5,
                     ).length
                   }
                 </span>
@@ -699,7 +759,7 @@ export default function DeliveryHub() {
                 <p>Awaiting client</p>
               </div>
               <div>
-                <span>{sorted.filter((p) => p.status.stage === "In progress").length}</span>
+                <span>{sorted.filter((p) => p.status.deliveryStage === "In progress").length}</span>
                 <p>In development</p>
               </div>
               <div>

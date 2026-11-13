@@ -1,4 +1,5 @@
 import type { Member, Project } from "../portal/types";
+import type { Milestone } from "./milestones";
 
 export const projectKinds = [
   "Business website",
@@ -34,6 +35,8 @@ export type DeliveryEvent = {
   task?: string;
 };
 export type DeliveryProject = {
+  approver?: string;
+  milestones?: Milestone[];
   project: string;
   revision: number;
   kind: ProjectKind;
@@ -54,6 +57,14 @@ export type DeliveryProject = {
   started?: { actor: string; at: string };
 };
 export type DeliveryState = {
+  outbox?: {
+    id: string;
+    project: string;
+    type: string;
+    actor: string;
+    at: string;
+    status: "held";
+  }[];
   projects: DeliveryProject[];
   events: DeliveryEvent[];
   operations: { id: string; digest: string }[];
@@ -73,6 +84,8 @@ export type CommercialProject = {
   invoices: { id: string; label: string; status: string; due?: number }[];
 };
 export type NextAction = {
+  milestone?: string;
+  due?: string;
   title: string;
   detail: string;
   responsible: Responsibility;
@@ -80,6 +93,7 @@ export type NextAction = {
   priority: number;
 };
 export type ProjectStatus = {
+  deliveryStage: "Not started" | "Onboarding" | "Scheduled" | "In progress";
   stage:
     | "Setup pending"
     | "Commercial review"
